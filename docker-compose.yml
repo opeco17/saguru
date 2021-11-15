@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  database:
+    build: ./database
+    ports:
+      - "3306:3306"
+    # volumes:
+    #   - mysql_vol:/var/lib/mysql
+    environment: 
+      - MYSQL_ROOT_PASSWORD=root
+      - TZ=Asia/Tokyo
+      - BIND-ADDRESS=0.0.0.0
+
+volumes:
+  mysql_vol:
+    driver: local
