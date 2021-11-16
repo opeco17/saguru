@@ -1,10 +1,13 @@
 package main
 
-import "time"
+import (
+	"strings"
+	"time"
+)
 
 type GitHubUser struct {
 	Login             string `json:"login"`
-	ID                int    `json:"id"`
+	ID                uint   `json:"id"`
 	NodeID            string `json:"node_id"`
 	AvatarURL         string `json:"avatar_url"`
 	GravatarID        string `json:"gravatar_id"`
@@ -23,14 +26,31 @@ type GitHubUser struct {
 	SiteAdmin         bool   `json:"site_admin"`
 }
 
+func (githubUser *GitHubUser) convert() User {
+	user := User{
+		Name:      githubUser.Login,
+		URL:       githubUser.HTMLURL,
+		AvatarURL: githubUser.AvatarURL,
+		GitHubID:  githubUser.ID,
+	}
+	return user
+}
+
 type GitHubLabel struct {
-	ID          int    `json:"id"`
+	ID          uint   `json:"id"`
 	NodeID      string `json:"node_id"`
 	URL         string `json:"url"`
 	Name        string `json:"name"`
 	Color       string `json:"color"`
 	Default     bool   `json:"default"`
 	Description string `json:"description"`
+}
+
+func (gitHubLabel *GitHubLabel) convert() Label {
+	label := Label{
+		Name: gitHubLabel.Name,
+	}
+	return label
 }
 
 type GitHubLicense struct {
@@ -41,44 +61,75 @@ type GitHubLicense struct {
 	NodeID string `json:"node_id"`
 }
 
-type GitHubIssue struct {
-	URL                   string `json:"url"`
-	RepositoryURL         string `json:"repository_url"`
-	LabelsURL             string `json:"labels_url"`
-	CommentsURL           string `json:"comments_url"`
-	EventsURL             string `json:"events_url"`
-	HTMLURL               string `json:"html_url"`
-	ID                    int    `json:"id"`
-	NodeID                string `json:"node_id"`
-	Number                int    `json:"number"`
-	Title                 string `json:"title"`
-	GitHubUser            `json:"user"`
-	GithubLabels          []GitHubLabel `json:"labels"`
-	State                 string        `json:"state"`
-	Locked                bool          `json:"locked"`
-	Assignee              interface{}   `json:"assignee"`
-	Assignees             []interface{} `json:"assignees"`
-	Milestone             interface{}   `json:"milestone"`
-	Comments              int           `json:"comments"`
-	CreatedAt             time.Time     `json:"created_at"`
-	UpdatedAt             time.Time     `json:"updated_at"`
-	ClosedAt              interface{}   `json:"closed_at"`
-	AuthorAssociation     string        `json:"author_association"`
-	ActiveLockReason      interface{}   `json:"active_lock_reason"`
-	Body                  string        `json:"body"`
-	TimelineURL           string        `json:"timeline_url"`
-	PerformedViaGithubApp interface{}   `json:"performed_via_github_app"`
-	Score                 float64       `json:"score"`
+type GitHubPullRequest struct {
+	URL      string      `json:"url"`
+	HTMLURL  string      `json:"html_url"`
+	DiffURL  string      `json:"diff_url"`
+	PatchURL string      `json:"patch_url"`
+	MergedAt interface{} `json:"merged_at"`
 }
 
-type GitHubIssuesResponse struct {
-	TotalCount        int           `json:"total_count"`
-	IncompleteResults bool          `json:"incomplete_results"`
-	Issues            []GitHubIssue `json:"items"`
+type GitHubIssue struct {
+	URL                   string            `json:"url"`
+	RepositoryURL         string            `json:"repository_url"`
+	LabelsURL             string            `json:"labels_url"`
+	CommentsURL           string            `json:"comments_url"`
+	EventsURL             string            `json:"events_url"`
+	HTMLURL               string            `json:"html_url"`
+	ID                    uint              `json:"id"`
+	NodeID                string            `json:"node_id"`
+	Number                uint              `json:"number"`
+	Title                 string            `json:"title"`
+	State                 string            `json:"state"`
+	Locked                bool              `json:"locked"`
+	Assignee              GitHubUser        `json:"assignee"`
+	Assignees             []GitHubUser      `json:"assignees"`
+	Milestone             interface{}       `json:"milestone"`
+	Comments              uint              `json:"comments"`
+	CreatedAt             time.Time         `json:"created_at"`
+	UpdatedAt             time.Time         `json:"updated_at"`
+	ClosedAt              time.Time         `json:"closed_at"`
+	AuthorAssociation     string            `json:"author_association"`
+	ActiveLockReason      interface{}       `json:"active_lock_reason"`
+	Draft                 bool              `json:"draft"`
+	Body                  string            `json:"body"`
+	TimelineURL           string            `json:"timeline_url"`
+	PerformedViaGithubApp interface{}       `json:"performed_via_github_app"`
+	User                  GitHubUser        `json:"user"`
+	PullRequest           GitHubPullRequest `json:"pull_request"`
+	Labels                []GitHubLabel     `json:"labels"`
 }
+
+func (gitHubIssue *GitHubIssue) convert() Issue {
+	issuer := gitHubIssue.User.convert()
+
+	var assignees []User
+	for _, gitHubUser := range gitHubIssue.Assignees {
+		assignees = append(assignees, gitHubUser.convert())
+	}
+
+	var labels []Label
+	for _, gitHubLabel := range gitHubIssue.Labels {
+		labels = append(labels, gitHubLabel.convert())
+	}
+
+	issue := Issue{
+		URL:             gitHubIssue.HTMLURL,
+		PullRequestURL:  gitHubIssue.PullRequest.HTMLURL,
+		GitHubID:        gitHubIssue.ID,
+		GitHubCreatedAt: gitHubIssue.CreatedAt,
+		GitHubUpdatedAt: gitHubIssue.UpdatedAt,
+		Issuer:          issuer,
+		Assignees:       assignees,
+		Labels:          labels,
+	}
+	return issue
+}
+
+type GitHubIssuesResponse []GitHubIssue
 
 type GitHubRepository struct {
-	ID               int           `json:"id"`
+	ID               uint          `json:"id"`
 	NodeID           string        `json:"node_id"`
 	Name             string        `json:"name"`
 	FullName         string        `json:"full_name"`
@@ -132,34 +183,51 @@ type GitHubRepository struct {
 	CloneURL         string        `json:"clone_url"`
 	SvnURL           string        `json:"svn_url"`
 	Homepage         string        `json:"homepage"`
-	Size             int           `json:"size"`
-	StargazersCount  int           `json:"stargazers_count"`
-	WatchersCount    int           `json:"watchers_count"`
+	Size             uint          `json:"size"`
+	StargazersCount  uint          `json:"stargazers_count"`
+	WatchersCount    uint          `json:"watchers_count"`
 	Language         string        `json:"language"`
 	HasIssues        bool          `json:"has_issues"`
 	HasProjects      bool          `json:"has_projects"`
 	HasDownloads     bool          `json:"has_downloads"`
 	HasWiki          bool          `json:"has_wiki"`
 	HasPages         bool          `json:"has_pages"`
-	ForksCount       int           `json:"forks_count"`
+	ForksCount       uint          `json:"forks_count"`
 	MirrorURL        interface{}   `json:"mirror_url"`
 	Archived         bool          `json:"archived"`
 	Disabled         bool          `json:"disabled"`
-	OpenIssuesCount  int           `json:"open_issues_count"`
-	License          GitHubLicense `json:"license"`
+	OpenIssuesCount  uint          `json:"open_issues_count"`
 	AllowForking     bool          `json:"allow_forking"`
 	IsTemplate       bool          `json:"is_template"`
 	Topics           []string      `json:"topics"`
 	Visibility       string        `json:"visibility"`
-	Forks            int           `json:"forks"`
-	OpenIssues       int           `json:"open_issues"`
-	Watchers         int           `json:"watchers"`
+	Forks            uint          `json:"forks"`
+	OpenIssues       uint          `json:"open_issues"`
+	Watchers         uint          `json:"watchers"`
 	DefaultBranch    string        `json:"default_branch"`
 	Score            float64       `json:"score"`
+	License          GitHubLicense `json:"license"`
+}
+
+func (gitHubRepository *GitHubRepository) convert() Repository {
+	repository := Repository{
+		Name:            gitHubRepository.FullName,
+		URL:             gitHubRepository.HTMLURL,
+		Description:     gitHubRepository.Description,
+		StarCount:       gitHubRepository.StargazersCount,
+		ForkCount:       gitHubRepository.ForksCount,
+		OpenIssueCount:  gitHubRepository.OpenIssuesCount,
+		License:         gitHubRepository.License.Name,
+		Topics:          strings.Join(gitHubRepository.Topics, ","),
+		GitHubID:        gitHubRepository.ID,
+		GitHubCreatedAt: gitHubRepository.CreatedAt,
+		GitHubUpdatedAt: gitHubRepository.UpdatedAt,
+	}
+	return repository
 }
 
 type GitHubRepositoriesResponse struct {
-	TotalCount        int                `json:"total_count"`
+	TotalCount        uint               `json:"total_count"`
 	IncompleteResults bool               `json:"incomplete_results"`
 	Repositories      []GitHubRepository `json:"items"`
 }
