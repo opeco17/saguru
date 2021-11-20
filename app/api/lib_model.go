@@ -2,50 +2,44 @@ package main
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type Label struct {
-	gorm.Model
-	Name    string `gorm:"unique"`
-	IssueID uint
+	Name   string  `gorm:"primaryKey"`
+	Issues []Issue `gorm:"many2many:issue_labels;"`
 }
 
 type User struct {
-	gorm.Model
+	GitHubID  uint `gorm:"primaryKey"`
 	Name      string
 	URL       string
 	AvatarURL string
-	GitHubID  uint `gorm:"unique"`
 	IssueID   uint
 }
 
 type Issue struct {
-	gorm.Model
-	URL             string
-	PullRequestURL  string
-	GitHubID        uint `gorm:"unique"`
+	GitHubID        uint `gorm:"primaryKey"`
 	GitHubCreatedAt time.Time
 	GitHubUpdatedAt time.Time
+	URL             string
+	PullRequestURL  string
+	AssigneesCount  uint
 	Issuer          User
-	Assignees       []User
-	Labels          []Label
+	Labels          []Label `gorm:"many2many:issue_labels;"`
 	RepositoryID    uint
 }
 
 type Repository struct {
-	gorm.Model
+	GitHubID        uint `gorm:"primaryKey"`
+	GitHubCreatedAt time.Time
+	GitHubUpdatedAt time.Time
 	Name            string
 	URL             string
 	Description     string
 	StarCount       uint
 	ForkCount       uint
 	OpenIssueCount  uint
-	License         string
 	Topics          string
-	GitHubID        uint `gorm:"unique"`
-	GitHubCreatedAt time.Time
-	GitHubUpdatedAt time.Time
-	Issues          []Issue
+	License         string
+	Issues          []Issue `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }

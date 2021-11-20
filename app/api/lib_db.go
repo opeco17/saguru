@@ -3,7 +3,9 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	stdlog "log"
 	"os"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 	"gorm.io/driver/mysql"
@@ -24,9 +26,17 @@ func GetDBClient() (*gorm.DB, *sql.DB) {
 		"%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		DBUSER, DBPASSWORD, DBHOST, DBPORT, DBNAME,
 	)
+	gormLogger := logger.New(
+		stdlog.New(os.Stdout, "\r\n", stdlog.LstdFlags),
+		logger.Config{
+			SlowThreshold: 3 * time.Second,
+			LogLevel:      logger.Warn,
+			Colorful:      true,
+		},
+	)
 	gormDB, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		CreateBatchSize: 1000,
-		Logger:          logger.Default.LogMode(logger.Warn),
+		Logger:          gormLogger,
 	})
 	if err != nil {
 		log.Fatal("Error occurred when connecting database")

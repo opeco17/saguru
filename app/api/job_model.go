@@ -103,11 +103,6 @@ type GitHubIssue struct {
 func (gitHubIssue *GitHubIssue) convert() Issue {
 	issuer := gitHubIssue.User.convert()
 
-	var assignees []User
-	for _, gitHubUser := range gitHubIssue.Assignees {
-		assignees = append(assignees, gitHubUser.convert())
-	}
-
 	var labels []Label
 	for _, gitHubLabel := range gitHubIssue.Labels {
 		labels = append(labels, gitHubLabel.convert())
@@ -116,11 +111,11 @@ func (gitHubIssue *GitHubIssue) convert() Issue {
 	issue := Issue{
 		URL:             gitHubIssue.HTMLURL,
 		PullRequestURL:  gitHubIssue.PullRequest.HTMLURL,
+		AssigneesCount:  uint(len(gitHubIssue.Assignees)),
 		GitHubID:        gitHubIssue.ID,
 		GitHubCreatedAt: gitHubIssue.CreatedAt,
 		GitHubUpdatedAt: gitHubIssue.UpdatedAt,
 		Issuer:          issuer,
-		Assignees:       assignees,
 		Labels:          labels,
 	}
 	return issue

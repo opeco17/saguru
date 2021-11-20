@@ -10,10 +10,10 @@ import (
 
 const (
 	REPOSITORIES_API_URL              string = "https://api.github.com/search/repositories"
-	REPOSITORIES_API_MAX_RESULTS      uint   = 1000
+	REPOSITORIES_API_MAX_RESULTS      uint   = 100
 	REPOSITORIES_API_RESULTS_PER_PAGE uint   = 100
 	ISSUES_API_URL                    string = "https://api.github.com/repos/%s/issues"
-	ISSUES_API_CONCURRENT             uint   = 30
+	MINI_BATCH_SIZE                   uint   = 50
 )
 
 func UpdateRepositories() {
@@ -54,26 +54,41 @@ func UpdateIssues() {
 	var (
 		repositories []Repository
 		wg           sync.WaitGroup
+		mutex        = &sync.Mutex{}
 	)
-	semaphore := make(chan bool, ISSUES_API_CONCURRENT)
 	gormDB.Find(&repositories)
 
-	log.Info("Start fetching issues")
-	log.Info(fmt.Sprintf("Number of repositories: %d", len(repositories)))
-	for _, repository := range repositories {
-		wg.Add(1)
-		go func(repository Repository) {
-			defer wg.Done()
-			semaphore <- true
+	for i := 0; i < len(repositories)/int(MINI_BATCH_SIZE); i++ {
+		// Create mini batch of repository
+		lower := i * int(MINI_BATCH_SIZE)
+		upper := min((i+1)*int(MINI_BATCH_SIZE), len(repositories)-1)
+		miniBatchRepositories := repositories[lower:upper]
 
-			issues := FetchIssues(repository.Name)
-			repository.Issues = issues
-			gormDB.Clauses(clause.OnConflict{
-				UpdateAll: true,
-			}).Save(&repository)
+		// Fetch issues concurrently for each mini batchn
+		modelMiniBatchRepositories := make([]Repository, 0, MINI_BATCH_SIZE)
+		for _, repository := range miniBatchRepositories {
+			wg.Add(1)
+			go func(repository Repository) {
+				defer wg.Done()
+				issues := FetchIssues(repository.Name)
+				repository.Issues = issues
 
-			<-semaphore
-		}(repository)
+				mutex.Lock()
+				modelMiniBatchRepositories = append(modelMiniBatchRepositories, repository)
+				mutex.Unlock()
+
+			}(repository)
+		}
+		wg.Wait()
+		gormDB.Clauses(clause.OnConflict{
+			UpdateAll: true,
+		}).Save(&modelMiniBatchRepositories)
 	}
-	wg.Wait()
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }

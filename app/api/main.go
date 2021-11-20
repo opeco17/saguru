@@ -2,6 +2,6 @@ package main
 
 func main() {
 	Init()
-	// UpdateRepositories()
+	UpdateRepositories()
 	UpdateIssues()
 }
