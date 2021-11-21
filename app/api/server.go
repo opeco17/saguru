@@ -17,6 +17,7 @@ func main() {
 	e := echo.New()
 	e.GET("/", index)
 	e.GET("/repositories", getRepositories)
+	e.GET("/languages", getLanguages)
 
 	e.Logger.Fatal(e.Start(":8000"))
 }

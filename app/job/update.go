@@ -3,19 +3,18 @@ package main
 import (
 	"fmt"
 	"opeco17/oss-book/lib"
-	"os"
 	"sync"
 
 	"github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
 func UpdateRepositories() error {
 	logrus.Info("Start updating repositories.")
 
-	gormDB, sqlDB, err := lib.GetDBClient(
-		os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_HOST"),
-	)
+	// Connect DB
+	gormDB, sqlDB, err := getDBClient()
 	if err != nil {
 		logrus.Error(err)
 		return fmt.Errorf("error occured when updating repositories")
@@ -50,9 +49,8 @@ func UpdateRepositories() error {
 func UpdateIssues() error {
 	logrus.Info("Start updating issues.")
 
-	gormDB, sqlDB, err := lib.GetDBClient(
-		os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_HOST"),
-	)
+	// Connect DB
+	gormDB, sqlDB, err := getDBClient()
 	if err != nil {
 		logrus.Error(err)
 		return fmt.Errorf("error occured when updating repositories")
@@ -96,7 +94,42 @@ func UpdateIssues() error {
 	return nil
 }
 
-func UpdateLanguages() error {
+func UpdateFrontLanguages() error {
+	logrus.Info("Start updating languages.")
+
+	// Connect DB
+	gormDB, sqlDB, err := getDBClient()
+	if err != nil {
+		logrus.Error(err)
+		return fmt.Errorf("error occured when updating front languages")
+	}
+	defer sqlDB.Close()
+
+	// Fetch languages from other table
+	var (
+		languages    []lib.FrontLanguages
+		oldLanguages []lib.FrontLanguages
+	)
+	query := gormDB.Model(&lib.Repository{})
+	query.Select("language AS name, COUNT(language) AS repository_count")
+	query.Where("language != ?", "")
+	query.Group("language")
+	query.Order("repository_count DESC")
+	query.Find(&languages)
+
+	// Update languages inside transaction
+	gormDB.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Unscoped().Session(&gorm.Session{AllowGlobalUpdate: true}).Delete(&oldLanguages).Error; err != nil {
+			logrus.Error("error occured when deleting old front languages")
+			return err
+		}
+		if err := tx.Create(&languages).Error; err != nil {
+			logrus.Error("error occured when inserting new front languages")
+			return err
+		}
+		return nil
+	})
+
 	return nil
 }
 

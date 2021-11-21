@@ -16,13 +16,12 @@ func main() {
 		initDB()
 		updateRepositories()
 		updateIssues()
-		updateLanguages()
+		updateFrontLanguages()
 		updateLabels()
 		updateLicenses()
 	} else if flag.Arg(0) == "issue" {
 		initDB()
 		updateIssues()
-		updateLanguages()
 		updateLabels()
 		updateLicenses()
 	} else if flag.Arg(0) == "init" {
@@ -54,8 +53,8 @@ func updateIssues() {
 	}
 }
 
-func updateLanguages() {
-	if err := UpdateLanguages(); err != nil {
+func updateFrontLanguages() {
+	if err := UpdateFrontLanguages(); err != nil {
 		logrus.Error(err)
 	}
 }

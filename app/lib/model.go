@@ -48,4 +48,10 @@ type (
 		Language        string
 		Issues          []Issue `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	}
+
+	FrontLanguages struct {
+		gorm.Model
+		Name            string
+		RepositoryCount uint
+	}
 )

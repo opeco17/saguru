@@ -3,10 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"os"
 	"time"
-
-	"opeco17/oss-book/lib"
 
 	"github.com/labstack/echo/v4"
 )
@@ -26,11 +23,9 @@ func getRepositories(c echo.Context) error {
 	}
 
 	// Connect DB
-	gormDB, sqlDB, err := lib.GetDBClient(
-		os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_HOST"),
-	)
+	gormDB, sqlDB, err := getDBClient()
 	if err != nil {
-		return c.String(http.StatusServiceUnavailable, "test")
+		return c.String(http.StatusServiceUnavailable, "")
 	}
 	defer sqlDB.Close()
 
@@ -38,10 +33,28 @@ func getRepositories(c echo.Context) error {
 	now := time.Now()
 	issueIDs := fetchIssueIDs(gormDB, input)
 	repositoryIDs := fetchRepositoryIDs(gormDB, input, issueIDs)
-	repositories := fetchRepositoryEntities(c, gormDB, issueIDs, repositoryIDs)
-	fmt.Printf("Total time: %vms\n", time.Since(now).Milliseconds())
+	repositories := fetchRepositoryEntities(gormDB, issueIDs, repositoryIDs)
+	fmt.Printf("Total time to fetch repositories: %vms\n", time.Since(now).Milliseconds())
 
 	// Format data
 
 	return c.JSON(http.StatusOK, repositories)
+}
+
+func getLanguages(c echo.Context) error {
+	// Connect DB
+	gormDB, sqlDB, err := getDBClient()
+	if err != nil {
+		return c.String(http.StatusServiceUnavailable, "")
+	}
+	defer sqlDB.Close()
+
+	// Fetch data
+	now := time.Now()
+	frontLanguages := fetchFrontLanguages(gormDB)
+	fmt.Printf("Total time to fetch front languages: %vms\n", time.Since(now).Milliseconds())
+
+	// Format data
+
+	return c.JSON(http.StatusOK, frontLanguages)
 }
