@@ -2,24 +2,24 @@ package main
 
 import (
 	"fmt"
+	"opeco17/oss-book/lib"
+	"os"
 	"sync"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	"gorm.io/gorm/clause"
 )
 
-const (
-	REPOSITORIES_API_URL              string = "https://api.github.com/search/repositories"
-	REPOSITORIES_API_MAX_RESULTS      uint   = 100
-	REPOSITORIES_API_RESULTS_PER_PAGE uint   = 100
-	ISSUES_API_URL                    string = "https://api.github.com/repos/%s/issues"
-	MINI_BATCH_SIZE                   uint   = 50
-)
+func UpdateRepositories() error {
+	logrus.Info("Start updating repositories.")
 
-func UpdateRepositories() {
-	LoadEnv()
-
-	gormDB, sqlDB := GetDBClient()
+	gormDB, sqlDB, err := lib.GetDBClient(
+		os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_HOST"),
+	)
+	if err != nil {
+		logrus.Error(err)
+		return fmt.Errorf("error occured when updating repositories")
+	}
 	defer sqlDB.Close()
 
 	// Fetch and save repositories
@@ -34,25 +34,33 @@ func UpdateRepositories() {
 	// Adjust number of repositories
 	var (
 		repositoryCount    int64
-		removeRepositories []Repository
+		removeRepositories []lib.Repository
 	)
-	gormDB.Model(&Repository{}).Count(&repositoryCount)
+	gormDB.Model(&lib.Repository{}).Count(&repositoryCount)
 	removeRepositoryCount := int(repositoryCount) - 3*int(REPOSITORIES_API_MAX_RESULTS)
 	if removeRepositoryCount > 0 {
-		log.Info(fmt.Sprintf("%d repositories will be removed", removeRepositoryCount))
-		gormDB.Model(&Repository{}).Limit(removeRepositoryCount).Find(&removeRepositories)
+		logrus.Info(fmt.Sprintf("%d repositories will be removed.", removeRepositoryCount))
+		gormDB.Model(&lib.Repository{}).Limit(removeRepositoryCount).Find(&removeRepositories)
 		gormDB.Unscoped().Delete(&removeRepositories)
 	}
+	logrus.Info("Successfully finished to update repositories.")
+	return nil
 }
 
-func UpdateIssues() {
-	LoadEnv()
+func UpdateIssues() error {
+	logrus.Info("Start updating issues.")
 
-	gormDB, sqlDB := GetDBClient()
+	gormDB, sqlDB, err := lib.GetDBClient(
+		os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_HOST"),
+	)
+	if err != nil {
+		logrus.Error(err)
+		return fmt.Errorf("error occured when updating repositories")
+	}
 	defer sqlDB.Close()
 
 	var (
-		repositories []Repository
+		repositories []lib.Repository
 		wg           sync.WaitGroup
 		mutex        = &sync.Mutex{}
 	)
@@ -61,14 +69,14 @@ func UpdateIssues() {
 	for i := 0; i < len(repositories)/int(MINI_BATCH_SIZE); i++ {
 		// Create mini batch of repository
 		lower := i * int(MINI_BATCH_SIZE)
-		upper := min((i+1)*int(MINI_BATCH_SIZE), len(repositories)-1)
+		upper := lib.Min((i+1)*int(MINI_BATCH_SIZE), len(repositories)-1)
 		miniBatchRepositories := repositories[lower:upper]
 
 		// Fetch issues concurrently for each mini batchn
-		modelMiniBatchRepositories := make([]Repository, 0, MINI_BATCH_SIZE)
+		modelMiniBatchRepositories := make([]lib.Repository, 0, MINI_BATCH_SIZE)
 		for _, repository := range miniBatchRepositories {
 			wg.Add(1)
-			go func(repository Repository) {
+			go func(repository lib.Repository) {
 				defer wg.Done()
 				issues := FetchIssues(repository.Name)
 				repository.Issues = issues
@@ -84,11 +92,18 @@ func UpdateIssues() {
 			UpdateAll: true,
 		}).Save(&modelMiniBatchRepositories)
 	}
+	logrus.Info("Successfully finished to update issues.")
+	return nil
 }
 
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
+func UpdateLanguages() error {
+	return nil
+}
+
+func UpdateLabels() error {
+	return nil
+}
+
+func UpdateLicenses() error {
+	return nil
 }

@@ -1,17 +1,32 @@
 version: '3'
 
 services:
+  api:
+    build:
+      context: .
+      dockerfile: api.Dockerfile
+    depends_on:
+      - database
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/usr/src/app/
+
+  job:
+    build:
+      context: .
+      dockerfile: job.Dockerfile
+    depends_on:
+      - database
+    volumes:
+      - ./app:/usr/src/app
+    tty: true
+
   database:
-    build: ./database
+    build:
+      context: .
+      dockerfile: db.Dockerfile
     ports:
       - "3306:3306"
     # volumes:
-    #   - mysql_vol:/var/lib/mysql
-    environment: 
-      - MYSQL_ROOT_PASSWORD=root
-      - TZ=Asia/Tokyo
-      - BIND-ADDRESS=0.0.0.0
-
-volumes:
-  mysql_vol:
-    driver: local
+    #   - ./database/data:/var/lib/mysql

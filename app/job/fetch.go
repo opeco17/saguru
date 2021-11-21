@@ -10,7 +10,9 @@ import (
 	"strings"
 	"time"
 
-	log "github.com/sirupsen/logrus"
+	"opeco17/oss-book/lib"
+
+	"github.com/sirupsen/logrus"
 )
 
 func FetchGitHubRepositoriesSubset(page int, query ...string) (*GitHubRepositoriesResponse, string, error) {
@@ -38,15 +40,16 @@ func FetchGitHubRepositoriesSubset(page int, query ...string) (*GitHubRepositori
 	if err != nil {
 		return nil, "", err
 	}
-	if response.StatusCode >= 400 {
-		return nil, "", fmt.Errorf("bad response status code %d", response.StatusCode)
-	}
-	defer response.Body.Close()
 
+	defer response.Body.Close()
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		return nil, "", err
 	}
+	if response.StatusCode >= 400 {
+		return nil, "", fmt.Errorf("bad response status code %d\n%s", response.StatusCode, body)
+	}
+
 	responseBody := new(GitHubRepositoriesResponse)
 	json.Unmarshal([]byte(body), responseBody)
 
@@ -58,22 +61,22 @@ func FetchGitHubRepositories(query ...string) []GitHubRepository {
 	for page := 0; page < int(REPOSITORIES_API_MAX_RESULTS/REPOSITORIES_API_RESULTS_PER_PAGE); page++ {
 		gitHubRepositoriesResponse, query, err := FetchGitHubRepositoriesSubset(page, query...)
 		if err != nil {
-			log.Fatal(err)
+			logrus.Error(err)
 			continue
 		}
 		gitHubRepositories = append(gitHubRepositories, gitHubRepositoriesResponse.Repositories...)
 		if page == 0 {
-			log.Info("Start fetching repositories")
-			log.Info(fmt.Sprintf("Query: %v", query))
-			log.Info(fmt.Sprintf("Total count: %v", gitHubRepositoriesResponse.TotalCount))
+			logrus.Info("Start fetching repositories.")
+			logrus.Info(fmt.Sprintf("Query: %v", query))
+			logrus.Info(fmt.Sprintf("Total count: %v", gitHubRepositoriesResponse.TotalCount))
 		}
 	}
 	return gitHubRepositories
 }
 
-func FetchRepositories(query ...string) []Repository {
+func FetchRepositories(query ...string) []lib.Repository {
 	gitHubRepositories := FetchGitHubRepositories(query...)
-	repositories := make([]Repository, 0, len(gitHubRepositories))
+	repositories := make([]lib.Repository, 0, len(gitHubRepositories))
 	for _, gitHubRepository := range gitHubRepositories {
 		repositories = append(repositories, gitHubRepository.convert())
 	}
@@ -99,14 +102,14 @@ func FetchGitHubIssues(repositoryName string) (GitHubIssuesResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	if response.StatusCode >= 400 {
-		return nil, fmt.Errorf("bad response status code %d", response.StatusCode)
-	}
-	defer response.Body.Close()
 
+	defer response.Body.Close()
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		return nil, err
+	}
+	if response.StatusCode >= 400 {
+		return nil, fmt.Errorf("bad response status code %d\n%s", response.StatusCode, body)
 	}
 
 	var responseBody GitHubIssuesResponse
@@ -115,13 +118,13 @@ func FetchGitHubIssues(repositoryName string) (GitHubIssuesResponse, error) {
 	return responseBody, nil
 }
 
-func FetchIssues(RepositoryName string) []Issue {
+func FetchIssues(RepositoryName string) []lib.Issue {
 	gitHubIssues, err := FetchGitHubIssues(RepositoryName)
 	if err != nil {
-		log.Fatal(err)
-		return []Issue{}
+		logrus.Error(err)
+		return []lib.Issue{}
 	}
-	issues := make([]Issue, 0, len(gitHubIssues))
+	issues := make([]lib.Issue, 0, len(gitHubIssues))
 	for _, gitHubIssue := range gitHubIssues {
 		issues = append(issues, gitHubIssue.convert())
 	}
