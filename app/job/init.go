@@ -18,7 +18,15 @@ func InitDB() error {
 		return fmt.Errorf("error occured when initializing DB")
 	}
 	defer sqlDB.Close()
-	err = gormDB.AutoMigrate(&lib.Repository{}, &lib.User{}, &lib.Issue{}, &lib.Label{}, &lib.FrontLanguages{})
+	err = gormDB.AutoMigrate(
+		&lib.Repository{},
+		&lib.User{},
+		&lib.Issue{},
+		&lib.Label{},
+		&lib.FrontLanguage{},
+		&lib.FrontLicense{},
+		&lib.FrontLabel{},
+	)
 	if err != nil {
 		return fmt.Errorf("error occurred when migrating database\n%s", err)
 	}

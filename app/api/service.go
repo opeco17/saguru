@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func fetchIssueIDs(gormDB *gorm.DB, input *getRepositoriesInput) []uint {
+func fetchIssueIDs(gormDB *gorm.DB, input *GetRepositoriesInput) []uint {
 	var (
 		issues   []lib.Issue
 		issueIDs []uint
@@ -22,9 +22,9 @@ func fetchIssueIDs(gormDB *gorm.DB, input *getRepositoriesInput) []uint {
 	if len(input.Labels) > 0 {
 		query.Where("labels.name IN ?", input.Labels)
 	}
-	if *input.Assigned {
+	if input.Assigned != nil && *input.Assigned {
 		query.Where("issues.assignees_count > ?", 0)
-	} else if !*input.Assigned {
+	} else if input.Assigned != nil && !*input.Assigned {
 		query.Where("issues.assignees_count = ?", 0)
 	}
 	query.Distinct("issues.id")
@@ -33,11 +33,11 @@ func fetchIssueIDs(gormDB *gorm.DB, input *getRepositoriesInput) []uint {
 	for _, issue := range issues {
 		issueIDs = append(issueIDs, issue.ID)
 	}
-	fmt.Printf("Issue: %d record\n", len(issues))
+	logrus.Info(fmt.Sprintf("Issue: %d record\n", len(issues)))
 	return issueIDs
 }
 
-func fetchRepositoryIDs(gormDB *gorm.DB, input *getRepositoriesInput, issueIDs []uint) []uint {
+func fetchRepositoryIDs(gormDB *gorm.DB, input *GetRepositoriesInput, issueIDs []uint) []uint {
 	var (
 		repositories  []lib.Repository
 		repositoryIDs []uint
@@ -70,7 +70,7 @@ func fetchRepositoryIDs(gormDB *gorm.DB, input *getRepositoriesInput, issueIDs [
 	for _, repository := range repositories {
 		repositoryIDs = append(repositoryIDs, repository.ID)
 	}
-	fmt.Printf("Repository: %d record\n", len(repositories))
+	logrus.Info(fmt.Sprintf("Repository: %d record\n", len(repositories)))
 	return repositoryIDs
 }
 
@@ -94,8 +94,20 @@ func fetchRepositoryEntities(gormDB *gorm.DB, issueIDs []uint, repositoryIDs []u
 	return repositories
 }
 
-func fetchFrontLanguages(gormDB *gorm.DB) []lib.FrontLanguages {
-	var frontLanguages []lib.FrontLanguages
+func fetchFrontLanguages(gormDB *gorm.DB) []lib.FrontLanguage {
+	var frontLanguages []lib.FrontLanguage
 	gormDB.Model(&frontLanguages).Where("repository_count > ?", MINIMUM_REPOSITORY_COUNT_IN_FRONT_LANGUAGES).Find(&frontLanguages)
 	return frontLanguages
+}
+
+func fetchFrontLicenses(gormDB *gorm.DB) []lib.FrontLicense {
+	var frontLicenses []lib.FrontLicense
+	gormDB.Model(&frontLicenses).Where("repository_count > ?", MINIMUM_REPOSITORY_COUNT_IN_FRONT_LICENSES).Find(&frontLicenses)
+	return frontLicenses
+}
+
+func fetchFrontLabels(gormDB *gorm.DB) []lib.FrontLabel {
+	var frontLabels []lib.FrontLabel
+	gormDB.Model(&frontLabels).Where("issue_count > ?", MINIMUM_ISSUE_COUNT_IN_FRONT_LABELS).Find(&frontLabels)
+	return frontLabels
 }

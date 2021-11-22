@@ -18,6 +18,8 @@ func main() {
 	e.GET("/", index)
 	e.GET("/repositories", getRepositories)
 	e.GET("/languages", getLanguages)
+	e.GET("/licenses", getLicenses)
+	e.GET("/labels", getLabels)
 
 	e.Logger.Fatal(e.Start(":8000"))
 }

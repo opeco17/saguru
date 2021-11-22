@@ -1,9 +1,11 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type (
-	getRepositoriesInput struct {
+	GetRepositoriesInput struct {
 		Labels         []string `query:"labels"`
 		Assigned       *bool    `query:"assigned"`
 		Language       string   `query:"language"`
@@ -13,9 +15,36 @@ type (
 		ForkCountUpper *uint    `query:"fork_count_upper"`
 		License        string   `query:"license"`
 	}
+
+	GetRepositoryIssue struct {
+		URL            string
+		AssigneesCount uint
+		Labels         []string
+	}
+
+	GetRepository struct {
+		Name           string
+		URL            string
+		Description    string
+		StarCount      uint
+		ForkCount      uint
+		OpenIssueCount uint
+		Topics         string
+		License        string
+		Language       string
+		Issues         []GetRepositoryIssue
+	}
+
+	GetRepositoriesOutput []GetRepository
+
+	GetLanguagesOutput []string
+
+	GetLicensesOutput []string
+
+	GetLabelsOutput []string
 )
 
-func (input *getRepositoriesInput) validator() error {
+func (input *GetRepositoriesInput) validator() error {
 	if input.StarCountLower != nil && input.StarCountUpper != nil && *input.StarCountLower > *input.StarCountUpper {
 		return fmt.Errorf("star_count_lower should be less than star_count_upper")
 	}

@@ -211,6 +211,7 @@ func (gitHubIssue *GitHubIssue) convert() lib.Issue {
 		URL:             gitHubIssue.HTMLURL,
 		PullRequestURL:  gitHubIssue.PullRequest.HTMLURL,
 		AssigneesCount:  uint(len(gitHubIssue.Assignees)),
+		CommentCount:    gitHubIssue.Comments,
 		Issuer:          issuer,
 		Labels:          labels,
 	}

@@ -28,6 +28,7 @@ type (
 		URL             string
 		PullRequestURL  string
 		AssigneesCount  uint
+		CommentCount    uint
 		Issuer          User    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 		Labels          []Label `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 		RepositoryID    uint
@@ -49,9 +50,21 @@ type (
 		Issues          []Issue `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	}
 
-	FrontLanguages struct {
+	FrontLanguage struct {
 		gorm.Model
 		Name            string
 		RepositoryCount uint
+	}
+
+	FrontLicense struct {
+		gorm.Model
+		Name            string
+		RepositoryCount uint
+	}
+
+	FrontLabel struct {
+		gorm.Model
+		Name       string
+		IssueCount uint
 	}
 )

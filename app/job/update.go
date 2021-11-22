@@ -107,8 +107,8 @@ func UpdateFrontLanguages() error {
 
 	// Fetch languages from other table
 	var (
-		languages    []lib.FrontLanguages
-		oldLanguages []lib.FrontLanguages
+		languages    []lib.FrontLanguage
+		oldLanguages []lib.FrontLanguage
 	)
 	query := gormDB.Model(&lib.Repository{})
 	query.Select("language AS name, COUNT(language) AS repository_count")
@@ -133,10 +133,78 @@ func UpdateFrontLanguages() error {
 	return nil
 }
 
-func UpdateLabels() error {
+func UpdateLicenses() error {
+	logrus.Info("Start updating licenses.")
+
+	// Connect DB
+	gormDB, sqlDB, err := getDBClient()
+	if err != nil {
+		logrus.Error(err)
+		return fmt.Errorf("error occured when updating front languages")
+	}
+	defer sqlDB.Close()
+
+	// Fetch licenses from other table
+	var (
+		licenses    []lib.FrontLicense
+		oldLicenses []lib.FrontLicense
+	)
+	query := gormDB.Model(&lib.Repository{})
+	query.Select("license AS name, COUNT(license) AS repository_count")
+	query.Where("license != ?", "")
+	query.Group("license")
+	query.Order("repository_count DESC")
+	query.Find(&licenses)
+
+	// Update licenses inside transaction
+	gormDB.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Unscoped().Session(&gorm.Session{AllowGlobalUpdate: true}).Delete(&oldLicenses).Error; err != nil {
+			logrus.Error("error occured when deleting old front licenses")
+			return err
+		}
+		if err := tx.Create(&licenses).Error; err != nil {
+			logrus.Error("error occured when inserting new front licenses")
+			return err
+		}
+		return nil
+	})
 	return nil
 }
 
-func UpdateLicenses() error {
+func UpdateLabels() error {
+	logrus.Info("Start updating labels.")
+
+	// Connect DB
+	gormDB, sqlDB, err := getDBClient()
+	if err != nil {
+		logrus.Error(err)
+		return fmt.Errorf("error occured when updating front labels")
+	}
+	defer sqlDB.Close()
+
+	// Fetch labels from other table
+	var (
+		labels    []lib.FrontLabel
+		oldLabels []lib.FrontLabel
+	)
+	query := gormDB.Model(&lib.Label{})
+	query.Select("name, COUNT(name) AS issue_count")
+	query.Where("name != ?", "")
+	query.Group("name")
+	query.Order("issue_count DESC")
+	query.Find(&labels)
+
+	// Update labels inside transaction
+	gormDB.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Unscoped().Session(&gorm.Session{AllowGlobalUpdate: true}).Delete(&oldLabels).Error; err != nil {
+			logrus.Error("error occured when deleting old front labels")
+			return err
+		}
+		if err := tx.Create(&labels).Error; err != nil {
+			logrus.Error("error occured when inserting new front labels")
+			return err
+		}
+		return nil
+	})
 	return nil
 }
