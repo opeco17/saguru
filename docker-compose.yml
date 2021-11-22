@@ -10,7 +10,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./app:/usr/src/app/
+      - ./backend:/usr/src/app
 
   job:
     build:
@@ -19,7 +19,7 @@ services:
     depends_on:
       - database
     volumes:
-      - ./app:/usr/src/app
+      - ./backend:/usr/src/app
     tty: true
 
   database:

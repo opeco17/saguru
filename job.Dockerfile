@@ -1,13 +1,13 @@
 FROM --platform=linux/x86_64 golang:1.16.5
 
 WORKDIR /usr/src/app/lib/
-COPY app/lib/go.mod app/lib/go.sum ./
+COPY backend/lib/go.mod backend/lib/go.sum ./
 
 WORKDIR /usr/src/app/api/
-COPY app/job/go.mod app/job/go.sum ./
+COPY backend/job/go.mod backend/job/go.sum ./
 RUN go mod download
 
 WORKDIR /usr/src/
-COPY app ./app
+COPY backend ./app
 
 WORKDIR /usr/src/app/job
