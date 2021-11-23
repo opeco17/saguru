@@ -34,20 +34,87 @@
           class="mr-4 white--text"
           color="#F85758"
           depressed
-          @click="submit"
+          @click="search"
         >
-          submit
+          search
         </v-btn>
       </v-col>
       <v-col cols="12" sm="8" md="8">
         <v-card
-          class="my-3 pa-3"
+          class="my-3"
           elevation="0"
           outlined
           v-for="repository in repositories"
           :key="repository.id"
         >
-          {{ repository.name }}
+          <v-card-title class="py-2">
+            {{ repository.name }}
+          </v-card-title>
+          <v-card-text class="pt-1 pb-2">
+            {{ repository.description }}
+          </v-card-text>
+          <v-card-text class="py-1">
+            <v-chip
+              color="#F85758"
+              class="mr-2"
+              label
+              small
+              outlined
+            >
+              #{{ repository.language }}
+            </v-chip>
+            <v-chip
+              color="#F85758"
+              class="mr-2"
+              label
+              small
+              outlined
+            >
+              <v-icon small>mdi-star-outline</v-icon>
+              {{ repository.starCount }}
+            </v-chip>
+            <v-chip
+              color="#F85758"
+              class="mr-2"
+              label
+              small
+              outlined
+            >
+              <v-icon small>mdi-source-fork</v-icon>
+              {{ repository.forkCount }}
+            </v-chip>
+          </v-card-text>
+          <div v-if="true">
+            <v-card-text>
+              <div
+                v-for="issue in repository.issues"
+                :key="issue.id"
+              >
+                <v-divider></v-divider>
+                <div class="py-3">
+                  <span
+                    :href="issue.url"
+                    target="_blank"
+                    class="text-decoration-none text-subtitle-1 mr-2"
+                  >
+                    <v-icon left>mdi-label-outline</v-icon>
+                    {{ issue.title }}
+                  </span>
+                  <v-chip
+                    v-for="label in issue.labels"
+                    :key="label"
+                    color="grey"
+                    class="mr-2"
+                    label
+                    small
+                    outlined
+                  >
+                    #{{ label }}
+                  </v-chip>
+                </div>
+              </div>
+            </v-card-text>
+          </div>
         </v-card>
         <v-btn
           class="mr-4 white--text"
@@ -78,7 +145,7 @@
 // define class and constructor?
 let inputsTemplate = {
   language: '',
-  labels: ''
+  labels: 'good first issue'
 }
 
 export default {
@@ -89,7 +156,7 @@ export default {
     }
   },
   methods: {
-    submit (event) {
+    search (event) {
       this.inputs = JSON.parse(JSON.stringify(this.temporaryInputs))
       this.$store.commit('resetPage')
       this.$store.dispatch('fetchRepositories', this.getParams())
@@ -114,7 +181,7 @@ export default {
     },
   },
   created () {
-    this.$store.dispatch('fetchRepositories', {page: 0})
+    this.$store.dispatch('fetchRepositories', this.getParams())
     this.$store.dispatch('fetchLanguages')
     this.$store.dispatch('fetchLicenses')
     this.$store.dispatch('fetchLabels')

@@ -19,6 +19,7 @@ type (
 
 	GetRepositoriesOutputItemIssue struct {
 		ID             uint     `json:"id"`
+		Title          string   `json:"title"`
 		URL            string   `json:"url"`
 		AssigneesCount uint     `json:"assigneesCount"`
 		Labels         []string `json:"labels"`

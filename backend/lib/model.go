@@ -25,6 +25,7 @@ type (
 		gorm.Model
 		GitHubCreatedAt time.Time
 		GitHubUpdatedAt time.Time
+		Title           string
 		URL             string
 		PullRequestURL  string
 		AssigneesCount  uint

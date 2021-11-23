@@ -208,6 +208,7 @@ func (gitHubIssue *GitHubIssue) convert() lib.Issue {
 		Model:           gorm.Model{ID: gitHubIssue.ID},
 		GitHubCreatedAt: gitHubIssue.CreatedAt,
 		GitHubUpdatedAt: gitHubIssue.UpdatedAt,
+		Title:           gitHubIssue.Title,
 		URL:             gitHubIssue.HTMLURL,
 		PullRequestURL:  gitHubIssue.PullRequest.HTMLURL,
 		AssigneesCount:  uint(len(gitHubIssue.Assignees)),

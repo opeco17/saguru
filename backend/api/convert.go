@@ -9,6 +9,7 @@ func convertGetRepositoriesOutputItemIssue(issue lib.Issue) GetRepositoriesOutpu
 	}
 	getRepositoryIssue := GetRepositoriesOutputItemIssue{
 		ID:             issue.ID,
+		Title:          issue.Title,
 		URL:            issue.URL,
 		AssigneesCount: issue.AssigneesCount,
 		Labels:         getRepositoryIssueLabels,
