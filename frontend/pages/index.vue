@@ -103,7 +103,7 @@
                   <v-chip
                     v-for="label in issue.labels"
                     :key="label"
-                    color="grey"
+                    color="purple lighten-2"
                     class="mr-2"
                     label
                     small
