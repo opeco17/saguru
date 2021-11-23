@@ -2,12 +2,13 @@ package main
 
 import "opeco17/oss-book/lib"
 
-func convertGetRepositoryIssue(issue lib.Issue) GetRepositoryIssue {
+func convertGetRepositoriesOutputItemIssue(issue lib.Issue) GetRepositoriesOutputItemIssue {
 	getRepositoryIssueLabels := make([]string, 0, len(issue.Labels))
 	for _, label := range issue.Labels {
 		getRepositoryIssueLabels = append(getRepositoryIssueLabels, label.Name)
 	}
-	getRepositoryIssue := GetRepositoryIssue{
+	getRepositoryIssue := GetRepositoriesOutputItemIssue{
+		ID:             issue.ID,
 		URL:            issue.URL,
 		AssigneesCount: issue.AssigneesCount,
 		Labels:         getRepositoryIssueLabels,
@@ -15,12 +16,13 @@ func convertGetRepositoryIssue(issue lib.Issue) GetRepositoryIssue {
 	return getRepositoryIssue
 }
 
-func convertGetRepository(repository lib.Repository) GetRepository {
-	getRepositoryIssues := make([]GetRepositoryIssue, 0, len(repository.Issues))
+func convertGetRepositoriesOutputItem(repository lib.Repository) GetRepositoriesOutputItem {
+	getRepositoryIssues := make([]GetRepositoriesOutputItemIssue, 0, len(repository.Issues)-1)
 	for _, issue := range repository.Issues {
-		getRepositoryIssues = append(getRepositoryIssues, convertGetRepositoryIssue(issue))
+		getRepositoryIssues = append(getRepositoryIssues, convertGetRepositoriesOutputItemIssue(issue))
 	}
-	getRepository := GetRepository{
+	getRepositoriesOutputItem := GetRepositoriesOutputItem{
+		ID:             repository.ID,
 		Name:           repository.Name,
 		URL:            repository.URL,
 		Description:    repository.Description,
@@ -32,37 +34,49 @@ func convertGetRepository(repository lib.Repository) GetRepository {
 		Language:       repository.Language,
 		Issues:         getRepositoryIssues,
 	}
-	return getRepository
+	return getRepositoriesOutputItem
 }
 
 func convertGetRepositoriesOutput(repositories []lib.Repository) GetRepositoriesOutput {
-	getRepositoriesOutput := make(GetRepositoriesOutput, 0, len(repositories))
-	for _, repository := range repositories {
-		getRepositoriesOutput = append(getRepositoriesOutput, convertGetRepository(repository))
+	hasNext := len(repositories) > int(RESULTS_PER_PAGE)
+	var last int
+	if hasNext {
+		last = len(repositories) - 1
+	} else {
+		last = len(repositories)
 	}
-	return getRepositoriesOutput
+
+	getRepositoriesOutputItems := make([]GetRepositoriesOutputItem, 0, last)
+	for _, repository := range repositories[:last] {
+		getRepositoriesOutputItems = append(getRepositoriesOutputItems, convertGetRepositoriesOutputItem(repository))
+	}
+	GetRepositoriesOutput := GetRepositoriesOutput{
+		Items:   getRepositoriesOutputItems,
+		HasNext: hasNext,
+	}
+	return GetRepositoriesOutput
 }
 
 func convertGetLanguagesOutput(frontLanguages []lib.FrontLanguage) GetLanguagesOutput {
-	getLanguagesOutput := make(GetLanguagesOutput, 0, len(frontLanguages))
+	GetLanguagesOutputItems := make([]string, 0, len(frontLanguages))
 	for _, frontLanguage := range frontLanguages {
-		getLanguagesOutput = append(getLanguagesOutput, frontLanguage.Name)
+		GetLanguagesOutputItems = append(GetLanguagesOutputItems, frontLanguage.Name)
 	}
-	return getLanguagesOutput
+	return GetLanguagesOutput{Items: GetLanguagesOutputItems}
 }
 
 func convertGetLicensesOutput(frontLicenses []lib.FrontLicense) GetLicensesOutput {
-	getLicensesOutput := make(GetLicensesOutput, 0, len(frontLicenses))
+	getLicensesOutputItems := make([]string, 0, len(frontLicenses))
 	for _, frontLicense := range frontLicenses {
-		getLicensesOutput = append(getLicensesOutput, frontLicense.Name)
+		getLicensesOutputItems = append(getLicensesOutputItems, frontLicense.Name)
 	}
-	return getLicensesOutput
+	return GetLicensesOutput{Items: getLicensesOutputItems}
 }
 
 func convertGetLabelsOutput(frontLabels []lib.FrontLabel) GetLabelsOutput {
-	getLabelsOutput := make(GetLabelsOutput, 0, len(frontLabels))
+	getLabelsOutputItems := make([]string, 0, len(frontLabels))
 	for _, frontLabel := range frontLabels {
-		getLabelsOutput = append(getLabelsOutput, frontLabel.Name)
+		getLabelsOutputItems = append(getLabelsOutputItems, frontLabel.Name)
 	}
-	return getLabelsOutput
+	return GetLabelsOutput{Items: getLabelsOutputItems}
 }

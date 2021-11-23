@@ -64,6 +64,7 @@ func fetchRepositoryIDs(gormDB *gorm.DB, input *GetRepositoriesInput, issueIDs [
 		query.Where("issues.id IN ?", issueIDs)
 	}
 	query.Distinct("repositories.id")
+	query.Offset(int(*input.Page) * int(RESULTS_PER_PAGE))
 	query.Limit(int(RESULTS_PER_PAGE) + 1)
 	query.Find(&repositories)
 

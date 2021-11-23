@@ -6,6 +6,7 @@ import (
 
 type (
 	GetRepositoriesInput struct {
+		Page           *uint    `query:"page"`
 		Labels         []string `query:"labels"`
 		Assigned       *bool    `query:"assigned"`
 		Language       string   `query:"language"`
@@ -16,35 +17,50 @@ type (
 		License        string   `query:"license"`
 	}
 
-	GetRepositoryIssue struct {
-		URL            string
-		AssigneesCount uint
-		Labels         []string
+	GetRepositoriesOutputItemIssue struct {
+		ID             uint     `json:"id"`
+		URL            string   `json:"url"`
+		AssigneesCount uint     `json:"assigneesCount"`
+		Labels         []string `json:"labels"`
 	}
 
-	GetRepository struct {
-		Name           string
-		URL            string
-		Description    string
-		StarCount      uint
-		ForkCount      uint
-		OpenIssueCount uint
-		Topics         string
-		License        string
-		Language       string
-		Issues         []GetRepositoryIssue
+	GetRepositoriesOutputItem struct {
+		ID             uint                             `json:"id"`
+		Name           string                           `json:"name"`
+		URL            string                           `json:"url"`
+		Description    string                           `json:"description"`
+		StarCount      uint                             `json:"starCount"`
+		ForkCount      uint                             `json:"forkCount"`
+		OpenIssueCount uint                             `json:"openIssueCount"`
+		Topics         string                           `json:"topics"`
+		License        string                           `json:"license"`
+		Language       string                           `json:"language"`
+		Issues         []GetRepositoriesOutputItemIssue `json:"issues"`
 	}
 
-	GetRepositoriesOutput []GetRepository
+	GetRepositoriesOutput struct {
+		Items   []GetRepositoriesOutputItem `json:"items"`
+		HasNext bool                        `json:"hasNext"`
+	}
 
-	GetLanguagesOutput []string
+	GetLanguagesOutput struct {
+		Items []string `json:"items"`
+	}
 
-	GetLicensesOutput []string
+	GetLicensesOutput struct {
+		Items []string `json:"items"`
+	}
 
-	GetLabelsOutput []string
+	GetLabelsOutput struct {
+		Items []string `json:"items"`
+	}
 )
 
 func (input *GetRepositoriesInput) validator() error {
+	if input.Page == nil {
+		return fmt.Errorf("page is required")
+	}
+
 	if input.StarCountLower != nil && input.StarCountUpper != nil && *input.StarCountLower > *input.StarCountUpper {
 		return fmt.Errorf("star_count_lower should be less than star_count_upper")
 	}
