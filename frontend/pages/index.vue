@@ -10,18 +10,81 @@
         Explore GitHub issues using flexible query with <span style="color: #F85758">saguru</span>
       </h2>
     </v-row>
-    <v-row justify="center">
-      <v-col cols="12" sm="4" md="4">
-        <v-select
-          v-model="temporaryInputs.language"
+    <v-row justify="center" class="mt-5">
+      <v-col cols="12" sm="4" md="4" class="mt-3">
+        <v-card class="pa-4"           elevation="0"
+          outlined>
+        <!-- <v-select
+          v-model="temporaryInputs.languages"
           :items="languages"
-          label="Language"
-        ></v-select>
-        <v-select
+          label="Languages"
+        ></v-select> -->
+        <!-- <v-select
           v-model="temporaryInputs.labels"
           :items="labels"
           label="Labels"
-        ></v-select>
+        ></v-select> -->
+        <v-autocomplete
+          v-model="temporaryInputs.languages"
+          :items="languages"
+          outlined
+          chips
+          small-chips
+          label="Languages"
+          multiple
+          clearable
+        ></v-autocomplete>
+        <v-autocomplete
+          v-model="temporaryInputs.labels"
+          :items="labels"
+          outlined
+          chips
+          small-chips
+          label="Labels"
+          multiple
+          clearable
+        ></v-autocomplete>
+        <!-- <v-subheader>Star count</v-subheader>
+        <v-range-slider
+          max="50"
+          min="-50"
+          thumb-label="true"
+          dense
+        ></v-range-slider> -->
+        <v-subheader>Fork count</v-subheader>
+        <v-range-slider
+          max="50"
+          min="-50"
+          dense
+        ></v-range-slider>
+        <v-row justify="space-between">
+          <v-col
+            cols="5"
+            sm="5"
+          >
+            <v-text-field
+              outlined
+              dense
+              single-line
+              v-model="message1"
+              label="upper"
+            ></v-text-field>
+          </v-col>
+          <v-col
+            cols="5"
+            sm="5"
+          >
+            <v-text-field
+              v-model="message2"
+              outlined
+              single-line
+              dense
+              clearable
+              label="lower"
+            ></v-text-field>
+          </v-col>
+        </v-row>
+      
         <v-btn
           class="mr-4"
           color="#F85758"
@@ -38,6 +101,7 @@
         >
           search
         </v-btn>
+        </v-card>
       </v-col>
       <v-col cols="12" sm="8" md="8">
         <v-card
@@ -53,9 +117,9 @@
           <v-card-text class="pt-1 pb-2">
             {{ repository.description }}
           </v-card-text>
-          <v-card-text class="py-1">
+          <v-card-actions class="py-1 mb-2">
             <v-chip
-              color="#F85758"
+              color="#f57879"
               class="mr-2"
               label
               small
@@ -64,7 +128,7 @@
               #{{ repository.language }}
             </v-chip>
             <v-chip
-              color="#F85758"
+              color="#f57879"
               class="mr-2"
               label
               small
@@ -74,7 +138,7 @@
               {{ repository.starCount }}
             </v-chip>
             <v-chip
-              color="#F85758"
+              color="#f57879"
               class="mr-2"
               label
               small
@@ -83,38 +147,51 @@
               <v-icon small>mdi-source-fork</v-icon>
               {{ repository.forkCount }}
             </v-chip>
-          </v-card-text>
-          <div v-if="true">
-            <v-card-text>
-              <div
-                v-for="issue in repository.issues"
-                :key="issue.id"
-              >
-                <v-divider></v-divider>
-                <div class="py-3">
-                  <span
-                    :href="issue.url"
-                    target="_blank"
-                    class="text-decoration-none text-subtitle-1 mr-2"
-                  >
-                    <v-icon left>mdi-label-outline</v-icon>
-                    {{ issue.title }}
-                  </span>
-                  <v-chip
-                    v-for="label in issue.labels"
-                    :key="label"
-                    color="purple lighten-2"
-                    class="mr-2"
-                    label
-                    small
-                    outlined
-                  >
-                    #{{ label }}
-                  </v-chip>
+            <v-spacer></v-spacer>
+
+            <v-btn
+              @click="repository.show = !repository.show"
+              outlined
+              small
+              color="purple"
+            >
+              {{ repository.issues.length }} Issues
+              <v-icon>{{ repository.show ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
+            </v-btn>
+          </v-card-actions>
+          <v-expand-transition>
+            <div v-show="repository.show">
+              <v-card-text>
+                <div
+                  v-for="issue in repository.issues"
+                  :key="issue.id"
+                >
+                  <v-divider></v-divider>
+                  <div class="py-3">
+                    <span
+                      :href="issue.url"
+                      target="_blank"
+                      class="text-decoration-none text-subtitle-1 mr-2"
+                    >
+                      <v-icon left>mdi-label-outline</v-icon>
+                      {{ issue.title }}
+                    </span>
+                    <v-chip
+                      v-for="label in issue.labels"
+                      :key="label"
+                      color="grey darken-2"
+                      class="mr-2"
+                      label
+                      small
+                      outlined
+                    >
+                      #{{ label }}
+                    </v-chip>
+                  </div>
                 </div>
-              </div>
-            </v-card-text>
-          </div>
+              </v-card-text>
+            </div>
+          </v-expand-transition>
         </v-card>
         <v-btn
           class="mr-4 white--text"
@@ -144,8 +221,8 @@
 <script>
 // define class and constructor?
 let inputsTemplate = {
-  language: '',
-  labels: 'good first issue'
+  languages: ['Python', 'Go'],
+  labels: ['good first issue', 'help wanted']
 }
 
 export default {
@@ -153,16 +230,18 @@ export default {
     return {
       inputs: JSON.parse(JSON.stringify(inputsTemplate)),
       temporaryInputs: JSON.parse(JSON.stringify(inputsTemplate)),
+      show: false,
     }
   },
   methods: {
     search (event) {
       this.inputs = JSON.parse(JSON.stringify(this.temporaryInputs))
       this.$store.commit('resetPage')
+      console.log(this.getParams())
       this.$store.dispatch('fetchRepositories', this.getParams())
     },
     reset (event) {
-      // reset inputs
+      this.temporaryInputs = JSON.parse(JSON.stringify(inputsTemplate))
     },
     previous (event) {
       this.$store.commit('decrimentPage')
@@ -175,10 +254,13 @@ export default {
     getParams () {
       return {
         page: this.page,
-        language: this.inputs.language === 'all' ? '' : this.inputs.language,
-        labels: this.inputs.labels === 'all' ? '' : this.inputs.labels,
+        languages: this.inputs.languages.includes('all') ? '' : this.inputs.languages.join(','),
+        labels: this.inputs.labels.includes('all') ? '' : this.inputs.labels.join(','),
       }
     },
+    openIssues () {
+      
+    }
   },
   created () {
     this.$store.dispatch('fetchRepositories', this.getParams())

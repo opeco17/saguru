@@ -6,15 +6,15 @@ import (
 
 type (
 	GetRepositoriesInput struct {
-		Page           *uint    `query:"page"`
-		Labels         []string `query:"labels"`
-		Assigned       *bool    `query:"assigned"`
-		Language       string   `query:"language"`
-		StarCountLower *uint    `query:"star_count_lower"`
-		StarCountUpper *uint    `query:"star_count_upper"`
-		ForkCountLower *uint    `query:"fork_count_lower"`
-		ForkCountUpper *uint    `query:"fork_count_upper"`
-		License        string   `query:"license"`
+		Page           *uint  `query:"page"`
+		Labels         string `query:"labels"`
+		Assigned       *bool  `query:"assigned"`
+		Languages      string `query:"languages"`
+		StarCountLower *uint  `query:"star_count_lower"`
+		StarCountUpper *uint  `query:"star_count_upper"`
+		ForkCountLower *uint  `query:"fork_count_lower"`
+		ForkCountUpper *uint  `query:"fork_count_upper"`
+		License        string `query:"license"`
 	}
 
 	GetRepositoriesOutputItemIssue struct {

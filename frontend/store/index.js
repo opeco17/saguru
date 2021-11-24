@@ -46,6 +46,9 @@ export default () => (new Vuex.Store({
     actions: {
         async fetchRepositories(ctx, params) {
             const res = await this.$axios.$get(`${this.$API_BASE_URL}/repositories`, { params: params})
+            for (let item of res.items) {
+                item.show = false
+            }
             ctx.commit('setRepositories', res.items)
             ctx.commit('setHasNext', res.hasNext)
         },

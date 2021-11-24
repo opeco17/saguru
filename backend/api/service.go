@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"opeco17/oss-book/lib"
+	"strings"
 
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -17,10 +18,10 @@ func fetchIssueIDs(gormDB *gorm.DB, input *GetRepositoriesInput) []uint {
 		return nil
 	}
 
-	query := gormDB.Model(&lib.Issue{})
+	query := gormDB.Debug().Model(&lib.Issue{})
 	query.Joins("INNER JOIN labels ON labels.issue_id = issues.id")
 	if len(input.Labels) > 0 {
-		query.Where("labels.name IN ?", input.Labels)
+		query.Where("labels.name IN ?", strings.Split(input.Labels, ","))
 	}
 	if input.Assigned != nil && *input.Assigned {
 		query.Where("issues.assignees_count > ?", 0)
@@ -45,8 +46,8 @@ func fetchRepositoryIDs(gormDB *gorm.DB, input *GetRepositoriesInput, issueIDs [
 
 	query := gormDB.Model(&lib.Repository{})
 	query.Joins("INNER JOIN issues ON issues.repository_id = repositories.id")
-	if input.Language != "" {
-		query.Where("repositories.language = ?", input.Language)
+	if input.Languages != "" {
+		query.Where("repositories.language IN ?", strings.Split(input.Languages, ","))
 	}
 	if input.StarCountLower != nil {
 		query.Where("repositories.star_count > ?", *input.StarCountLower)
