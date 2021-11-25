@@ -49,6 +49,9 @@ func fetchRepositoryIDs(gormDB *gorm.DB, input *GetRepositoriesInput, issueIDs [
 	if input.Languages != "" {
 		query.Where("repositories.language IN ?", strings.Split(input.Languages, ","))
 	}
+	if input.License != "" {
+		query.Where("repositories.license = ?", input.License)
+	}
 	if input.StarCountLower != nil {
 		query.Where("repositories.star_count > ?", *input.StarCountLower)
 	}

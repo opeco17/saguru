@@ -26,8 +26,22 @@
           small-chips
           single-line
           multiple
-          clearable
-        ></v-autocomplete>
+        >
+          <template v-slot:selection="data">
+            <v-chip
+              v-bind="data.attrs"
+              :input-value="data.selected"
+              close
+              outlined
+              color="grey darken-2"
+              small
+              @click="data.select"
+              @click:close="removeLanguage(data.item)"
+            >
+              {{ data.item }}
+            </v-chip>
+          </template>
+        </v-autocomplete>
         <form-label label="Labels" />
         <v-autocomplete
           v-model="temporaryInputs.labels"
@@ -37,8 +51,22 @@
           small-chips
           single-line
           multiple
-          clearable
-        ></v-autocomplete>
+        >
+          <template v-slot:selection="data">
+            <v-chip
+              v-bind="data.attrs"
+              :input-value="data.selected"
+              close
+              outlined
+              color="grey darken-2"
+              small
+              @click="data.select"
+              @click:close="removeLabels(data.item)"
+            >
+              {{ data.item }}
+            </v-chip>
+          </template>
+        </v-autocomplete>
         <form-label label="Star count" />
         <v-row justify="space-between">
           <v-col
@@ -93,7 +121,15 @@
             ></v-text-field>
           </v-col>
         </v-row>
-        <v-row justify="center" class="mb-1">
+        <form-label label="License" />
+        <v-select
+          v-model="temporaryInputs.license"
+          :items="licenses"
+          outlined
+          single-line
+          dense
+        ></v-select>
+        <v-row justify="center" class="mb-1 mt-2">
           <v-btn
             class="mr-4"
             color="#F85758"
@@ -234,12 +270,13 @@
 import FormLabel from '../components/FormLabel.vue'
 
 let inputsTemplate = {
-  languages: ['Python', 'Go'],
+  languages: ['all'],
   labels: ['good first issue', 'help wanted'],
   star_count_lower: '',
   star_count_upper: '',
   fork_count_lower: '',
   fork_count_upper: '',
+  license: 'all',
 }
 
 export default {
@@ -249,6 +286,7 @@ export default {
       inputs: JSON.parse(JSON.stringify(inputsTemplate)),
       temporaryInputs: JSON.parse(JSON.stringify(inputsTemplate)),
       show: false,
+      showDetail: false
     }
   },
   methods: {
@@ -271,28 +309,22 @@ export default {
     getParams () {
       let params = {}
       params.page = this.page
-      if (this.inputs.languages !== '' && !this.inputs.languages.includes('all')) {
-        params.languages = this.inputs.languages.join(',')
-      }
-      if (this.inputs.labels !== '' && !this.inputs.labels.includes('all')) {
-        params.labels = this.inputs.labels.join(',')
-      }
-      if (this.inputs.star_count_lower !== '') {
-        params.star_count_lower = this.inputs.star_count_lower
-      }
-      if (this.inputs.star_count_upper !== '') {
-        params.star_count_upper = this.inputs.star_count_upper
-      }
-      if (this.inputs.fork_count_lower !== '') {
-        params.fork_count_lower = this.inputs.fork_count_lower
-      }
-      if (this.inputs.fork_count_upper !== '') {
-        params.fork_count_upper = this.inputs.fork_count_upper
-      }
+      if (this.inputs.languages !== '' && !this.inputs.languages.includes('all')) params.languages = this.inputs.languages.join(',')
+      if (this.inputs.labels !== '' && !this.inputs.labels.includes('all')) params.labels = this.inputs.labels.join(',')
+      if (this.inputs.star_count_lower !== '') params.star_count_lower = this.inputs.star_count_lower
+      if (this.inputs.star_count_upper !== '') params.star_count_upper = this.inputs.star_count_upper
+      if (this.inputs.fork_count_lower !== '') params.fork_count_lower = this.inputs.fork_count_lower
+      if (this.inputs.fork_count_upper !== '') params.fork_count_upper = this.inputs.fork_count_upper
+      if (this.inputs.license !== '' && this.inputs.license !== 'all') params.license = this.inputs.license
       return params
     },
-    openIssues () {
-      
+    removeLanguage(language) {
+      const index = this.temporaryInputs.languages.indexOf(language)
+      if (index >= 0) this.temporaryInputs.languages.splice(index, 1)
+    },
+    removeLabels(label) {
+      const index = this.temporaryInputs.labels.indexOf(label)
+      if (index >= 0) this.temporaryInputs.labels.splice(index, 1)
     }
   },
   created () {
