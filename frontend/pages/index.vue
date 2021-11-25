@@ -12,19 +12,12 @@
     </v-row>
     <v-row justify="center" class="mt-5">
       <v-col cols="12" sm="4" md="4" class="mt-3">
-        <v-card class="pa-4"           elevation="0"
-          outlined>
-        <!-- <v-select
-          v-model="temporaryInputs.languages"
-          :items="languages"
-          label="Languages"
-        ></v-select> -->
-        <!-- <v-select
-          v-model="temporaryInputs.labels"
-          :items="labels"
-          label="Labels"
-        ></v-select> -->
-        <div class="grey--text text--darken-2 mb-1">Languages</div>
+        <v-card 
+          class="pa-4"
+          elevation="0"
+          outlined
+        >
+        <form-label label="Languages" />
         <v-autocomplete
           v-model="temporaryInputs.languages"
           :items="languages"
@@ -35,7 +28,7 @@
           multiple
           clearable
         ></v-autocomplete>
-        <div class="grey--text text--darken-2 mb-1">Labels</div>
+        <form-label label="Labels" />
         <v-autocomplete
           v-model="temporaryInputs.labels"
           :items="labels"
@@ -46,7 +39,7 @@
           multiple
           clearable
         ></v-autocomplete>
-        <div class="grey--text text--darken-2 mb-1">Fork count</div>
+        <form-label label="Star count" />
         <v-row justify="space-between">
           <v-col
             cols="6"
@@ -56,7 +49,7 @@
               outlined
               dense
               single-line
-              v-model="message1"
+              v-model="temporaryInputs.star_count_lower"
               label="Min"
             ></v-text-field>
           </v-col>
@@ -65,32 +58,59 @@
             sm="6"
           >
             <v-text-field
-              v-model="message2"
+              v-model="temporaryInputs.star_count_upper"
               outlined
               single-line
               dense
-              clearable
               label="Max"
             ></v-text-field>
           </v-col>
         </v-row>
-      
-        <v-btn
-          class="mr-4"
-          color="#F85758"
-          outlined
-          @click="reset"
-        >
-          reset
-        </v-btn>
-        <v-btn
-          class="mr-4 white--text"
-          color="#F85758"
-          depressed
-          @click="search"
-        >
-          search
-        </v-btn>
+        <form-label label="Fork count" />
+        <v-row justify="space-between">
+          <v-col
+            cols="6"
+            sm="6"
+          >
+            <v-text-field
+              outlined
+              dense
+              single-line
+              v-model="temporaryInputs.fork_count_lower"
+              label="Min"
+            ></v-text-field>
+          </v-col>
+          <v-col
+            cols="6"
+            sm="6"
+          >
+            <v-text-field
+              v-model="temporaryInputs.fork_count_upper"
+              outlined
+              single-line
+              dense
+              label="Max"
+            ></v-text-field>
+          </v-col>
+        </v-row>
+        <v-row justify="center" class="mb-1">
+          <v-btn
+            class="mr-4"
+            color="#F85758"
+            outlined
+            @click="reset"
+          >
+            reset
+          </v-btn>
+          <v-btn
+            class="mr-4 white--text"
+            color="#F85758"
+            depressed
+            @click="search"
+          >
+            search
+          </v-btn>
+        </v-row>
         </v-card>
       </v-col>
       <v-col cols="12" sm="8" md="8">
@@ -183,39 +203,47 @@
             </div>
           </v-expand-transition>
         </v-card>
-        <v-btn
-          class="mr-4 white--text"
-          color="#F85758"
-          depressed
-          @click="previous"
-          :disabled="page === 0"
-        >
-          <v-icon>mdi-chevron-left</v-icon>
-          previous
-        </v-btn>
-        <v-btn
-          class="mr-4 white--text"
-          color="#F85758"
-          depressed
-          @click="next"
-          :disabled="!hasNext"
-        >
-          next
-          <v-icon>mdi-chevron-right</v-icon>
-        </v-btn>
+        <v-row justify="center" class="mt-4">
+          <v-btn
+            class="mr-4 white--text"
+            color="#F85758"
+            depressed
+            @click="previous"
+            :disabled="page === 0"
+          >
+            <v-icon>mdi-chevron-left</v-icon>
+            previous
+          </v-btn>
+          <v-btn
+            class="mr-4 white--text"
+            color="#F85758"
+            depressed
+            @click="next"
+            :disabled="!hasNext"
+          >
+            next
+            <v-icon>mdi-chevron-right</v-icon>
+          </v-btn>
+        </v-row>
       </v-col>
     </v-row>
   </div>
 </template>
 
 <script>
-// define class and constructor?
+import FormLabel from '../components/FormLabel.vue'
+
 let inputsTemplate = {
   languages: ['Python', 'Go'],
-  labels: ['good first issue', 'help wanted']
+  labels: ['good first issue', 'help wanted'],
+  star_count_lower: '',
+  star_count_upper: '',
+  fork_count_lower: '',
+  fork_count_upper: '',
 }
 
 export default {
+  components: { FormLabel },
   data () {
     return {
       inputs: JSON.parse(JSON.stringify(inputsTemplate)),
@@ -227,7 +255,6 @@ export default {
     search (event) {
       this.inputs = JSON.parse(JSON.stringify(this.temporaryInputs))
       this.$store.commit('resetPage')
-      console.log(this.getParams())
       this.$store.dispatch('fetchRepositories', this.getParams())
     },
     reset (event) {
@@ -242,11 +269,27 @@ export default {
       this.$store.dispatch('fetchRepositories', this.getParams())
     },
     getParams () {
-      return {
-        page: this.page,
-        languages: this.inputs.languages.includes('all') ? '' : this.inputs.languages.join(','),
-        labels: this.inputs.labels.includes('all') ? '' : this.inputs.labels.join(','),
+      let params = {}
+      params.page = this.page
+      if (this.inputs.languages !== '' && !this.inputs.languages.includes('all')) {
+        params.languages = this.inputs.languages.join(',')
       }
+      if (this.inputs.labels !== '' && !this.inputs.labels.includes('all')) {
+        params.labels = this.inputs.labels.join(',')
+      }
+      if (this.inputs.star_count_lower !== '') {
+        params.star_count_lower = this.inputs.star_count_lower
+      }
+      if (this.inputs.star_count_upper !== '') {
+        params.star_count_upper = this.inputs.star_count_upper
+      }
+      if (this.inputs.fork_count_lower !== '') {
+        params.fork_count_lower = this.inputs.fork_count_lower
+      }
+      if (this.inputs.fork_count_upper !== '') {
+        params.fork_count_upper = this.inputs.fork_count_upper
+      }
+      return params
     },
     openIssues () {
       
