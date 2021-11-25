@@ -24,55 +24,45 @@
           :items="labels"
           label="Labels"
         ></v-select> -->
+        <div class="grey--text text--darken-2 mb-1">Languages</div>
         <v-autocomplete
           v-model="temporaryInputs.languages"
           :items="languages"
           outlined
           chips
           small-chips
-          label="Languages"
+          single-line
           multiple
           clearable
         ></v-autocomplete>
+        <div class="grey--text text--darken-2 mb-1">Labels</div>
         <v-autocomplete
           v-model="temporaryInputs.labels"
           :items="labels"
           outlined
           chips
           small-chips
-          label="Labels"
+          single-line
           multiple
           clearable
         ></v-autocomplete>
-        <!-- <v-subheader>Star count</v-subheader>
-        <v-range-slider
-          max="50"
-          min="-50"
-          thumb-label="true"
-          dense
-        ></v-range-slider> -->
-        <v-subheader>Fork count</v-subheader>
-        <v-range-slider
-          max="50"
-          min="-50"
-          dense
-        ></v-range-slider>
+        <div class="grey--text text--darken-2 mb-1">Fork count</div>
         <v-row justify="space-between">
           <v-col
-            cols="5"
-            sm="5"
+            cols="6"
+            sm="6"
           >
             <v-text-field
               outlined
               dense
               single-line
               v-model="message1"
-              label="upper"
+              label="Min"
             ></v-text-field>
           </v-col>
           <v-col
-            cols="5"
-            sm="5"
+            cols="6"
+            sm="6"
           >
             <v-text-field
               v-model="message2"
@@ -80,7 +70,7 @@
               single-line
               dense
               clearable
-              label="lower"
+              label="Max"
             ></v-text-field>
           </v-col>
         </v-row>
