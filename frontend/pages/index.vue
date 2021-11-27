@@ -1,11 +1,11 @@
 <template>
   <div>
-    <v-row justify="center" align-content="center" class="my-2">
+    <v-row justify="center" align-content="center" class="my-2 mx-1">
       <h1 class="text-md-h3 text-xs-h4 font-weight-medium">
         Grab a favorite issue and commit there
       </h1>
     </v-row>
-    <v-row justify="center" align-content="center" class="my-2">
+    <v-row justify="center" align-content="center" class="my-2 mx-1">
       <h2 class="text-md-h5 text-xs-h6 grey--text text--darken-2 font-weight-medium">
         Explore GitHub issues using flexible query with 
         <a
@@ -26,97 +26,85 @@
     </v-row>
     <v-row justify="center" class="mt-5">
       <v-col cols="12" sm="4" md="4" class="mt-3">
-        <v-card 
-          class="pa-4"
-          elevation="0"
-          outlined
+        <v-form
+          ref="form"
+          v-model="valid"
+          lazy-validation
         >
-          <form-label label="Languages" />
-          <multiple-chips-select
-            v-model="temporaryInputs.languages" 
-            :items="languages" 
-            @close="removeLanguage"
-          />
-          <form-label label="Labels" />
-          <multiple-chips-select
-            v-model="temporaryInputs.labels" 
-            :items="labels" 
-            @close="removeLabel" 
-          />
-          <form-label label="Star count" />
-          <v-row justify="space-between">
-            <v-col cols="6" sm="6">
-              <single-integer-field v-model="temporaryInputs.star_count_lower" label="Min" />
-            </v-col>
-            <v-col cols="6" sm="6">
-              <single-integer-field v-model="temporaryInputs.star_count_upper" label="Max" />
-            </v-col>
-          </v-row>
-          <form-label label="Order by" />
-          <orderby-select v-model="temporaryInputs.ordermetric" :items="ordermetrics" />
-          <v-row justify="end" class="mb-1 mr-1">
-            <v-btn @click="showDetail=!showDetail" text small class="px-1">
-              detail
-              <v-icon>{{ showDetail ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
-            </v-btn>
-          </v-row>
-          <v-divider></v-divider>
-          <v-expand-transition>
-            <div v-show="showDetail" class="mt-3">
-              <form-label label="Fork count" />
-              <v-row justify="space-between">
-                <v-col
-                  cols="6"
-                  sm="6"
-                >
-                  <single-integer-field 
-                    v-model="temporaryInputs.fork_count_lower" 
-                    label="Min"
-                  />
-                </v-col>
-                <v-col
-                  cols="6"
-                  sm="6"
-                >
-                  <single-integer-field 
-                    v-model="temporaryInputs.fork_count_upper" 
-                    label="Max"
-                  />
-                </v-col>
-              </v-row>
-              <form-label label="License" />
-              <single-text-select v-model="temporaryInputs.license" :items="licenses"/>
-              <form-label label="Assign status" />
-              <single-text-select v-model="temporaryInputs.assigned" :items="assignStatuses"/>
-            </div>
-          </v-expand-transition>
-          <v-row justify="center" class="mb-1 mt-4">
-            <v-btn
-              class="mr-4"
-              color="#F85758"
-              outlined
-              @click="reset"
-            >
-              reset
-            </v-btn>
-            <v-btn
-              class="mr-4 white--text"
-              color="#F85758"
-              depressed
-              @click="search"
-            >
-              search 
-              <v-progress-circular
-                indeterminate
-                color="white"
-                class="ml-2"
-                :size="15"
-                :width="2"
-                v-show="searchLoading"
-              ></v-progress-circular>
-            </v-btn>
-          </v-row>
-        </v-card>
+          <v-card
+            class="pa-4"
+            elevation="0"
+            outlined
+          >
+            <form-label label="Languages" />
+            <multiple-chips-select
+              v-model="temporaryInputs.languages" 
+              :items="languages" 
+              @close="removeLanguage"
+            />
+            <form-label label="Labels" />
+            <multiple-chips-select
+              v-model="temporaryInputs.labels" 
+              :items="labels" 
+              @close="removeLabel" 
+            />
+            <form-label label="Star count" />
+            <v-row justify="space-between">
+              <v-col cols="6" sm="6">
+                <single-integer-field v-model="temporaryInputs.star_count_lower" label="Min" />
+              </v-col>
+              <v-col cols="6" sm="6">
+                <single-integer-field v-model="temporaryInputs.star_count_upper" label="Max" />
+              </v-col>
+            </v-row>
+            <form-label label="Order by" />
+            <orderby-select v-model="temporaryInputs.ordermetric" :items="ordermetrics" />
+            <v-row justify="end" class="mb-1 mr-1">
+              <v-btn @click="showDetail=!showDetail" text small class="px-1">
+                detail
+                <v-icon>{{ showDetail ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
+              </v-btn>
+            </v-row>
+            <v-divider></v-divider>
+            <v-expand-transition>
+              <div v-show="showDetail" class="mt-3">
+                <form-label label="Fork count" />
+                <v-row justify="space-between">
+                  <v-col cols="6" sm="6">
+                    <single-integer-field 
+                      v-model="temporaryInputs.fork_count_lower" 
+                      label="Min"
+                    />
+                  </v-col>
+                  <v-col cols="6" sm="6">
+                    <single-integer-field 
+                      v-model="temporaryInputs.fork_count_upper" 
+                      label="Max"
+                    />
+                  </v-col>
+                </v-row>
+                <form-label label="License" />
+                <single-text-select v-model="temporaryInputs.license" :items="licenses"/>
+                <form-label label="Assign status" />
+                <single-text-select v-model="temporaryInputs.assigned" :items="assignStatuses"/>
+              </div>
+            </v-expand-transition>
+            <v-row justify="center" class="mb-1 mt-4">
+              <v-btn
+                class="mr-4"
+                color="#F85758"
+                outlined
+                @click="reset"
+              >
+                reset
+              </v-btn>
+              <basic-button @click="search">
+                search
+                <basic-button-circular v-show="searchLoading" />
+              </basic-button>
+            </v-row>
+          </v-card>
+        </v-form>
       </v-col>
       <v-col cols="12" sm="8" md="8">
         <v-card
@@ -140,7 +128,7 @@
               <v-icon small>mdi-star-outline</v-icon>
               {{ repository.starCount | killo }}
             </repository-chip>
-            <repository-chip>
+            <repository-chip class="hidden-xs-only">
               <v-icon small>mdi-source-fork</v-icon>
               {{ repository.forkCount | killo }}
             </repository-chip>
@@ -166,17 +154,9 @@
                   <div class="py-3">
                     <v-icon left>mdi-label-outline</v-icon>
                       <issue-title :url="issue.url">{{ issue.title }}</issue-title>
-                    <v-chip
-                      v-for="label in issue.labels"
-                      :key="label"
-                      color="grey darken-2"
-                      class="mr-2"
-                      label
-                      small
-                      outlined
-                    >
+                    <issue-chip v-for="label in issue.labels" :key="label">
                       #{{ label }}
-                    </v-chip>
+                    </issue-chip>
                   </div>
                 </div>
               </v-card-text>
@@ -184,25 +164,11 @@
           </v-expand-transition>
         </v-card>
         <v-row justify="center" class="mt-4">
-          <v-btn
-            class="mr-4 white--text"
-            color="#F85758"
-            depressed
-            @click="showmore"
-            :disabled="!hasNext"
-            v-show="!initLoading"
-          >
+          <basic-button @click="showmore" :disabled="!hasNext" v-show="!initLoading">
             <v-icon>mdi-chevron-down</v-icon>
             show more
-            <v-progress-circular
-              indeterminate
-              color="white"
-              class="ml-2"
-              :size="15"
-              :width="2"
-              v-show="showmoreLoading"
-            ></v-progress-circular>
-          </v-btn>
+            <basic-button-circular v-show="showmoreLoading" />
+          </basic-button>
         </v-row>
       </v-col>
     </v-row>
@@ -227,6 +193,7 @@ export default {
     return {
       inputs: JSON.parse(JSON.stringify(inputsTemplate)),
       temporaryInputs: JSON.parse(JSON.stringify(inputsTemplate)),
+      valid: true,
       show: false,
       showDetail: false,
     }
@@ -275,6 +242,10 @@ export default {
   },
   methods: {
     search (event) {
+      this.$refs.form.validate()
+      if (!this.valid) {
+        return
+      }
       this.inputs = JSON.parse(JSON.stringify(this.temporaryInputs))
       this.$store.commit('resetPage')
       this.$store.dispatch('fetchRepositories', { params: this.getParams(), type: 'search' })

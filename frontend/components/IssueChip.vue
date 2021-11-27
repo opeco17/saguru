@@ -1,11 +1,10 @@
 <template>
-    <v-chip
-        color="#f57879"
+    <v-chip        
+        color="grey darken-2"
         class="mr-2"
         label
         small
         outlined
-        :ripple="false"
     >
         <slot></slot>
     </v-chip>
