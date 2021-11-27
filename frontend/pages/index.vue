@@ -126,11 +126,11 @@
             </repository-chip>
             <repository-chip>
               <v-icon small>mdi-star-outline</v-icon>
-              {{ repository.starCount | killo }}
+              {{ repository.starCount | kilo }}
             </repository-chip>
             <repository-chip class="hidden-xs-only">
               <v-icon small>mdi-source-fork</v-icon>
-              {{ repository.forkCount | killo }}
+              {{ repository.forkCount | kilo }}
             </repository-chip>
             <v-spacer></v-spacer>
             <v-btn
@@ -285,7 +285,7 @@ export default {
     },
   },
   filters: {
-    killo (value) {
+    kilo (value) {
       return value > 999 ? (value / 1000).toFixed(1) + 'k' : value
     }
   }
