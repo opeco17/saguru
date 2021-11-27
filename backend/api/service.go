@@ -18,7 +18,7 @@ func fetchIssueIDs(gormDB *gorm.DB, input *GetRepositoriesInput) []uint {
 		return nil
 	}
 
-	query := gormDB.Debug().Model(&lib.Issue{})
+	query := gormDB.Model(&lib.Issue{})
 	query.Joins("INNER JOIN labels ON labels.issue_id = issues.id")
 	if len(input.Labels) > 0 {
 		query.Where("labels.name IN ?", strings.Split(input.Labels, ","))
@@ -67,6 +67,7 @@ func fetchRepositoryIDs(gormDB *gorm.DB, input *GetRepositoriesInput, issueIDs [
 	if issueIDs != nil {
 		query.Where("issues.id IN ?", issueIDs)
 	}
+	query.Order("repositories.id")
 	query.Distinct("repositories.id")
 	query.Offset(int(*input.Page) * int(RESULTS_PER_PAGE))
 	query.Limit(int(RESULTS_PER_PAGE) + 1)

@@ -33,6 +33,9 @@ export default () => (new Vuex.Store({
         setRepositories (state, repositories) {
             state.repositories = repositories
         },
+        addRepositories (state, repositories) {
+            state.repositories = state.repositories.concat(repositories)
+        },
         setLanguages (state, languages) {
             state.languages = languages
         },
@@ -41,15 +44,19 @@ export default () => (new Vuex.Store({
         },
         setLabels (state, labels) {
             state.labels = labels
-        }
+        },
     },
-    actions: {
-        async fetchRepositories(ctx, params) {
+    actions: {        
+        async fetchRepositories(ctx, {params, add}) {
             const res = await this.$axios.$get(`${this.$API_BASE_URL}/repositories`, { params: params})
             for (let item of res.items) {
                 item.show = false
             }
-            ctx.commit('setRepositories', res.items)
+            if (add) {
+                ctx.commit('addRepositories', res.items)
+            } else {
+                ctx.commit('setRepositories', res.items)
+            }
             ctx.commit('setHasNext', res.hasNext)
         },
         async fetchLanguages(ctx) {

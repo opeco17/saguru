@@ -1,20 +1,18 @@
 <template>
-    <v-autocomplete
-        v-model="model"
+    <v-select
+        :value="value"
+        @input="$emit('input', $event)"
         :items="items"
         outlined
-        chips
-        small-chips
         single-line
-        multiple
-        clearable
-    ></v-autocomplete>
+        dense
+    ></v-select>
 </template>
 
 <script>
 export default {
     props: {
-        model: Array,
+        value: String,
         items: Array
     }
 }
