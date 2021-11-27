@@ -15,6 +15,7 @@ type (
 		ForkCountLower *uint  `query:"fork_count_lower"`
 		ForkCountUpper *uint  `query:"fork_count_upper"`
 		License        string `query:"license"`
+		Orderby        string `query:"orderby"`
 	}
 
 	GetRepositoriesOutputItemIssue struct {
@@ -53,6 +54,10 @@ type (
 	}
 
 	GetLabelsOutput struct {
+		Items []string `json:"items"`
+	}
+
+	GetOrderMetricsOutput struct {
 		Items []string `json:"items"`
 	}
 )

@@ -36,7 +36,7 @@ func getRepositories(c echo.Context) error {
 	now := time.Now()
 	issueIDs := fetchIssueIDs(gormDB, input)
 	repositoryIDs := fetchRepositoryIDs(gormDB, input, issueIDs)
-	repositories := fetchRepositoryEntities(gormDB, issueIDs, repositoryIDs)
+	repositories := fetchRepositoryEntities(gormDB, input, issueIDs, repositoryIDs)
 	getRepositoriesOutput := convertGetRepositoriesOutput(repositories)
 	logrus.Info(fmt.Sprintf("Total time to fetch repositories: %vms\n", time.Since(now).Milliseconds()))
 
@@ -98,4 +98,14 @@ func getLabels(c echo.Context) error {
 	logrus.Info(fmt.Sprintf("Total time to fetch front labels: %vms\n", time.Since(now).Milliseconds()))
 
 	return c.JSON(http.StatusOK, getLabelsOutput)
+}
+
+func getOrderMetrics(c echo.Context) error {
+	logrus.Info("Get order metrics")
+	metrics := []string{}
+	for _, metric := range orderMetrics() {
+		metrics = append(metrics, metric+"_desc", metric+"_asc")
+	}
+	getOrderMetricsOutput := GetOrderMetricsOutput{Items: metrics}
+	return c.JSON(http.StatusOK, getOrderMetricsOutput)
 }

@@ -67,8 +67,8 @@ func fetchRepositoryIDs(gormDB *gorm.DB, input *GetRepositoriesInput, issueIDs [
 	if issueIDs != nil {
 		query.Where("issues.id IN ?", issueIDs)
 	}
-	query.Order("repositories.id")
-	query.Distinct("repositories.id")
+	setOrderQuery(query, input.Orderby)
+	setDistinctQuery(query, input.Orderby)
 	query.Offset(int(*input.Page) * int(RESULTS_PER_PAGE))
 	query.Limit(int(RESULTS_PER_PAGE) + 1)
 	query.Find(&repositories)
@@ -80,7 +80,7 @@ func fetchRepositoryIDs(gormDB *gorm.DB, input *GetRepositoriesInput, issueIDs [
 	return repositoryIDs
 }
 
-func fetchRepositoryEntities(gormDB *gorm.DB, issueIDs []uint, repositoryIDs []uint) []lib.Repository {
+func fetchRepositoryEntities(gormDB *gorm.DB, input *GetRepositoriesInput, issueIDs []uint, repositoryIDs []uint) []lib.Repository {
 	var repositories []lib.Repository
 
 	query := gormDB.Model(&repositories)
@@ -92,6 +92,7 @@ func fetchRepositoryEntities(gormDB *gorm.DB, issueIDs []uint, repositoryIDs []u
 	query.Preload("Issues.Labels")
 	query.Preload("Issues.Issuer")
 	query.Where("id IN ?", repositoryIDs)
+	setOrderQuery(query, input.Orderby)
 	query.Find(&repositories)
 
 	for _, repository := range repositories {

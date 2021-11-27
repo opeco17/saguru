@@ -17,6 +17,13 @@
         </a>
       </h2>
     </v-row>
+    <v-row style="height: 10px;">
+      <v-progress-linear
+        indeterminate
+        color="#F85758"
+        v-show="initLoading"
+      ></v-progress-linear>
+    </v-row>
     <v-row justify="center" class="mt-5">
       <v-col cols="12" sm="4" md="4" class="mt-3">
         <v-card 
@@ -25,13 +32,13 @@
           outlined
         >
           <form-label label="Languages" />
-          <multiple-chips-selecter
+          <multiple-chips-select
             v-model="temporaryInputs.languages" 
             :items="languages" 
             @close="removeLanguage"
           />
           <form-label label="Labels" />
-          <multiple-chips-selecter
+          <multiple-chips-select
             v-model="temporaryInputs.labels" 
             :items="labels" 
             @close="removeLabel" 
@@ -46,7 +53,7 @@
             </v-col>
           </v-row>
           <form-label label="Order by" />
-          <single-text-selecter v-model="temporaryInputs.license" :items="licenses"/>
+          <orderby-select v-model="temporaryInputs.ordermetric" :items="ordermetrics" />
           <v-row justify="end" class="mb-1 mr-1">
             <v-btn @click="showDetail=!showDetail" text small class="px-1">
               detail
@@ -78,7 +85,9 @@
                 </v-col>
               </v-row>
               <form-label label="License" />
-              <single-text-selecter v-model="temporaryInputs.license" :items="licenses"/>
+              <single-text-select v-model="temporaryInputs.license" :items="licenses"/>
+              <form-label label="Assign status" />
+              <single-text-select v-model="temporaryInputs.assigned" :items="assignStatuses"/>
             </div>
           </v-expand-transition>
           <v-row justify="center" class="mb-1 mt-4">
@@ -96,7 +105,15 @@
               depressed
               @click="search"
             >
-              search
+              search 
+              <v-progress-circular
+                indeterminate
+                color="white"
+                class="ml-2"
+                :size="15"
+                :width="2"
+                v-show="searchLoading"
+              ></v-progress-circular>
             </v-btn>
           </v-row>
         </v-card>
@@ -121,11 +138,11 @@
             </repository-chip>
             <repository-chip>
               <v-icon small>mdi-star-outline</v-icon>
-              {{ repository.starCount }}
+              {{ repository.starCount | killo }}
             </repository-chip>
             <repository-chip>
               <v-icon small>mdi-source-fork</v-icon>
-              {{ repository.forkCount }}
+              {{ repository.forkCount | killo }}
             </repository-chip>
             <v-spacer></v-spacer>
             <v-btn
@@ -173,9 +190,18 @@
             depressed
             @click="showmore"
             :disabled="!hasNext"
+            v-show="!initLoading"
           >
             <v-icon>mdi-chevron-down</v-icon>
             show more
+            <v-progress-circular
+              indeterminate
+              color="white"
+              class="ml-2"
+              :size="15"
+              :width="2"
+              v-show="showmoreLoading"
+            ></v-progress-circular>
           </v-btn>
         </v-row>
       </v-col>
@@ -186,12 +212,14 @@
 <script>
 let inputsTemplate = {
   languages: ['all'],
-  labels: ['good first issue', 'help wanted'],
+  labels: ['good first issue'],
   star_count_lower: '',
   star_count_upper: '',
   fork_count_lower: '',
   fork_count_upper: '',
   license: 'all',
+  assigned: 'all',
+  ordermetric: 'star_count_desc',
 }
 
 export default {
@@ -200,14 +228,15 @@ export default {
       inputs: JSON.parse(JSON.stringify(inputsTemplate)),
       temporaryInputs: JSON.parse(JSON.stringify(inputsTemplate)),
       show: false,
-      showDetail: false
+      showDetail: false,
     }
   },
   created () {
-    this.$store.dispatch('fetchRepositories', { params: this.getParams(), add: false })
+    this.$store.dispatch('fetchRepositories', { params: this.getParams(), type: 'init'})
     this.$store.dispatch('fetchLanguages')
     this.$store.dispatch('fetchLicenses')
     this.$store.dispatch('fetchLabels')
+    this.$store.dispatch('fetchOrdermetrics')
   },
   computed: {
     page() {
@@ -227,20 +256,35 @@ export default {
     },
     labels() {
       return this.$store.state.labels
-    }
+    },
+    assignStatuses() {
+      return this.$store.state.assignStatuses
+    },
+    ordermetrics() {
+      return this.$store.state.ordermetrics
+    },
+    initLoading() {
+      return this.$store.state.initLoading
+    },
+    searchLoading() {
+      return this.$store.state.searchLoading
+    },
+    showmoreLoading() {
+      return this.$store.state.showmoreLoading
+    },
   },
   methods: {
     search (event) {
       this.inputs = JSON.parse(JSON.stringify(this.temporaryInputs))
       this.$store.commit('resetPage')
-      this.$store.dispatch('fetchRepositories', { params: this.getParams(), add: false })
+      this.$store.dispatch('fetchRepositories', { params: this.getParams(), type: 'search' })
     },
     reset (event) {
       this.temporaryInputs = JSON.parse(JSON.stringify(inputsTemplate))
     },
     showmore (event) {
       this.$store.commit('incrementPage')
-      this.$store.dispatch('fetchRepositories', { params: this.getParams(), add: true })
+      this.$store.dispatch('fetchRepositories', { params: this.getParams(), type: 'showmore' })
     },
     getParams () {
       let params = {}
@@ -252,6 +296,12 @@ export default {
       if (this.inputs.fork_count_lower !== '') params.fork_count_lower = this.inputs.fork_count_lower
       if (this.inputs.fork_count_upper !== '') params.fork_count_upper = this.inputs.fork_count_upper
       if (this.inputs.license !== '' && this.inputs.license !== 'all') params.license = this.inputs.license
+      if (this.inputs.ordermetric !== '') params.orderby = this.inputs.ordermetric
+      if (this.inputs.assigned == 'assigned') {
+        params.assigned = true
+      } else if (this.inputs.assigned == 'unassigned') {
+        params.assigned = false
+      }
       return params
     },
     removeLanguage(language) {
@@ -261,7 +311,12 @@ export default {
     removeLabel(label) {
       const index = this.temporaryInputs.labels.indexOf(label)
       if (index >= 0) this.temporaryInputs.labels.splice(index, 1)
-    }
+    },
   },
+  filters: {
+    killo (value) {
+      return value > 999 ? (value / 1000).toFixed(1) + 'k' : value
+    }
+  }
 }
 </script>

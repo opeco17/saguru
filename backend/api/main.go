@@ -26,6 +26,7 @@ func main() {
 	e.GET("/languages", getLanguages)
 	e.GET("/licenses", getLicenses)
 	e.GET("/labels", getLabels)
+	e.GET("/ordermetrics", getOrderMetrics)
 
 	e.Logger.Fatal(e.Start(":8000"))
 }
