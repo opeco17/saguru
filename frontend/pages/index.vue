@@ -176,7 +176,7 @@
 </template>
 
 <script>
-let inputsTemplate = {
+let defaultInputs = {
   languages: ['all'],
   labels: ['good first issue'],
   star_count_lower: '',
@@ -191,8 +191,8 @@ let inputsTemplate = {
 export default {
   data () {
     return {
-      inputs: JSON.parse(JSON.stringify(inputsTemplate)),
-      temporaryInputs: JSON.parse(JSON.stringify(inputsTemplate)),
+      inputs: JSON.parse(JSON.stringify(defaultInputs)),
+      temporaryInputs: JSON.parse(JSON.stringify(defaultInputs)),
       valid: true,
       show: false,
       showDetail: false,
@@ -251,7 +251,7 @@ export default {
       this.$store.dispatch('fetchRepositories', { params: this.getParams(), type: 'search' })
     },
     reset (event) {
-      this.temporaryInputs = JSON.parse(JSON.stringify(inputsTemplate))
+      this.temporaryInputs = JSON.parse(JSON.stringify(defaultInputs))
     },
     showmore (event) {
       this.$store.commit('incrementPage')
