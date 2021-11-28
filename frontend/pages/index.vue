@@ -21,7 +21,7 @@
       <v-progress-linear
         indeterminate
         color="#F85758"
-        v-show="initLoading"
+        v-show="initLoading || searchLoading"
       ></v-progress-linear>
     </v-row>
     <v-row justify="center" class="mt-3">
