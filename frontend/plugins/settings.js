@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://ec2-18-180-202-55.ap-northeast-1.compute.amazonaws.com'
+const API_BASE_URL = 'https://api.saguru.dev'
 
 export default (context, inject) => {
     inject('API_BASE_URL', API_BASE_URL)

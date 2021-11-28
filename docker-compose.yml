@@ -5,22 +5,34 @@ services:
     build:
       context: .
       dockerfile: api.Dockerfile
-    depends_on:
-      - database
     ports:
       - "8000:8000"
     volumes:
       - ./backend:/usr/src/app
+    depends_on:
+      - database
 
   job:
     build:
       context: .
       dockerfile: job.Dockerfile
-    depends_on:
-      - database
     volumes:
       - ./backend:/usr/src/app
+    depends_on:
+      - database
     tty: true
+
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx.Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/public:/usr/share/nginx/html
+    depends_on:
+      - api
 
   database:
     build:
