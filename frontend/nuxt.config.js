@@ -9,7 +9,7 @@ export default {
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    titleTemplate: 'saguru - Explore GitHub issues and repositories',
+    titleTemplate: 'saguru - %s',
     title: 'saguru',
     htmlAttrs: {
       lang: 'en'
@@ -17,8 +17,11 @@ export default {
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: '' },
-      { name: 'format-detection', content: 'telephone=no' }
+      { hid: 'description', name: 'description', content: 'saguru help you search for GitHub issues and repositories with flexible query. saguru support you to contribute open-source.' },
+      { name: 'format-detection', content: 'telephone=no' },
+      { hid: 'keywords', name: 'keywords', content: 'Saguru,GitHub,issue,repository,open-source' },
+
+      { hid: 'og:site_name', property: 'og:site_name', content: 'saguru' },
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }

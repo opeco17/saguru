@@ -7,7 +7,7 @@
     >
       <img
         src="/logo.png"
-        alt="Vuetify.js"
+        alt="logo"
         height="43"
         class="ml-2"
       >
@@ -25,20 +25,10 @@
         <Nuxt />
       </v-container>
     </v-main>
-    <!-- <v-footer
-      :absolute="true"
-      app
-    >
-      <span>&copy; {{ new Date().getFullYear() }}</span>
-    </v-footer> -->
   </v-app>
 </template>
 
 <script>
 export default {
-  data () {
-    return {
-    }
-  }
 }
 </script>

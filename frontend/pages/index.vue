@@ -1,13 +1,13 @@
 <template>
   <div>
     <v-row justify="center" align-content="center" class="my-2 mx-1">
-      <h1 class="text-md-h3 text-xs-h4 font-weight-medium">
+      <h1 class="text-md-h3 text-sm-h4 text-xs-h4 font-weight-medium">
         Grab a favorite issue and commit there
       </h1>
     </v-row>
     <v-row justify="center" align-content="center" class="my-2 mx-1">
-      <h2 class="text-md-h5 text-xs-h6 grey--text text--darken-2 font-weight-medium">
-        Explore GitHub issues using flexible query with 
+      <h3 class="text-md-h5 text-sm-h6 text-xs-h6 grey--text text--darken-2 font-weight-medium">
+        Explore GitHub issues with flexible query in 
         <a
           style="color: #F85758; text-decoration: none;"
           href="https://github.com/opeco17/saguru"
@@ -15,7 +15,7 @@
         >
           saguru
         </a>
-      </h2>
+      </h3>
     </v-row>
     <v-row style="height: 10px;">
       <v-progress-linear
@@ -24,8 +24,8 @@
         v-show="initLoading"
       ></v-progress-linear>
     </v-row>
-    <v-row justify="center" class="mt-5">
-      <v-col cols="12" sm="4" md="4" class="mt-3">
+    <v-row justify="center" class="mt-3">
+      <v-col cols="12" sm="5" md="4" class="mt-3">
         <v-form
           ref="form"
           v-model="valid"
@@ -106,7 +106,7 @@
           </v-card>
         </v-form>
       </v-col>
-      <v-col cols="12" sm="8" md="8">
+      <v-col cols="12" sm="7" md="8">
         <v-card
           class="my-3"
           elevation="0"
@@ -178,7 +178,7 @@
 <script>
 let defaultInputs = {
   languages: ['all'],
-  labels: ['good first issue'],
+  labels: ['help wanted'],
   star_count_lower: '',
   star_count_upper: '',
   fork_count_lower: '',
@@ -287,6 +287,11 @@ export default {
   filters: {
     kilo (value) {
       return value > 999 ? (value / 1000).toFixed(1) + 'k' : value
+    }
+  },
+  head() {
+    return {
+      title: 'Explore GitHub issues with flexible query'
     }
   }
 }
