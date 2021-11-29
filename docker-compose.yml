@@ -7,6 +7,7 @@ services:
       dockerfile: api.Dockerfile
     ports:
       - "8000:8000"
+    restart: always
     volumes:
       - ./backend:/usr/src/app
     depends_on:
@@ -16,6 +17,7 @@ services:
     build:
       context: .
       dockerfile: job.Dockerfile
+    restart: always
     volumes:
       - ./backend:/usr/src/app
     depends_on:
@@ -29,6 +31,7 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    restart: always
     volumes:
       - ./nginx/public:/usr/share/nginx/html
     depends_on:
@@ -40,5 +43,6 @@ services:
       dockerfile: db.Dockerfile
     ports:
       - "3306:3306"
+    restart: always
     # volumes:
     #   - ./database/data:/var/lib/mysql

@@ -79,7 +79,7 @@ export default () => (new Vuex.Store({
             }
             ctx.commit(loadingMutation, true)
 
-            const res = await this.$axios.$get(`${this.$API_BASE_URL}/repositories`, { params: params})
+            const res = await this.$axios.$get('repositories', { params: params})
             for (let item of res.items) {
                 item.show = false
             }
@@ -92,22 +92,22 @@ export default () => (new Vuex.Store({
             ctx.commit('setHasNext', res.hasNext)
         },
         async fetchLanguages(ctx) {
-            const res = await this.$axios.$get(`${this.$API_BASE_URL}/languages`)
+            const res = await this.$axios.$get('languages')
             res.items.unshift('all')
             ctx.commit('setLanguages', res.items)
         },
         async fetchLicenses(ctx) {
-            const res = await this.$axios.$get(`${this.$API_BASE_URL}/licenses`)
+            const res = await this.$axios.$get('licenses')
             res.items.unshift('all')
             ctx.commit('setLicenses', res.items)
         },
         async fetchLabels(ctx) {
-            const res = await this.$axios.$get(`${this.$API_BASE_URL}/labels`)
+            const res = await this.$axios.$get('labels')
             res.items.unshift('all')
             ctx.commit('setLabels', res.items)
         },
         async fetchOrdermetrics(ctx) {
-            const res = await this.$axios.$get(`${this.$API_BASE_URL}/ordermetrics`)
+            const res = await this.$axios.$get('ordermetrics')
             ctx.commit('setOrdermetrics', res.items)
         }
     }

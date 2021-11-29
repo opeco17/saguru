@@ -1,13 +1,12 @@
 <template>
   <div>
-    <v-row justify="center" align-content="center" class="my-2 mx-1">
+    <v-row justify="center" align-content="center" class="my-1 mx-1">
       <h1 class="text-md-h3 text-sm-h4 text-xs-h4 font-weight-medium">
-        Grab a favorite issue and commit there
+        Explore GitHub issues with flexible filter
       </h1>
     </v-row>
     <v-row justify="center" align-content="center" class="my-2 mx-1">
-      <h3 class="text-md-h5 text-sm-h6 text-xs-h6 grey--text text--darken-2 font-weight-medium">
-        Explore GitHub issues with flexible query in 
+      <h3 class="text-md-h5 text-sm-h6 text-xs-h6 grey--text text--darken-2 font-weight-medium"> 
         <a
           style="color: #F85758; text-decoration: none;"
           href="https://github.com/opeco17/saguru"
@@ -15,16 +14,17 @@
         >
           saguru
         </a>
+        support for your open-source contribution
       </h3>
     </v-row>
-    <v-row style="height: 10px;">
+    <v-row style="height: 8px;">
       <v-progress-linear
         indeterminate
         color="#F85758"
         v-show="initLoading || searchLoading"
       ></v-progress-linear>
     </v-row>
-    <v-row justify="center" class="mt-3">
+    <v-row justify="center" class="mt-1">
       <v-col cols="12" sm="5" md="4" class="mt-3">
         <v-form
           ref="form"
@@ -291,7 +291,7 @@ export default {
   },
   head() {
     return {
-      title: 'Explore GitHub issues with flexible query'
+      title: 'Explore GitHub issues and repositories with flexible filter'
     }
   }
 }
