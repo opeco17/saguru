@@ -1,0 +1,3 @@
+app_path: /home/ec2-user/saguru
+repository_name: saguru
+repository_url: "https://github.com/opeco17/{{ repository_name }}.git"

@@ -1,0 +1,6 @@
+- name: install git
+  yum:
+    name: git-{{ git_version }}
+    state: present
+  become: true
+  

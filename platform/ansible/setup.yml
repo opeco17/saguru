@@ -1,0 +1,28 @@
+- hosts: backend
+  tasks:
+    - name: message
+      debug: 
+        msg: Start Ansible
+
+    - name: yum update
+      yum:
+        name: "*"
+        state: latest
+      become: true
+
+    - name: install docker
+      include_role:
+        name: docker
+    
+    - name: install git
+      include_role:
+        name: git
+
+    - name: configure app
+      include_role:
+        name: app
+
+    - name: set cron
+      include_role:
+        name: cron
+      

@@ -1,0 +1,9 @@
+- name: clone repository
+  git:
+    repo: "{{ repository_url }}"
+    dest: "{{ app_path }}"
+
+- name: copy .env
+  copy:
+    src: .env
+    dest: "{{ app_path }}/backend"
