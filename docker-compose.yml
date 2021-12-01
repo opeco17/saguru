@@ -24,6 +24,19 @@ services:
       - database
     tty: true
 
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx.Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: always
+    volumes:
+      - ./nginx/public:/usr/share/nginx/html
+    depends_on:
+      - api
+
   database:
     build:
       context: .
