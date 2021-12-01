@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	"opeco17/oss-book/lib"
+	"opeco17/saguru/lib"
 	"os"
 
 	"github.com/sirupsen/logrus"

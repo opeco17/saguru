@@ -1,4 +1,4 @@
-module opeco17/oss-book/lib
+module opeco17/saguru/lib
 
 go 1.16
 

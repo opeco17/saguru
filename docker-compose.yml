@@ -24,19 +24,6 @@ services:
       - database
     tty: true
 
-  nginx:
-    build:
-      context: .
-      dockerfile: nginx.Dockerfile
-    ports:
-      - "80:80"
-      - "443:443"
-    restart: always
-    volumes:
-      - ./nginx/public:/usr/share/nginx/html
-    depends_on:
-      - api
-
   database:
     build:
       context: .
@@ -44,5 +31,7 @@ services:
     ports:
       - "3306:3306"
     restart: always
-    # volumes:
-    #   - ./database/data:/var/lib/mysql
+    volumes:
+      - ./database/mysql_data:/var/lib/mysql
+    env_file:
+      - ./database/.env

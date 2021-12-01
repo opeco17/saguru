@@ -1,6 +1,6 @@
 package main
 
-import "opeco17/oss-book/lib"
+import "opeco17/saguru/lib"
 
 func convertGetRepositoriesOutputItemIssue(issue lib.Issue) GetRepositoriesOutputItemIssue {
 	getRepositoryIssueLabels := make([]string, 0, len(issue.Labels))
