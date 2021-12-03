@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"opeco17/saguru/lib"
+	"opeco17/gitnavi/lib"
 	"sync"
 
 	"github.com/sirupsen/logrus"

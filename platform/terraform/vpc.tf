@@ -1,38 +1,33 @@
-resource "aws_vpc" "saguru" {
+resource "aws_vpc" "gitnavi" {
   cidr_block           = "10.0.0.0/16"
   enable_dns_support   = true
   enable_dns_hostnames = true
   tags = {
-    Name = "saguru-vpc"
+    Name = "gitnavi-vpc"
   }
 }
 
 resource "aws_subnet" "public_subnet" {
-  vpc_id                  = aws_vpc.saguru.id
+  vpc_id                  = aws_vpc.gitnavi.id
   cidr_block              = "10.0.64.0/24"
   map_public_ip_on_launch = true
   availability_zone       = "ap-northeast-1a"
   tags = {
-    Name = "saguru-public-subnet"
+    Name = "gitnavi-public-subnet"
   }
 }
 
 resource "aws_internet_gateway" "internet_gateway" {
-  vpc_id = aws_vpc.saguru.id
+  vpc_id = aws_vpc.gitnavi.id
   tags = {
-    Name = "saguru-internet-gateway"
+    Name = "gitnavi-internet-gateway"
   }
 }
 
-resource "aws_eip" "nat_gateway_ip" {
-  vpc        = true
-  depends_on = [aws_internet_gateway.internet_gateway]
-}
-
 resource "aws_route_table" "public_table" {
-  vpc_id = aws_vpc.saguru.id
+  vpc_id = aws_vpc.gitnavi.id
   tags = {
-    Name = "saguru-public-route-table"
+    Name = "gitnavi-public-route-table"
   }
 }
 

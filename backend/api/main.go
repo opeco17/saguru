@@ -2,7 +2,7 @@ package main
 
 import (
 	"net/http"
-	"opeco17/saguru/lib"
+	"opeco17/gitnavi/lib"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"

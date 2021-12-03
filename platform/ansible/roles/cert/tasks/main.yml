@@ -23,13 +23,13 @@
 
 - name: copy privkey.pem
   copy:
-    src: /etc/letsencrypt/live/api.saguru.dev/privkey.pem
+    src: /etc/letsencrypt/live/api.gitnavi.dev/privkey.pem
     dest: "{{ app_path }}/nginx/conf/default.conf/privkey.pem"
     remote_src: true
 
 - name: copy pfullchain.pem
   copy:
-    src: /etc/letsencrypt/live/api.saguru.dev/fullchain.pem
+    src: /etc/letsencrypt/live/api.gitnavi.dev/fullchain.pem
     dest: "{{ app_path }}/nginx/conf/default.conf/fullchain.pem"
     remote_src: true
 

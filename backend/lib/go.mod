@@ -1,4 +1,4 @@
-module opeco17/saguru/lib
+module opeco17/gitnavi/lib
 
 go 1.16
 

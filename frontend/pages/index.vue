@@ -9,10 +9,10 @@
       <h3 class="text-md-h5 text-sm-h6 text-xs-h6 grey--text text--darken-2 font-weight-medium"> 
         <a
           style="color: #F85758; text-decoration: none;"
-          href="https://github.com/opeco17/saguru"
+          href="https://github.com/opeco17/gitnavi"
           target="_blank"
         >
-          saguru
+          gitnavi
         </a>
         support for your open-source contribution
       </h3>

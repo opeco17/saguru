@@ -4,7 +4,7 @@ import (
 	"strings"
 	"time"
 
-	"opeco17/saguru/lib"
+	"opeco17/gitnavi/lib"
 
 	"gorm.io/gorm"
 )

@@ -9,7 +9,7 @@ export default {
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    titleTemplate: 'saguru - %s',
+    titleTemplate: 'gitnavi - %s',
     title: 'Explore GitHub issues and repositories with flexible filter',
     htmlAttrs: {
       lang: 'en'
@@ -19,9 +19,9 @@ export default {
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       { hid: 'description', name: 'description', content: 'Help you search for GitHub issues and repositories with flexible filter (language, star count, fork count etc.). Support your open-source contribution.' },
       { name: 'format-detection', content: 'telephone=no' },
-      { hid: 'keywords', name: 'keywords', content: 'saguru,GitHub,issue,repository,open-source,contribution,filtering' },
+      { hid: 'keywords', name: 'keywords', content: 'gitnavi,GitHub,issue,repository,open-source,contribution,filtering' },
 
-      { hid: 'og:site_name', property: 'og:site_name', content: 'saguru' },
+      { hid: 'og:site_name', property: 'og:site_name', content: 'gitnavi' },
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
