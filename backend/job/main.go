@@ -15,10 +15,10 @@ func main() {
 	if flag.Arg(0) == "all" {
 		initDB()
 		updateRepositories()
-		// updateIssues()
-		// updateFrontLanguages()
-		// updateLicenses()
-		// updateLabels()
+		updateIssues()
+		updateFrontLanguages()
+		updateLicenses()
+		updateLabels()
 	} else if flag.Arg(0) == "issue" {
 		initDB()
 		updateIssues()

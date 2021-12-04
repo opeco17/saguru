@@ -69,15 +69,13 @@ func UpdateIssues() error {
 	}
 	defer sqlDB.Close()
 
+	// Get target repositories to update issue
 	var (
 		notInitializedRepositories []lib.Repository
 		initializedRepositories    []lib.Repository
-		wg                         sync.WaitGroup
-		mutex                      = &sync.Mutex{}
 	)
-
-	gormDB.Where("issue_initialized = ?", false).Limit(int(UPDATE_ISSUE_NUM_PER_BATCH)).Find(&notInitializedRepositories)
-	if restRepositoryNum := int(UPDATE_ISSUE_NUM_PER_BATCH) - len(notInitializedRepositories); restRepositoryNum > 0 {
+	gormDB.Where("issue_initialized = ?", false).Limit(int(UPDATE_ISSUE_BATCH_SIZE)).Find(&notInitializedRepositories)
+	if restRepositoryNum := int(UPDATE_ISSUE_BATCH_SIZE) - len(notInitializedRepositories); restRepositoryNum > 0 {
 		gormDB.Where("issue_initialized = ?", true).Order("updated_at ASC").Limit(restRepositoryNum).Find(&initializedRepositories)
 	}
 	logrus.Info(fmt.Sprintf("not initialized repository: %d", len(notInitializedRepositories)))
@@ -85,14 +83,19 @@ func UpdateIssues() error {
 
 	repositories := append(notInitializedRepositories, initializedRepositories...)
 
-	for i := 0; i < len(repositories)/int(MINI_BATCH_SIZE); i++ {
+	// Update issue
+	var (
+		wg    sync.WaitGroup
+		mutex = &sync.Mutex{}
+	)
+	for i := 0; i < len(repositories)/int(UPDATE_ISSUE_MINI_BATCH_SIZE); i++ {
 		// Create mini batch of repository
-		lower := i * int(MINI_BATCH_SIZE)
-		upper := lib.Min((i+1)*int(MINI_BATCH_SIZE), len(repositories)-1)
+		lower := i * int(UPDATE_ISSUE_MINI_BATCH_SIZE)
+		upper := lib.Min((i+1)*int(UPDATE_ISSUE_MINI_BATCH_SIZE), len(repositories)-1)
 		miniBatchRepositories := repositories[lower:upper]
 
 		// Fetch issues concurrently for each mini batchn
-		modelMiniBatchRepositories := make([]lib.Repository, 0, MINI_BATCH_SIZE)
+		modelMiniBatchRepositories := make([]lib.Repository, 0, UPDATE_ISSUE_MINI_BATCH_SIZE)
 		for _, repository := range miniBatchRepositories {
 			wg.Add(1)
 			go func(repository lib.Repository) {
