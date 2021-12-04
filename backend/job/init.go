@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"opeco17/oss-book/lib"
+	"opeco17/gitnavi/lib"
 	"os"
 
 	"github.com/sirupsen/logrus"

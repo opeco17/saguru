@@ -9,19 +9,19 @@ export default {
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    titleTemplate: 'saguru - %s',
-    title: 'saguru',
+    titleTemplate: 'gitnavi - %s',
+    title: 'Explore GitHub issues and repositories with flexible filter',
     htmlAttrs: {
       lang: 'en'
     },
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: 'saguru help you search for GitHub issues and repositories with flexible query. saguru support you to contribute open-source.' },
+      { hid: 'description', name: 'description', content: 'Help you search for GitHub issues and repositories with flexible filter (language, star count, fork count etc.). Support your open-source contribution.' },
       { name: 'format-detection', content: 'telephone=no' },
-      { hid: 'keywords', name: 'keywords', content: 'Saguru,GitHub,issue,repository,open-source' },
+      { hid: 'keywords', name: 'keywords', content: 'gitnavi,GitHub,issue,repository,open-source,contribution,filtering' },
 
-      { hid: 'og:site_name', property: 'og:site_name', content: 'saguru' },
+      { hid: 'og:site_name', property: 'og:site_name', content: 'gitnavi' },
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
@@ -44,6 +44,7 @@ export default {
   buildModules: [
     // https://go.nuxtjs.dev/vuetify
     '@nuxtjs/vuetify',
+    '@nuxtjs/google-analytics',
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
@@ -61,7 +62,24 @@ export default {
 
   },
 
+  googleAnalytics: {
+    id: process.env.GOOGLE_ANALYTICS_ID,
+  },
+
+  publicRuntimeConfig: {
+    googleAnalytics: {
+      id: process.env.GOOGLE_ANALYTICS_ID
+    },
+    axios: {
+      baseURL: process.env.API_BASE_URL
+    },
+  },
+
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
-  }
+  },
+
+  generate: {
+    fallback: true,
+  },
 }

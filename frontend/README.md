@@ -1,4 +1,4 @@
-# saguru
+# gitnavi
 
 ## Build Setup
 

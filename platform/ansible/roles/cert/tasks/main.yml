@@ -1,0 +1,41 @@
+- name: stop service
+  command:
+    cmd: docker-compose down
+    chdir: "{{ app_path }}"
+
+- name: install certbot
+  yum:
+    name: certbot
+    state: present
+  become: true
+
+- name: get certficate
+  command:
+    cmd: "certbot certonly --standalone --non-interactive --agree-tos --email {{ email }} --domains {{ domain }}"
+  become: true
+  when: get_cert
+
+- name: update certficate
+  command:
+    cmd: "certbot renew --standalone"
+  become: true
+  when: update_cert
+
+- name: copy privkey.pem
+  copy:
+    src: /etc/letsencrypt/live/api.gitnavi.dev/privkey.pem
+    dest: "{{ app_path }}/nginx/conf/certs/privkey.pem"
+    remote_src: true
+  become: true
+
+- name: copy pfullchain.pem
+  copy:
+    src: /etc/letsencrypt/live/api.gitnavi.dev/fullchain.pem
+    dest: "{{ app_path }}/nginx/conf/certs/fullchain.pem"
+    remote_src: true
+  become: true
+
+- name: start service
+  command:
+    cmd: docker-compose up -d --build
+    chdir: "{{ app_path }}"

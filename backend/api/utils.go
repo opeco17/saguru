@@ -3,7 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"opeco17/oss-book/lib"
+	"opeco17/gitnavi/lib"
 	"os"
 
 	"gorm.io/gorm"

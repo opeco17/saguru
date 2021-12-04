@@ -1,0 +1,20 @@
+- name: clone repository
+  git:
+    repo: "{{ repository_url }}"
+    dest: "{{ app_path }}"
+
+- name: copy .env for backend
+  copy:
+    src: .backend_env
+    dest: "{{ app_path }}/backend/.env"
+
+- name: copy .env for database
+  copy:
+    src: .database_env
+    dest: "{{ app_path }}/database/.env"
+
+- name: run service
+  command:
+    cmd: docker-compose up -d --build
+    chdir: "{{ app_path }}"
+  when: run_service

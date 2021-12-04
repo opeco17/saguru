@@ -1,0 +1,35 @@
+- name: install docker
+  yum:
+    name: docker-{{ docker_version }}
+    state: present
+  become: true
+  
+- name: start docker
+  systemd:
+    name: docker
+    state: started
+    enabled: yes
+  become: true
+
+- name: fetch docker compose binary
+  shell: curl -L "https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-$(uname -s)-$(uname -m)" -o {{ docker_compose_path }}
+  become: true
+  
+- name: update docker compose to executable
+  file:
+    path: "{{ docker_compose_path }}"
+    mode: +x
+  become: true
+
+- name: add ec2-user to docker group
+  user:
+    name: ec2-user
+    groups: docker
+    append: true
+  become: true
+
+- name: change group of docker.sock
+  file:
+    path: /var/run/docker.sock
+    group: docker
+  become: true

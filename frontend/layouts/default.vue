@@ -15,7 +15,7 @@
       <v-btn
         icon
         class="mr-2"
-        href="https://github.com/opeco17/saguru"
+        href="https://github.com/opeco17/gitnavi"
       >
         <v-icon large>mdi-github</v-icon>
       </v-btn>
