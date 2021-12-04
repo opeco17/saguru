@@ -2,7 +2,7 @@
   tasks:
     - name: message
       debug: 
-        msg: Start Ansible
+        msg: Start initialize
 
     - name: yum update
       yum:
@@ -23,9 +23,17 @@
       include_role:
         name: git
 
-    - name: configure app
+    - name: deploy app
       include_role:
         name: app
+      vars:
+        run_service: false
+
+    - name: get cert
+      include_role:
+        name: cert
+      vars:
+        get_cert: true
 
     - name: set cron
       include_role:

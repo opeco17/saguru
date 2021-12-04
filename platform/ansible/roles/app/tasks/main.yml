@@ -12,3 +12,9 @@
   copy:
     src: .database_env
     dest: "{{ app_path }}/database/.env"
+
+- name: run service
+  command:
+    cmd: docker-compose up -d --build
+    chdir: "{{ app_path }}"
+  when: run_service

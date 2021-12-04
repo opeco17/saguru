@@ -9,17 +9,17 @@
     state: present
   become: true
 
-# - name: get certficate
-#   command:
-#     cmd: "certbot certonly --standalone --non-interactive --agree-tos --email {{ email }} --domains {{ domain }}"
-#   become: true
-#   when: get_cert is defined
+- name: get certficate
+  command:
+    cmd: "certbot certonly --standalone --non-interactive --agree-tos --email {{ email }} --domains {{ domain }}"
+  become: true
+  when: get_cert
 
-# - name: update certficate
-#   command:
-#     cmd: "certbot renew --standalone"
-#   become: true
-#   when: update_cert is defined
+- name: update certficate
+  command:
+    cmd: "certbot renew --standalone"
+  become: true
+  when: update_cert
 
 - name: copy privkey.pem
   copy:
