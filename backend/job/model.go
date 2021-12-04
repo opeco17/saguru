@@ -221,18 +221,19 @@ func (gitHubIssue *GitHubIssue) convert() lib.Issue {
 
 func (gitHubRepository *GitHubRepository) convert() lib.Repository {
 	repository := lib.Repository{
-		Model:           gorm.Model{ID: gitHubRepository.ID},
-		GitHubCreatedAt: gitHubRepository.CreatedAt,
-		GitHubUpdatedAt: gitHubRepository.UpdatedAt,
-		Name:            gitHubRepository.FullName,
-		URL:             gitHubRepository.HTMLURL,
-		Description:     gitHubRepository.Description,
-		StarCount:       gitHubRepository.StargazersCount,
-		ForkCount:       gitHubRepository.ForksCount,
-		OpenIssueCount:  gitHubRepository.OpenIssuesCount,
-		License:         gitHubRepository.License.Name,
-		Language:        gitHubRepository.Language,
-		Topics:          strings.Join(gitHubRepository.Topics, ","),
+		Model:            gorm.Model{ID: gitHubRepository.ID},
+		GitHubCreatedAt:  gitHubRepository.CreatedAt,
+		GitHubUpdatedAt:  gitHubRepository.UpdatedAt,
+		Name:             gitHubRepository.FullName,
+		URL:              gitHubRepository.HTMLURL,
+		Description:      gitHubRepository.Description,
+		StarCount:        gitHubRepository.StargazersCount,
+		ForkCount:        gitHubRepository.ForksCount,
+		OpenIssueCount:   gitHubRepository.OpenIssuesCount,
+		License:          gitHubRepository.License.Name,
+		Language:         gitHubRepository.Language,
+		IssueInitialized: false,
+		Topics:           strings.Join(gitHubRepository.Topics, ","),
 	}
 	return repository
 }

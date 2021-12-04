@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"opeco17/oss-book/lib"
 	"sync"
+	"time"
 
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -22,24 +23,35 @@ func UpdateRepositories() error {
 	defer sqlDB.Close()
 
 	// Fetch and save repositories
-	uniqueQuery := [...]string{"stars:30..500", "stars:500..1500", "stars:>1500"}
+	uniqueQuery := [...]string{
+		"stars:30..100",
+		"stars:100..200",
+		"stars:200..400",
+		"stars:400..1000",
+		"stars:1000..3000",
+		"stars:>3000",
+	}
 	for _, eachQuery := range uniqueQuery {
+		now := time.Now()
 		repositories := FetchRepositories("good-first-issues:>1", eachQuery)
 		gormDB.Clauses(clause.OnConflict{
 			UpdateAll: true,
 		}).Create(&repositories)
+		restTimeSecond := int(REPOSITORIES_API_INTERVAL_SECOND) - int(time.Since(now).Seconds())
+		if restTimeSecond > 0 {
+			time.Sleep(time.Second * time.Duration(restTimeSecond))
+		}
 	}
 
-	// Adjust number of repositories
+	// Adjust number of repositories by removing old repositories
 	var (
 		repositoryCount    int64
 		removeRepositories []lib.Repository
 	)
 	gormDB.Model(&lib.Repository{}).Count(&repositoryCount)
-	removeRepositoryCount := int(repositoryCount) - 3*int(REPOSITORIES_API_MAX_RESULTS)
-	if removeRepositoryCount > 0 {
+	if removeRepositoryCount := int(repositoryCount) - len(uniqueQuery)*int(REPOSITORIES_API_MAX_RESULTS); removeRepositoryCount > 0 {
 		logrus.Info(fmt.Sprintf("%d repositories will be removed.", removeRepositoryCount))
-		gormDB.Model(&lib.Repository{}).Limit(removeRepositoryCount).Find(&removeRepositories)
+		gormDB.Model(&lib.Repository{}).Order("updated_at ASC").Limit(removeRepositoryCount).Find(&removeRepositories)
 		gormDB.Unscoped().Delete(&removeRepositories)
 	}
 	logrus.Info("Successfully finished to update repositories.")
@@ -58,11 +70,20 @@ func UpdateIssues() error {
 	defer sqlDB.Close()
 
 	var (
-		repositories []lib.Repository
-		wg           sync.WaitGroup
-		mutex        = &sync.Mutex{}
+		notInitializedRepositories []lib.Repository
+		initializedRepositories    []lib.Repository
+		wg                         sync.WaitGroup
+		mutex                      = &sync.Mutex{}
 	)
-	gormDB.Find(&repositories)
+
+	gormDB.Where("issue_initialized = ?", false).Limit(int(UPDATE_ISSUE_NUM_PER_BATCH)).Find(&notInitializedRepositories)
+	if restRepositoryNum := int(UPDATE_ISSUE_NUM_PER_BATCH) - len(notInitializedRepositories); restRepositoryNum > 0 {
+		gormDB.Where("issue_initialized = ?", true).Order("updated_at ASC").Limit(restRepositoryNum).Find(&initializedRepositories)
+	}
+	logrus.Info(fmt.Sprintf("not initialized repository: %d", len(notInitializedRepositories)))
+	logrus.Info(fmt.Sprintf("initialized repository: %d", len(initializedRepositories)))
+
+	repositories := append(notInitializedRepositories, initializedRepositories...)
 
 	for i := 0; i < len(repositories)/int(MINI_BATCH_SIZE); i++ {
 		// Create mini batch of repository
@@ -78,6 +99,7 @@ func UpdateIssues() error {
 				defer wg.Done()
 				issues := FetchIssues(repository.Name)
 				repository.Issues = issues
+				repository.IssueInitialized = true
 
 				mutex.Lock()
 				modelMiniBatchRepositories = append(modelMiniBatchRepositories, repository)
