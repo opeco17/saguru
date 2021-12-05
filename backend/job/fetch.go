@@ -16,8 +16,8 @@ import (
 )
 
 func FetchGitHubRepositoriesSubset(page int, query ...string) (*GitHubRepositoriesResponse, string, error) {
-	month_ago := time.Now().AddDate(0, -1, 0).Format("2006-01-02T15:04:05+09:00")
-	query = append(query, fmt.Sprintf("pushed:>%s", month_ago))
+	threeMonthAgo := time.Now().AddDate(0, -3, 0).Format("2006-01-02T15:04:05+09:00")
+	query = append(query, fmt.Sprintf("pushed:>%s", threeMonthAgo), "good-first-issues:>1")
 
 	client := &http.Client{}
 	client.Timeout = time.Second * 15

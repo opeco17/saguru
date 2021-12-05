@@ -10,16 +10,16 @@ export default {
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
     titleTemplate: 'gitnavi - %s',
-    title: 'Explore GitHub issues and repositories with flexible filter',
+    title: 'Good first issues in GitHub for open-source contribution',
     htmlAttrs: {
       lang: 'en'
     },
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: 'Help you search for GitHub issues and repositories with flexible filter (language, star count, fork count etc.). Support your open-source contribution.' },
+      { hid: 'description', name: 'description', content: 'Flexible and strong filters help you search for good first issues in GitHub. gitnavi support your open-source contribution.' },
       { name: 'format-detection', content: 'telephone=no' },
-      { hid: 'keywords', name: 'keywords', content: 'gitnavi,GitHub,issue,repository,open-source,contribution,filtering' },
+      { hid: 'keywords', name: 'keywords', content: 'gitnavi,GitHub,good first issue,help wanted,open-source,contribution' },
 
       { hid: 'og:site_name', property: 'og:site_name', content: 'gitnavi' },
     ],

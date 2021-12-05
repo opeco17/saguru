@@ -37,18 +37,19 @@ type (
 
 	Repository struct {
 		gorm.Model
-		GitHubCreatedAt time.Time
-		GitHubUpdatedAt time.Time
-		Name            string
-		URL             string
-		Description     string
-		StarCount       uint
-		ForkCount       uint
-		OpenIssueCount  uint
-		Topics          string
-		License         string
-		Language        string
-		Issues          []Issue `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+		GitHubCreatedAt  time.Time
+		GitHubUpdatedAt  time.Time
+		Name             string
+		URL              string
+		Description      string
+		StarCount        uint
+		ForkCount        uint
+		OpenIssueCount   uint
+		Topics           string
+		License          string
+		Language         string
+		IssueInitialized bool
+		Issues           []Issue `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	}
 
 	FrontLanguage struct {
