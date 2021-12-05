@@ -1,6 +1,6 @@
 - name: stop service
   command:
-    cmd: docker-compose stop nginx
+    cmd: docker-compose -f docker-compose-prod.yml stop nginx
     chdir: "{{ app_path }}"
 
 - name: install certbot
@@ -37,5 +37,5 @@
 
 - name: start service
   command:
-    cmd: docker-compose up -d --build
+    cmd: docker-compose -f docker-compose-prod.yml up -d --build
     chdir: "{{ app_path }}"

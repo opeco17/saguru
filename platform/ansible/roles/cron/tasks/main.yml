@@ -3,7 +3,7 @@
     name: job to update all data
     minute: "30"
     hour: "0-2,4-23"
-    job: 'docker-compose exec job bash -c "go run *.go issue"'
+    job: 'docker-compose -f docker-compose-prod.yml exec job bash -c "job issue"'
     state: present
   become: true
   
@@ -12,6 +12,6 @@
     name: job to update issue
     minute: "30"
     hour: "3"
-    job: 'docker-compose exec job bash -c "go run *.go all"'
+    job: 'docker-compose -f docker-compose-prod.yml exec job bash -c "job all"'
     state: present
   become: true
