@@ -15,3 +15,12 @@
     job: 'docker-compose -f docker-compose-prod.yml exec job bash -c "job all"'
     state: present
   become: true
+
+- name: register crontab
+  command: crontab -l
+  register: crontab
+  become: true
+
+- name: print crontab
+  debug:
+    msg: "{{ crontab.stdout_lines }}"

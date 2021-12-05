@@ -40,7 +40,7 @@ services:
   database:
     build:
       context: ./database
-      dockerfile: db.Dockerfile
+      dockerfile: database.Dockerfile
     ports:
       - "3306:3306"
     restart: always

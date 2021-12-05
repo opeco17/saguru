@@ -35,7 +35,7 @@ services:
   database:
     build:
       context: ./database
-      dockerfile: db.Dockerfile
+      dockerfile: database.Dockerfile
     restart: always
     volumes:
       - ./database/mysql_data:/var/lib/mysql
