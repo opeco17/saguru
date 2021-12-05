@@ -178,7 +178,7 @@
 <script>
 let defaultInputs = {
   languages: ['all'],
-  labels: ['help wanted'],
+  labels: ['good first issue'],
   star_count_lower: '',
   star_count_upper: '',
   fork_count_lower: '',
