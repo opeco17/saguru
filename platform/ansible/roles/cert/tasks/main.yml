@@ -1,6 +1,6 @@
 - name: stop service
   command:
-    cmd: docker-compose down
+    cmd: docker-compose stop nginx
     chdir: "{{ app_path }}"
 
 - name: install certbot

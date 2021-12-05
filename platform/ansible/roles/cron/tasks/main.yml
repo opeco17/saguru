@@ -1,15 +1,15 @@
-- name: Set hourly job
+- name: hourly job to update all data
   cron:
-    name: Set hourly job
+    name: job to update all data
     minute: "30"
     hour: "0-2,4-23"
     job: 'docker-compose exec job bash -c "go run *.go issue"'
     state: present
   become: true
   
-- name: Set daily job
+- name: daily job to update issue
   cron:
-    name: Set daily job
+    name: job to update issue
     minute: "30"
     hour: "3"
     job: 'docker-compose exec job bash -c "go run *.go all"'
