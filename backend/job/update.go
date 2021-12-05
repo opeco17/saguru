@@ -49,7 +49,7 @@ func UpdateRepositories() error {
 		removeRepositories []lib.Repository
 	)
 	gormDB.Model(&lib.Repository{}).Count(&repositoryCount)
-	if removeRepositoryCount := int(repositoryCount) - len(uniqueQuery)*int(REPOSITORIES_API_MAX_RESULTS); removeRepositoryCount > 0 {
+	if removeRepositoryCount := int(repositoryCount) - int(MAX_REPOSITORY_RECORES); removeRepositoryCount > 0 {
 		logrus.Info(fmt.Sprintf("%d repositories will be removed.", removeRepositoryCount))
 		gormDB.Model(&lib.Repository{}).Order("updated_at ASC").Limit(removeRepositoryCount).Find(&removeRepositories)
 		gormDB.Unscoped().Delete(&removeRepositories)
