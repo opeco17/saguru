@@ -5,8 +5,6 @@ services:
     build:
       context: ./backend
       dockerfile: api-prod.Dockerfile
-    ports:
-      - "8000:8000"
     restart: always
     depends_on:
       - database
