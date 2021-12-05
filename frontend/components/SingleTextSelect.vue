@@ -6,6 +6,7 @@
     outlined
     single-line
     dense
+    :menu-props="{offsetY: true, maxHeight: 250, bottom: true}"
   ></v-select>
 </template>
 

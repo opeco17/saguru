@@ -17,7 +17,7 @@
         class="mr-2"
         href="https://github.com/opeco17/gitnavi"
       >
-        <v-icon large>mdi-github</v-icon>
+        <v-icon large class="github-icon">mdi-github</v-icon>
       </v-btn>
     </v-app-bar>
     <v-main>

@@ -37,16 +37,16 @@
             outlined
           >
             <form-label label="Languages" />
-            <multiple-chips-select
+            <multiple-chips-complete
               v-model="temporaryInputs.languages" 
               :items="languages" 
               @close="removeLanguage"
             />
             <form-label label="Labels" />
-            <multiple-chips-select
+            <multiple-chips-complete
               v-model="temporaryInputs.labels" 
               :items="labels" 
-              @close="removeLabel" 
+              @close="removeLabel"
             />
             <form-label label="Star count" />
             <v-row justify="space-between">

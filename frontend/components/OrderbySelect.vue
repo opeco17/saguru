@@ -7,11 +7,11 @@
     single-line
     dense
   >
-    <template v-slot:selection="{ item }">
-      {{ item | formatOrderMetricLabel }}<v-icon>{{ item | orderMetricIcon }}</v-icon>
+    <template v-slot:selection="{ item }" dense>
+      {{ item | formatOrderMetricLabel }}
     </template>
     <template v-slot:item="{ item }">
-      {{ item | formatOrderMetricLabel }}<v-icon>{{ item | orderMetricIcon }}</v-icon>
+      {{ item | formatOrderMetricLabel }}
     </template>
   </v-select>
 </template>
@@ -24,17 +24,10 @@ export default {
   },
   filters: {
     formatOrderMetricLabel(value) {
-      value = value.replace('_asc', '').replace('_desc', '').replace("_", " ")
-      value = value.charAt(0).toUpperCase() + value.slice(1)
-      return value
+      let prefix = value.includes('desc') ? "Most" : "Fewest"
+      value = value.replace('_asc', '').replace('_desc', '').replace("_count", "s")
+      return prefix + " " + value
     },
-    orderMetricIcon(value) {
-      if (value.includes('desc')) {
-        return "mdi-menu-up"
-      } else {
-        return "mdi-menu-down"
-      }
-    }
   }
 }
 </script>
