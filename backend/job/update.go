@@ -33,7 +33,7 @@ func UpdateRepositories() error {
 	}
 	for _, eachQuery := range uniqueQuery {
 		now := time.Now()
-		repositories := FetchRepositories("good-first-issues:>1", eachQuery)
+		repositories := FetchRepositories(eachQuery)
 		gormDB.Clauses(clause.OnConflict{
 			UpdateAll: true,
 		}).Create(&repositories)
