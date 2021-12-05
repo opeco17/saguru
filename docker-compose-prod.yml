@@ -4,22 +4,17 @@ services:
   api:
     build:
       context: ./backend
-      dockerfile: api.Dockerfile
-    ports:
-      - "8000:8000"
+      dockerfile: api-prod.Dockerfile
     restart: always
-    volumes:
-      - ./backend:/usr/src/app
     depends_on:
       - database
+    tty: true
 
   job:
     build:
       context: ./backend
-      dockerfile: job.Dockerfile
+      dockerfile: job-prod.Dockerfile
     restart: always
-    volumes:
-      - ./backend:/usr/src/app
     depends_on:
       - database
     tty: true
@@ -27,7 +22,7 @@ services:
   nginx:
     build:
       context: ./nginx
-      dockerfile: nginx.Dockerfile
+      dockerfile: nginx-prod.Dockerfile
     ports:
       - "80:80"
       - "443:443"
@@ -41,8 +36,6 @@ services:
     build:
       context: ./database
       dockerfile: db.Dockerfile
-    ports:
-      - "3306:3306"
     restart: always
     volumes:
       - ./database/mysql_data:/var/lib/mysql

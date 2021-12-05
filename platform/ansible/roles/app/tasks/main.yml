@@ -17,6 +17,6 @@
 
 - name: run service
   command:
-    cmd: docker-compose up -d --build
+    cmd: docker-compose -f docker-compose-prod.yml up -d --build
     chdir: "{{ app_path }}"
   when: run_service
