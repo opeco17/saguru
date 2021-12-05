@@ -9,5 +9,3 @@
         name: app
       vars:
         run_service: true
-
-      

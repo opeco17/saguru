@@ -1,7 +1,9 @@
-- name: clone repository
+- name: clone/pull repository
   git:
     repo: "{{ repository_url }}"
     dest: "{{ app_path }}"
+    update: true
+    force: true
 
 - name: copy .env for backend
   copy:
