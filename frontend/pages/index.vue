@@ -2,7 +2,7 @@
   <div>
     <v-row justify="center" align-content="center" class="my-1 mx-1">
       <h1 class="text-md-h3 text-sm-h4 text-xs-h4 font-weight-medium">
-        Explore GitHub issues with flexible filter
+        Explore good first issues in GitHub
       </h1>
     </v-row>
     <v-row justify="center" align-content="center" class="my-2 mx-1">
@@ -14,7 +14,7 @@
         >
           gitnavi
         </a>
-        support for your open-source contribution
+        support your open-source contribution with flexible filters
       </h3>
     </v-row>
     <v-row style="height: 8px;">
@@ -291,7 +291,7 @@ export default {
   },
   head() {
     return {
-      title: 'Explore GitHub issues and repositories with flexible filter'
+      title: 'Good first issues in GitHub for open-source contribution'
     }
   }
 }
