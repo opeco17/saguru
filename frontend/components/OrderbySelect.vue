@@ -6,6 +6,7 @@
     outlined
     single-line
     dense
+    :menu-props="{offsetY: true, maxHeight: 250, bottom: true}"
   >
     <template v-slot:selection="{ item }" dense>
       {{ item | formatOrderMetricLabel }}
