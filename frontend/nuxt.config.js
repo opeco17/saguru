@@ -82,4 +82,6 @@ export default {
   generate: {
     fallback: true,
   },
+
+  loading: false,
 }
