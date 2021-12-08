@@ -17,7 +17,7 @@ export default {
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: 'Flexible and strong filters help you search for good first issues in GitHub. gitnavi support your open-source contribution.' },
+      { hid: 'description', name: 'description', content: 'Flexible and strong filters help you search for good first issues from GitHub. gitnavi support your open-source contribution.' },
       { name: 'format-detection', content: 'telephone=no' },
       { hid: 'keywords', name: 'keywords', content: 'gitnavi,GitHub,good first issue,help wanted,open-source,contribution' },
 
@@ -34,7 +34,7 @@ export default {
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
-    { src: '~/plugins/settings.js' }
+    { src: '~/plugins/utils.js' }
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -44,6 +44,7 @@ export default {
   buildModules: [
     // https://go.nuxtjs.dev/vuetify
     '@nuxtjs/vuetify',
+    '@nuxtjs/i18n',
     '@nuxtjs/google-analytics',
   ],
 
@@ -60,6 +61,23 @@ export default {
 
   axios: {
 
+  },
+
+  i18n: {
+    locales: [
+      { code: 'en', name: 'English', iso: 'en-US', file: 'en.json' },
+      { code: 'ja', name: 'Japanese', iso: 'ja_JP', file: 'ja.json' },
+    ],
+    defaultLocale: 'en',
+    langDir: 'locales/',
+    strategy: 'prefix_except_default',
+    lazy: true,
+    detectBrowserLanguage: {
+      fallbackLocale: 'en',
+      useCookie: true,
+      cookieKey: 'gitnavi_i18n',
+      detectBrowserLanguage: true
+    },
   },
 
   googleAnalytics: {

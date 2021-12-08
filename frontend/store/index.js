@@ -108,7 +108,7 @@ export default () => (new Vuex.Store({
         },
         async fetchOrdermetrics(ctx) {
             const res = await this.$axios.$get('ordermetrics')
-            ctx.commit('setOrdermetrics', res.items)
+            ctx.commit('setOrdermetrics', res.items.map(this.$snakeToCamel))
         }
     }
 }))
