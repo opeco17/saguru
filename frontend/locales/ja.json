@@ -1,6 +1,10 @@
 {
+    "headerLang": "ja",
+    "headerTitle": "OSS活動のためのGitHub issue検索機能",
+    "headerDescription": "GitHub issueの強力なフィルタリング機能で初めてのOSS活動をサポートします。gitnaviを使用してお気に入りのGood first issueやhelp wanted issueを探しましょう。",
+
     "title": "Explore good first issues from GitHub",
-    "subTitle": "は強力なissue検索機能であなたのOSS活動を支援します",
+    "subTitle": "は強力なissue検索機能であなたのOSS活動をサポートします",
     "languageLabel": "プログラミング言語",
     "labelLabel": "ラベル",
     "starCountLabel": "スター数",
@@ -20,5 +24,6 @@
     "starCountDesc": "スターが多い順",
     "starCountAsc": "スターが少ない順",
     "forkCountDesc": "フォークが多い順",
-    "forkCountAsc": "フォークが少ない順"
+    "forkCountAsc": "フォークが少ない順",
+    "githubIconMessage": "GitHubで見る"
 }

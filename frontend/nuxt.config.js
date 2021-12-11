@@ -1,5 +1,3 @@
-import colors from 'vuetify/es5/util/colors'
-
 export default {
   // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
   ssr: false,
@@ -8,26 +6,34 @@ export default {
   target: 'static',
 
   // Global page headers: https://go.nuxtjs.dev/config-head
-  head () {
-    return {
-      titleTemplate: 'gitnavi - %s',
-      title: 'Good first issues in GitHub for open-source contribution',
-      htmlAttrs: {
-        lang: 'en'
-      },
-      meta: [
-        { charset: 'utf-8' },
-        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { hid: 'description', name: 'description', content: 'Flexible and strong filters help you search for good first issues from GitHub. gitnavi support your open-source contribution.' },
-        { name: 'format-detection', content: 'telephone=no' },
-        { hid: 'keywords', name: 'keywords', content: 'gitnavi,GitHub,good first issue,help wanted,open-source,contribution' },
-  
-        { hid: 'og:site_name', property: 'og:site_name', content: 'gitnavi' },
-      ],
-      link: [
-        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
-      ]
-    }
+  head: {
+    titleTemplate: 'gitnavi - %s',
+    title: 'Good first issues in GitHub for open-source contribution',
+    htmlAttrs: {
+      lang: 'en'
+    },
+    meta: [
+      { charset: 'utf-8' },
+      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+      { name: 'format-detection', content: 'telephone=no' },
+      
+      { hid: 'description', name: 'description', content: 'Flexible and powerful filter help you search for good first issues from GitHub. gitnavi support your open-source contribution.' },
+      { hid: 'keywords', name: 'keywords', content: 'GitHub,good first issue,help wanted,open-source' },
+      
+      { hid: 'og:title', property: 'og:title', content: 'gitnavi - Good first issues in GitHub for open-source contribution' },
+      { hid: 'og:description', property: 'og:description', content: 'Flexible and powerful filter help you search for good first issues from GitHub. gitnavi support your open-source contribution.' },
+      { hid: 'og:site_name', property: 'og:site_name', content: 'gitnavi' },
+      { hid: 'og:type', property: 'og:type', content: 'website' },
+      { hid: 'og:url', property: 'og:url', content: 'https://gitnavi.dev' },
+
+      { hid: 'twitter:card', name: 'twitter:card', content: 'summary_large_image' },
+      { hid: 'twitter:creator', name: 'twitter:creator', content: '@opeco17' }
+    ],
+    link: [
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+      { rel: "alternate", hreflang: 'en', href: 'https://gitnavi.dev' },
+      { rel: "alternate", hreflang: 'ja', href: 'https://gitnavi.dev/ja' }
+    ]
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
@@ -84,7 +90,7 @@ export default {
     baseUrl: 'https://gitnavi.dev',
     defaultLocale: 'en',
     langDir: 'locales/',
-    strategy: 'prefix_except_default',
+    strategy: 'prefix_and_default',
     lazy: true,
     detectBrowserLanguage: {
       fallbackLocale: 'en',

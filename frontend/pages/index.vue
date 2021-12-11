@@ -195,52 +195,52 @@ export default {
     this.$store.dispatch('fetchOrdermetrics')
   },
   computed: {
-    page() {
+    page () {
       return this.$store.state.page
     },
-    hasNext() {
+    hasNext () {
       return this.$store.state.hasNext
     },
-    repositories() {
+    repositories () {
       return this.$store.state.repositories
     },
-    languages() {
+    languages () {
       return this.$store.state.languages
     },
-    licenses() {
+    licenses () {
       return this.$store.state.licenses
     },
-    labels() {
+    labels () {
       return this.$store.state.labels
     },
-    assignStatuses() {
+    assignStatuses () {
       return this.$store.state.assignStatuses
     },
-    ordermetrics() {
+    ordermetrics () {
       return this.$store.state.ordermetrics
     },
-    initLoading() {
+    initLoading () {
       return this.$store.state.initLoading
     },
-    searchLoading() {
+    searchLoading () {
       return this.$store.state.searchLoading
     },
-    showmoreLoading() {
+    showmoreLoading () {
       return this.$store.state.showmoreLoading
     },
-    formatedLanguages() {
+    formatedLanguages () {
       return this.languages.map(x => { return x === 'all' ? this.$t(x) : x })
     },
-    formatedLicenses() {
+    formatedLicenses () {
       return this.licenses.map(x => { return x === 'all' ? this.$t(x) : x })
     },
-    formatedLabels() {
+    formatedLabels () {
       return this.labels.map(x => { return x === 'all' ? this.$t(x) : x })
     },
-    formatedAssignStatuses() {
+    formatedAssignStatuses () {
       return this.assignStatuses.map(x => this.$t(x))
     },
-    formatedOrderMetrics() {
+    formatedOrderMetrics () {
       return this.ordermetrics.map(x => this.$t(x))
     },
   },
@@ -305,11 +305,11 @@ export default {
       }
       return params
     },
-    removeLanguage(language) {
+    removeLanguage (language) {
       const index = this.temporaryInputs.languages.indexOf(language)
       if (index >= 0) this.temporaryInputs.languages.splice(index, 1)
     },
-    removeLabel(label) {
+    removeLabel (label) {
       const index = this.temporaryInputs.labels.indexOf(label)
       if (index >= 0) this.temporaryInputs.labels.splice(index, 1)
     },
@@ -319,9 +319,17 @@ export default {
       return value > 999 ? (value / 1000).toFixed(1) + 'k' : value
     }
   },
-  head() {
+  head () {
     return {
-      title: 'Good first issues in GitHub for open-source contribution'
+      htmlAttrs: {
+        lang: this.$t('headerLang')
+      },
+      title: this.$t('headerTitle'),
+      meta: [
+        { hid: 'description', name: 'description', content: this.$t('headerDescription') },
+        { hid: 'og:title', property: 'og:title', content: 'gitnavi - ' + this.$t('headerTitle') },
+        { hid: 'og:description', property: 'og:description', content: this.$t('headerDescription') },
+      ],
     }
   }
 }

@@ -1,6 +1,10 @@
 {
+    "headerLang": "en",
+    "headerTitle": "Good first issues in GitHub for open-source contribution",
+    "headerDescription": "Flexible and powerful filter help you search for good first issues from GitHub. gitnavi support your open-source contribution.",
+
     "title": "Explore good first issues from GitHub",
-    "subTitle": "support your open-source contribution with powerful issue search engine",
+    "subTitle": "support your open-source contribution with powerful issue filter",
     "languageLabel": "Languages",
     "labelLabel": "Labels",
     "starCountLabel": "Star count",
@@ -20,5 +24,6 @@
     "starCountDesc": "Most star count",
     "starCountAsc": "Fewest star count",
     "forkCountDesc": "Most fork count",
-    "forkCountAsc": "Fewest fork count"
+    "forkCountAsc": "Fewest fork count",
+    "githubIconMessage": "View on GitHub"
 }
