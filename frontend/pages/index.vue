@@ -39,13 +39,13 @@
             <form-label :label="$t('languageLabel')" />
             <multiple-chips-complete
               v-model="temporaryInputs.languages" 
-              :items="languages" 
+              :items="formatedLanguages" 
               @close="removeLanguage"
             />
             <form-label :label="$t('labelLabel')" />
             <multiple-chips-complete
               v-model="temporaryInputs.labels" 
-              :items="labels" 
+              :items="formatedLabels" 
               @close="removeLabel"
             />
             <form-label :label="$t('starCountLabel')" />
@@ -58,7 +58,7 @@
               </v-col>
             </v-row>
             <form-label :label="$t('orderByLabel')" />
-            <single-text-select v-model="temporaryInputs.ordermetric" :items="ordermetrics"/>
+            <single-text-select v-model="temporaryInputs.ordermetric" :items="formatedOrderMetrics"/>
             <v-row justify="end" class="mb-1 mr-1">
               <v-btn @click="showDetail=!showDetail" text small class="px-1">
                 {{ $t('detailLabel') }}
@@ -84,9 +84,9 @@
                   </v-col>
                 </v-row>
                 <form-label :label="$t('licenseLabel')" />
-                <single-text-select v-model="temporaryInputs.license" :items="licenses"/>
+                <single-text-select v-model="temporaryInputs.license" :items="formatedLicenses"/>
                 <form-label :label="$t('assignStatusLabel')" />
-                <single-text-select v-model="temporaryInputs.assigned" :items="assignStatuses"/>
+                <single-text-select v-model="temporaryInputs.assigned" :items="formatedAssignStatuses"/>
               </div>
             </v-expand-transition>
             <v-row justify="center" class="mb-1 mt-4">
@@ -155,7 +155,7 @@
                     <v-icon left>mdi-label-outline</v-icon>
                       <issue-title :url="issue.url">{{ issue.title }}</issue-title>
                     <issue-chip v-for="label in issue.labels" :key="label">
-                      #{{ label }}
+                      {{ label }}
                     </issue-chip>
                   </div>
                 </div>
@@ -187,19 +187,7 @@ export default {
     }
   },
   created () {
-    let defaultInputs = {
-      languages: [this.$t('all')],
-      labels: ['good first issue'],
-      star_count_lower: '',
-      star_count_upper: '',
-      fork_count_lower: '',
-      fork_count_upper: '',
-      license: this.$t('all'),
-      assigned: this.$t('all'),
-      ordermetric: this.$t('starCountDesc'),
-    }
-    this.inputs = JSON.parse(JSON.stringify(defaultInputs))
-    this.temporaryInputs = JSON.parse(JSON.stringify(defaultInputs))
+    this.initializeInputs()
     this.$store.dispatch('fetchRepositories', { params: this.getParams(), type: 'init'})
     this.$store.dispatch('fetchLanguages')
     this.$store.dispatch('fetchLicenses')
@@ -217,19 +205,19 @@ export default {
       return this.$store.state.repositories
     },
     languages() {
-      return this.$store.state.languages.map(x => { return x === 'all' ? this.$t(x) : x })
+      return this.$store.state.languages
     },
     licenses() {
-      return this.$store.state.licenses.map(x => { return x === 'all' ? this.$t(x) : x })
+      return this.$store.state.licenses
     },
     labels() {
-      return this.$store.state.labels.map(x => { return x === 'all' ? this.$t(x) : x })
+      return this.$store.state.labels
     },
     assignStatuses() {
-      return this.$store.state.assignStatuses.map(x => this.$t(x))
+      return this.$store.state.assignStatuses
     },
     ordermetrics() {
-      return this.$store.state.ordermetrics.map(x => this.$t(x))
+      return this.$store.state.ordermetrics
     },
     initLoading() {
       return this.$store.state.initLoading
@@ -240,8 +228,38 @@ export default {
     showmoreLoading() {
       return this.$store.state.showmoreLoading
     },
+    formatedLanguages() {
+      return this.languages.map(x => { return x === 'all' ? this.$t(x) : x })
+    },
+    formatedLicenses() {
+      return this.licenses.map(x => { return x === 'all' ? this.$t(x) : x })
+    },
+    formatedLabels() {
+      return this.labels.map(x => { return x === 'all' ? this.$t(x) : x })
+    },
+    formatedAssignStatuses() {
+      return this.assignStatuses.map(x => this.$t(x))
+    },
+    formatedOrderMetrics() {
+      return this.ordermetrics.map(x => this.$t(x))
+    },
   },
   methods: {
+    initializeInputs () {
+      let defaultInputs = {
+        languages: [this.$t('all')],
+        labels: this.$labelsDefault,
+        star_count_lower: '',
+        star_count_upper: '',
+        fork_count_lower: '',
+        fork_count_upper: '',
+        license: this.$t('all'),
+        assigned: this.$t('all'),
+        ordermetric: this.$t(this.$ordermetricDefault),
+      }
+      this.inputs = JSON.parse(JSON.stringify(defaultInputs))
+      this.temporaryInputs = JSON.parse(JSON.stringify(defaultInputs))
+    },
     search (event) {
       this.$refs.form.validate()
       if (!this.valid) {
@@ -252,25 +270,29 @@ export default {
       this.$store.dispatch('fetchRepositories', { params: this.getParams(), type: 'search' })
     },
     reset (event) {
-      this.temporaryInputs = JSON.parse(JSON.stringify(defaultInputs))
+      this.initializeInputs()
     },
     showmore (event) {
       this.$store.commit('incrementPage')
       this.$store.dispatch('fetchRepositories', { params: this.getParams(), type: 'showmore' })
     },
     getParams () {
+      let i = this.inputs
+
       let params = {}
       params.page = this.page
-      if (this.inputs.languages !== '' && !this.inputs.languages.includes(this.$t('all'))) params.languages = this.inputs.languages.join(',')
-      if (this.inputs.labels !== '' && !this.inputs.labels.includes(this.$t('all'))) params.labels = this.inputs.labels.join(',')
-      if (this.inputs.star_count_lower !== '') params.star_count_lower = this.inputs.star_count_lower
-      if (this.inputs.star_count_upper !== '') params.star_count_upper = this.inputs.star_count_upper
-      if (this.inputs.fork_count_lower !== '') params.fork_count_lower = this.inputs.fork_count_lower
-      if (this.inputs.fork_count_upper !== '') params.fork_count_upper = this.inputs.fork_count_upper
-      if (this.inputs.license !== '' && this.inputs.license !== this.$t('all')) params.license = this.inputs.license
-      if (this.inputs.ordermetric !== '') {
+      if (i.languages !== '' && !i.languages.includes(this.$t('all'))) params.languages = i.languages.join(',')
+      if (i.labels !== '' && !i.labels.includes(this.$t('all'))) params.labels = i.labels.join(',')
+      if (i.star_count_lower !== '') params.star_count_lower = i.star_count_lower
+      if (i.star_count_upper !== '') params.star_count_upper = i.star_count_upper
+      if (i.fork_count_lower !== '') params.fork_count_lower = i.fork_count_lower
+      if (i.fork_count_upper !== '') params.fork_count_upper = i.fork_count_upper
+      if (i.license !== '' && i.license !== this.$t('all')) params.license = i.license
+      if (i.ordermetric === this.$t(this.$ordermetricDefault)) {
+        params.orderby = this.$camelToSnake(this.$ordermetricDefault)
+      } else {
         for (const ordermetric of this.$store.state.ordermetrics) {
-          if (this.inputs.ordermetric === this.$t(ordermetric)) {
+          if (i.ordermetric === this.$t(ordermetric)) {
             params.orderby = this.$camelToSnake(ordermetric)
             break
           }

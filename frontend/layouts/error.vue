@@ -7,12 +7,12 @@
         height="80"
         class="mb-8"
       >
-      <h1 class="text-md-h5 font-weight-medium">
+      <h1 class="text-h5 font-weight-medium">
         <span v-if="error.statusCode === 404">404 | Not Found</span>
         <span v-else>An error occurred</span>
       </h1>
-      <NuxtLink to="/" style="text-decoration: none;">
-        <span class="text-md-h6">Home page</span>
+      <NuxtLink :to="localePath('/')" style="text-decoration: none;">
+        <span class="text-h6">Home page</span>
       </NuxtLink>
     </div>
   </v-app>

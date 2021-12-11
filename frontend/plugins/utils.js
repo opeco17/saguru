@@ -9,4 +9,6 @@ const camelToSnake = function (p) {
 export default (context, inject) => {
     inject('snakeToCamel', snakeToCamel)
     inject('camelToSnake', camelToSnake)
+    inject('labelsDefault', ['good first issue'])
+    inject('ordermetricDefault', 'starCountDesc')
 }
