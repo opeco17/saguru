@@ -12,7 +12,7 @@
       >
       <v-spacer />
 
-      <v-menu offset-y open-on-hover transition="slide-y-transition">
+      <v-menu offset-y transition="slide-y-transition">
         <template v-slot:activator="{ on, attrs }">
           <v-btn
             icon
