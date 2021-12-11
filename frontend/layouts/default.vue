@@ -12,7 +12,7 @@
       >
       <v-spacer />
 
-      <v-menu offset-y transition="slide-y-transition">
+      <v-menu offset-y transition="slide-y-transition" :open-on-hover="!mobile">
         <template v-slot:activator="{ on, attrs }">
           <v-btn
             icon
@@ -39,7 +39,7 @@
 
     <v-menu>
       <template v-slot:activator="{ on: menu, attrs }">
-        <v-tooltip bottom>
+        <v-tooltip bottom :disabled="mobile">
           <template v-slot:activator="{ on: tooltip }">
             <v-btn
               icon
@@ -67,9 +67,15 @@
 
 <script>
 export default {
+  created () {
+    console.log(this.$vuetify.breakpoint)
+  },
   computed: {
     xs () {
       return this.$vuetify.breakpoint.xs
+    },
+    mobile () {
+      return this.$vuetify.mobile
     },
     languages () {
       return [
