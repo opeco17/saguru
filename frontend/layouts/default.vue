@@ -8,7 +8,7 @@
       <img
         src="/logo.png"
         alt="logo"
-        :class="{ 'logo ml-2': !xs, 'logo-xs ml-1': xs }"
+        :class="{ 'logo': !xs, 'ml-2': !xs, 'logo-xs': xs, 'ml-1': xs }"
       >
       <v-spacer />
 
@@ -16,7 +16,7 @@
         <template v-slot:activator="{ on, attrs }">
           <v-btn
             icon
-            :class="{'mr-4': !xs, 'mr-2': xs}"
+            :class="{ 'mr-4': !xs, 'mr-2': xs }"
             v-bind="attrs"
             v-on="on"
           >
@@ -67,9 +67,6 @@
 
 <script>
 export default {
-  created () {
-    console.log(this.$vuetify.breakpoint)
-  },
   computed: {
     xs () {
       return this.$vuetify.breakpoint.xs

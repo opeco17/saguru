@@ -1,12 +1,12 @@
 <template>
   <div>
     <v-row justify="center" align-content="center" class="my-1 mx-1">
-      <h1 class="text-md-h3 text-sm-h4 text-xs-h4 font-weight-medium">
+      <h1 class="text-md-h3 text-sm-h4 font-weight-medium">
         {{ $t('title') }}
       </h1>
     </v-row>
     <v-row justify="center" align-content="center" class="my-2 mx-1">
-      <h3 class="text-md-h5 text-sm-h6 text-xs-h6 grey--text text--darken-2 font-weight-medium"> 
+      <h3 class="text-md-h5 text-sm-h6 grey--text text--darken-2 font-weight-medium"> 
         <a
           style="color: #F85758; text-decoration: none;"
           href="https://github.com/opeco17/gitnavi"
@@ -90,15 +90,10 @@
               </div>
             </v-expand-transition>
             <v-row justify="center" class="mb-1 mt-4">
-              <v-btn
-                class="mr-4"
-                color="#F85758"
-                outlined
-                @click="reset"
-              >
+              <outlined-button width="88px" @click="reset">
                 {{ $t('reset') }}
-              </v-btn>
-              <basic-button @click="search">
+              </outlined-button>
+              <basic-button width="88px" @click="search">
                 {{ $t('search') }}
                 <basic-button-circular v-show="searchLoading" />
               </basic-button>

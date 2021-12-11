@@ -1,9 +1,9 @@
 <template>
   <v-btn
-    class="mr-4 white--text"
+    class="mr-4"
     color="#F85758"
-    depressed
-    :min-width="width"
+    outlined
+    :width="width"
     :disabled="disabled"
     @click="$emit('click', $event)"
   >
