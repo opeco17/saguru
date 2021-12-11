@@ -3,6 +3,8 @@
     :value="value"
     @input="$emit('input', $event)"
     :items="items"
+    item-text="label"
+    item-value="value"
     outlined
     single-line
     dense

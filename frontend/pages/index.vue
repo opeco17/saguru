@@ -2,7 +2,7 @@
   <div>
     <v-row justify="center" align-content="center" class="my-1 mx-1">
       <h1 class="text-md-h3 text-sm-h4 text-xs-h4 font-weight-medium">
-        Explore good first issues in GitHub
+        {{ $t('title') }}
       </h1>
     </v-row>
     <v-row justify="center" align-content="center" class="my-2 mx-1">
@@ -14,7 +14,7 @@
         >
           gitnavi
         </a>
-        support your open-source contribution with flexible filters
+        {{ $t('subTitle') }}
       </h3>
     </v-row>
     <v-row style="height: 8px;">
@@ -36,57 +36,57 @@
             elevation="0"
             outlined
           >
-            <form-label label="Languages" />
+            <form-label :label="$t('languageLabel')" />
             <multiple-chips-complete
               v-model="temporaryInputs.languages" 
-              :items="languages" 
+              :items="formatedLanguages" 
               @close="removeLanguage"
             />
-            <form-label label="Labels" />
+            <form-label :label="$t('labelLabel')" />
             <multiple-chips-complete
               v-model="temporaryInputs.labels" 
-              :items="labels" 
+              :items="formatedLabels" 
               @close="removeLabel"
             />
-            <form-label label="Star count" />
+            <form-label :label="$t('starCountLabel')" />
             <v-row justify="space-between">
               <v-col cols="6" sm="6">
-                <single-integer-field v-model="temporaryInputs.star_count_lower" label="Min" />
+                <single-integer-field v-model="temporaryInputs.star_count_lower" :label="$t('min')" />
               </v-col>
               <v-col cols="6" sm="6">
-                <single-integer-field v-model="temporaryInputs.star_count_upper" label="Max" />
+                <single-integer-field v-model="temporaryInputs.star_count_upper" :label="$t('max')" />
               </v-col>
             </v-row>
-            <form-label label="Order by" />
-            <orderby-select v-model="temporaryInputs.ordermetric" :items="ordermetrics" />
+            <form-label :label="$t('orderByLabel')" />
+            <single-text-select v-model="temporaryInputs.ordermetric" :items="formatedOrderMetrics"/>
             <v-row justify="end" class="mb-1 mr-1">
               <v-btn @click="showDetail=!showDetail" text small class="px-1">
-                detail
+                {{ $t('detailLabel') }}
                 <v-icon>{{ showDetail ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
               </v-btn>
             </v-row>
             <v-divider></v-divider>
             <v-expand-transition>
               <div v-show="showDetail" class="mt-3">
-                <form-label label="Fork count" />
+                <form-label :label="$t('forkCountLabel')" />
                 <v-row justify="space-between">
                   <v-col cols="6" sm="6">
                     <single-integer-field 
                       v-model="temporaryInputs.fork_count_lower" 
-                      label="Min"
+                      :label="$t('min')"
                     />
                   </v-col>
                   <v-col cols="6" sm="6">
                     <single-integer-field 
                       v-model="temporaryInputs.fork_count_upper" 
-                      label="Max"
+                      :label="$t('max')"
                     />
                   </v-col>
                 </v-row>
-                <form-label label="License" />
-                <single-text-select v-model="temporaryInputs.license" :items="licenses"/>
-                <form-label label="Assign status" />
-                <single-text-select v-model="temporaryInputs.assigned" :items="assignStatuses"/>
+                <form-label :label="$t('licenseLabel')" />
+                <single-text-select v-model="temporaryInputs.license" :items="formatedLicenses"/>
+                <form-label :label="$t('assignStatusLabel')" />
+                <single-text-select v-model="temporaryInputs.assigned" :items="formatedAssignStatuses"/>
               </div>
             </v-expand-transition>
             <v-row justify="center" class="mb-1 mt-4">
@@ -96,10 +96,10 @@
                 outlined
                 @click="reset"
               >
-                reset
+                {{ $t('reset') }}
               </v-btn>
               <basic-button @click="search">
-                search
+                {{ $t('search') }}
                 <basic-button-circular v-show="searchLoading" />
               </basic-button>
             </v-row>
@@ -155,7 +155,7 @@
                     <v-icon left>mdi-label-outline</v-icon>
                       <issue-title :url="issue.url">{{ issue.title }}</issue-title>
                     <issue-chip v-for="label in issue.labels" :key="label">
-                      #{{ label }}
+                      {{ label }}
                     </issue-chip>
                   </div>
                 </div>
@@ -166,7 +166,7 @@
         <v-row justify="center" class="mt-4">
           <basic-button @click="showmore" :disabled="!hasNext" v-show="!initLoading">
             <v-icon>mdi-chevron-down</v-icon>
-            show more
+            {{ $t('showmoreLabel') }}
             <basic-button-circular v-show="showmoreLoading" />
           </basic-button>
         </v-row>
@@ -176,29 +176,18 @@
 </template>
 
 <script>
-let defaultInputs = {
-  languages: ['all'],
-  labels: ['good first issue'],
-  star_count_lower: '',
-  star_count_upper: '',
-  fork_count_lower: '',
-  fork_count_upper: '',
-  license: 'all',
-  assigned: 'all',
-  ordermetric: 'star_count_desc',
-}
-
 export default {
   data () {
     return {
-      inputs: JSON.parse(JSON.stringify(defaultInputs)),
-      temporaryInputs: JSON.parse(JSON.stringify(defaultInputs)),
+      inputs: {},
+      temporaryInputs: {},
       valid: true,
       show: false,
       showDetail: false,
     }
   },
   created () {
+    this.initializeInputs()
     this.$store.dispatch('fetchRepositories', { params: this.getParams(), type: 'init'})
     this.$store.dispatch('fetchLanguages')
     this.$store.dispatch('fetchLicenses')
@@ -206,41 +195,71 @@ export default {
     this.$store.dispatch('fetchOrdermetrics')
   },
   computed: {
-    page() {
+    page () {
       return this.$store.state.page
     },
-    hasNext() {
+    hasNext () {
       return this.$store.state.hasNext
     },
-    repositories() {
+    repositories () {
       return this.$store.state.repositories
     },
-    languages() {
+    languages () {
       return this.$store.state.languages
     },
-    licenses() {
+    licenses () {
       return this.$store.state.licenses
     },
-    labels() {
+    labels () {
       return this.$store.state.labels
     },
-    assignStatuses() {
+    assignStatuses () {
       return this.$store.state.assignStatuses
     },
-    ordermetrics() {
+    ordermetrics () {
       return this.$store.state.ordermetrics
     },
-    initLoading() {
+    initLoading () {
       return this.$store.state.initLoading
     },
-    searchLoading() {
+    searchLoading () {
       return this.$store.state.searchLoading
     },
-    showmoreLoading() {
+    showmoreLoading () {
       return this.$store.state.showmoreLoading
+    },
+    formatedLanguages () {
+      return this.languages.map(x => { return x === 'all' ? this.$t(x) : x })
+    },
+    formatedLicenses () {
+      return this.licenses.map(x => { return x === 'all' ? this.$t(x) : x })
+    },
+    formatedLabels () {
+      return this.labels.map(x => { return x === 'all' ? this.$t(x) : x })
+    },
+    formatedAssignStatuses () {
+      return this.assignStatuses.map(x => this.$t(x))
+    },
+    formatedOrderMetrics () {
+      return this.ordermetrics.map(x => this.$t(x))
     },
   },
   methods: {
+    initializeInputs () {
+      let defaultInputs = {
+        languages: [this.$t('all')],
+        labels: this.$labelsDefault,
+        star_count_lower: '',
+        star_count_upper: '',
+        fork_count_lower: '',
+        fork_count_upper: '',
+        license: this.$t('all'),
+        assigned: this.$t('all'),
+        ordermetric: this.$t(this.$ordermetricDefault),
+      }
+      this.inputs = JSON.parse(JSON.stringify(defaultInputs))
+      this.temporaryInputs = JSON.parse(JSON.stringify(defaultInputs))
+    },
     search (event) {
       this.$refs.form.validate()
       if (!this.valid) {
@@ -251,35 +270,46 @@ export default {
       this.$store.dispatch('fetchRepositories', { params: this.getParams(), type: 'search' })
     },
     reset (event) {
-      this.temporaryInputs = JSON.parse(JSON.stringify(defaultInputs))
+      this.initializeInputs()
     },
     showmore (event) {
       this.$store.commit('incrementPage')
       this.$store.dispatch('fetchRepositories', { params: this.getParams(), type: 'showmore' })
     },
     getParams () {
+      let i = this.inputs
+
       let params = {}
       params.page = this.page
-      if (this.inputs.languages !== '' && !this.inputs.languages.includes('all')) params.languages = this.inputs.languages.join(',')
-      if (this.inputs.labels !== '' && !this.inputs.labels.includes('all')) params.labels = this.inputs.labels.join(',')
-      if (this.inputs.star_count_lower !== '') params.star_count_lower = this.inputs.star_count_lower
-      if (this.inputs.star_count_upper !== '') params.star_count_upper = this.inputs.star_count_upper
-      if (this.inputs.fork_count_lower !== '') params.fork_count_lower = this.inputs.fork_count_lower
-      if (this.inputs.fork_count_upper !== '') params.fork_count_upper = this.inputs.fork_count_upper
-      if (this.inputs.license !== '' && this.inputs.license !== 'all') params.license = this.inputs.license
-      if (this.inputs.ordermetric !== '') params.orderby = this.inputs.ordermetric
-      if (this.inputs.assigned == 'assigned') {
+      if (i.languages !== '' && !i.languages.includes(this.$t('all'))) params.languages = i.languages.join(',')
+      if (i.labels !== '' && !i.labels.includes(this.$t('all'))) params.labels = i.labels.join(',')
+      if (i.star_count_lower !== '') params.star_count_lower = i.star_count_lower
+      if (i.star_count_upper !== '') params.star_count_upper = i.star_count_upper
+      if (i.fork_count_lower !== '') params.fork_count_lower = i.fork_count_lower
+      if (i.fork_count_upper !== '') params.fork_count_upper = i.fork_count_upper
+      if (i.license !== '' && i.license !== this.$t('all')) params.license = i.license
+      if (i.ordermetric === this.$t(this.$ordermetricDefault)) {
+        params.orderby = this.$camelToSnake(this.$ordermetricDefault)
+      } else {
+        for (const ordermetric of this.$store.state.ordermetrics) {
+          if (i.ordermetric === this.$t(ordermetric)) {
+            params.orderby = this.$camelToSnake(ordermetric)
+            break
+          }
+        }
+      }
+      if (this.inputs.assigned == this.$t('assigned')) {
         params.assigned = true
-      } else if (this.inputs.assigned == 'unassigned') {
+      } else if (this.inputs.assigned == this.$t('unassigned')) {
         params.assigned = false
       }
       return params
     },
-    removeLanguage(language) {
+    removeLanguage (language) {
       const index = this.temporaryInputs.languages.indexOf(language)
       if (index >= 0) this.temporaryInputs.languages.splice(index, 1)
     },
-    removeLabel(label) {
+    removeLabel (label) {
       const index = this.temporaryInputs.labels.indexOf(label)
       if (index >= 0) this.temporaryInputs.labels.splice(index, 1)
     },
@@ -289,9 +319,17 @@ export default {
       return value > 999 ? (value / 1000).toFixed(1) + 'k' : value
     }
   },
-  head() {
+  head () {
     return {
-      title: 'Good first issues in GitHub for open-source contribution'
+      htmlAttrs: {
+        lang: this.$t('headerLang')
+      },
+      title: this.$t('headerTitle'),
+      meta: [
+        { hid: 'description', name: 'description', content: this.$t('headerDescription') },
+        { hid: 'og:title', property: 'og:title', content: 'gitnavi - ' + this.$t('headerTitle') },
+        { hid: 'og:description', property: 'og:description', content: this.$t('headerDescription') },
+      ],
     }
   }
 }

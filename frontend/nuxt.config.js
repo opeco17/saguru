@@ -1,5 +1,3 @@
-import colors from 'vuetify/es5/util/colors'
-
 export default {
   // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
   ssr: false,
@@ -17,14 +15,24 @@ export default {
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: 'Flexible and strong filters help you search for good first issues in GitHub. gitnavi support your open-source contribution.' },
       { name: 'format-detection', content: 'telephone=no' },
-      { hid: 'keywords', name: 'keywords', content: 'gitnavi,GitHub,good first issue,help wanted,open-source,contribution' },
-
+      
+      { hid: 'description', name: 'description', content: 'Flexible and powerful filter help you search for good first issues from GitHub. gitnavi support your open-source contribution.' },
+      { hid: 'keywords', name: 'keywords', content: 'GitHub,good first issue,help wanted,open-source' },
+      
+      { hid: 'og:title', property: 'og:title', content: 'gitnavi - Good first issues in GitHub for open-source contribution' },
+      { hid: 'og:description', property: 'og:description', content: 'Flexible and powerful filter help you search for good first issues from GitHub. gitnavi support your open-source contribution.' },
       { hid: 'og:site_name', property: 'og:site_name', content: 'gitnavi' },
+      { hid: 'og:type', property: 'og:type', content: 'website' },
+      { hid: 'og:url', property: 'og:url', content: 'https://gitnavi.dev' },
+
+      { hid: 'twitter:card', name: 'twitter:card', content: 'summary_large_image' },
+      { hid: 'twitter:creator', name: 'twitter:creator', content: '@opeco17' }
     ],
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+      { rel: "alternate", hreflang: 'en', href: 'https://gitnavi.dev' },
+      { rel: "alternate", hreflang: 'ja', href: 'https://gitnavi.dev/ja' }
     ]
   },
 
@@ -34,7 +42,7 @@ export default {
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
-    { src: '~/plugins/settings.js' }
+    { src: '~/plugins/utils.js' }
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -44,22 +52,52 @@ export default {
   buildModules: [
     // https://go.nuxtjs.dev/vuetify
     '@nuxtjs/vuetify',
-    '@nuxtjs/google-analytics',
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
     '@nuxtjs/axios',
+    '@nuxtjs/i18n',
+    '@nuxtjs/google-analytics',
+    'nuxt-webfontloader',
   ],
 
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
   vuetify: {
+    // treeShake: true,
+    defaultAssets: {
+      font: false,
+    },
     customVariables: ['~/assets/variables.scss'],
     theme: {}
   },
 
+  webfontloader: {
+    google: {
+      families: ['Roboto:400,500,700', 'Noto+Sans+JP:400,500'],
+    },
+  },
+
   axios: {
 
+  },
+
+  i18n: {
+    locales: [
+      { code: 'en', name: 'English', iso: 'en-US', file: 'en.json' },
+      { code: 'ja', name: 'Japanese', iso: 'ja_JP', file: 'ja.json' },
+    ],
+    baseUrl: 'https://gitnavi.dev',
+    defaultLocale: 'en',
+    langDir: 'locales/',
+    strategy: 'prefix_and_default',
+    lazy: true,
+    detectBrowserLanguage: {
+      fallbackLocale: 'en',
+      useCookie: true,
+      cookieKey: 'gitnavi_i18n',
+      detectBrowserLanguage: true
+    },
   },
 
   googleAnalytics: {
