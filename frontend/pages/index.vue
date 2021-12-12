@@ -167,6 +167,7 @@
         </v-row>
       </v-col>
     </v-row>
+    <go-top-button />
   </div>
 </template>
 
