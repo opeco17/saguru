@@ -48,15 +48,8 @@
               :items="formatedLabels" 
               @close="removeLabel"
             />
-            <form-label :label="$t('starCountLabel')" />
-            <v-row justify="space-between">
-              <v-col cols="6" sm="6">
-                <single-integer-field v-model="temporaryInputs.star_count_lower" :label="$t('min')" />
-              </v-col>
-              <v-col cols="6" sm="6">
-                <single-integer-field v-model="temporaryInputs.star_count_upper" :label="$t('max')" />
-              </v-col>
-            </v-row>
+            <form-label :label="$t('assignStatusLabel')" />
+            <single-text-select v-model="temporaryInputs.assigned" :items="formatedAssignStatuses"/>
             <form-label :label="$t('orderByLabel')" />
             <single-text-select v-model="temporaryInputs.ordermetric" :items="formatedOrderMetrics"/>
             <v-row justify="end" class="mb-1 mr-1">
@@ -68,6 +61,15 @@
             <v-divider></v-divider>
             <v-expand-transition>
               <div v-show="showDetail" class="mt-3">
+                <form-label :label="$t('starCountLabel')" />
+                <v-row justify="space-between">
+                  <v-col cols="6" sm="6">
+                    <single-integer-field v-model="temporaryInputs.star_count_lower" :label="$t('min')" />
+                  </v-col>
+                  <v-col cols="6" sm="6">
+                    <single-integer-field v-model="temporaryInputs.star_count_upper" :label="$t('max')" />
+                  </v-col>
+                </v-row>
                 <form-label :label="$t('forkCountLabel')" />
                 <v-row justify="space-between">
                   <v-col cols="6" sm="6">
@@ -85,8 +87,6 @@
                 </v-row>
                 <form-label :label="$t('licenseLabel')" />
                 <single-text-select v-model="temporaryInputs.license" :items="formatedLicenses"/>
-                <form-label :label="$t('assignStatusLabel')" />
-                <single-text-select v-model="temporaryInputs.assigned" :items="formatedAssignStatuses"/>
               </div>
             </v-expand-transition>
             <v-row justify="center" class="mb-1 mt-4">
