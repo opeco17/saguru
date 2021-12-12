@@ -29,3 +29,9 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.v-input {
+  font-size: 15px !important;
+}
+</style>

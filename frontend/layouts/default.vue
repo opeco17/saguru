@@ -88,23 +88,18 @@ export default {
 .logo {
   height: 43px;
 }
-
 .logo-xs {
   height: 40px;
 }
-
 .translate-icon {
   font-size: 31px !important;
 }
-
 .translate-icon-xs {
   font-size: 28px !important;
 }
-
 .github-icon {
   font-size: 40px !important;
 }
-
 .github-icon-xs {
   font-size: 37px !important;
 }
