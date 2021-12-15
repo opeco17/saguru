@@ -2,15 +2,12 @@ package main
 
 import (
 	"flag"
-	"opeco17/gitnavi/lib"
 	"os"
 
 	"github.com/sirupsen/logrus"
 )
 
 func main() {
-	lib.LoadEnv()
-
 	flag.Parse()
 	if flag.Arg(0) == "all" {
 		initDB()
