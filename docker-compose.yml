@@ -27,12 +27,15 @@ services:
     tty: true
 
   database:
-    build:
-      context: ./database
-      dockerfile: database.Dockerfile
+    image: mysql:8.0
     ports:
       - "3306:3306"
     volumes:
-      - ./database/mysql_data:/var/lib/mysql
+      - ./database/mysql_init:/docker-entrypoint-initdb.d
+      - ./database/conf.d:/etc/mysql/conf.d
+      - ./mysql_data:/var/lib/mysql
+    environment:
+      - TZ=Asia/Tokyo
+      - BIND-ADDRESS=0.0.0.0
     env_file:
       - .env
