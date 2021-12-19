@@ -48,7 +48,7 @@ spec:
       containers:
       - name: database
         image: mysql:8.0
-        imagePullPolicy: Never
+        imagePullPolicy: Always
         resources:
           requests:
             cpu: 500m

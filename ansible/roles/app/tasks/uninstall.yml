@@ -1,0 +1,28 @@
+- name: delete envs
+  command:
+    cmd: "kubectl delete secret envs"
+  ignore_errors: true
+
+- name: uninstall app from local
+  kubernetes.core.k8s:
+    state: absent
+    namespace: "{{ namespace }}"
+    template: 'kubernetes/{{ item }}.yaml'
+  with_items:
+    - api
+    - database
+    - job
+  when: env == "local"
+
+- name: uninstall app from prod
+  kubernetes.core.k8s:
+    state: absent
+    namespace: "{{ namespace }}"
+    template: 'kubernetes-prod/{{ item }}.yaml'
+  with_items:
+    - ingress
+    - api
+    - database
+    - job
+    - issuer
+  when: env == "prod"

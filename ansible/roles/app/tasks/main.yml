@@ -1,0 +1,7 @@
+- name: include install task
+  include_tasks: install.yml
+  when: type == "install"
+
+- name: include uninstall task
+  include_tasks: uninstall.yml
+  when: type == "uninstall"
