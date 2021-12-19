@@ -49,6 +49,10 @@ spec:
       - name: database
         image: mysql:8.0
         imagePullPolicy: Never
+        resources:
+          requests:
+            cpu: 500m
+            memory: 256Mi
         ports:
         - containerPort: 3306
           name: database
@@ -65,6 +69,8 @@ spec:
           mountPath: /docker-entrypoint-initdb.d
         - name: mysql-cnf
           mountPath: /etc/mysql/conf.d
+        - name: database-volume
+          mountPath: /var/lib/mysql
       volumes:
       - name: sql-init
         configMap:
@@ -78,3 +84,11 @@ spec:
           items:
           - key: mysql.cnf
             path: mysql.cnf        
+  volumeClaimTemplates:
+  - metadata:
+      name: database-volume
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 5Gi
