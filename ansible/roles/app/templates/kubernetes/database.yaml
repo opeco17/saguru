@@ -1,0 +1,80 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: database
+spec:
+  selector:
+    app: database
+  ports:
+  - port: 3306
+    targetPort: 3306
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: database-config
+data:
+  init.sql: |
+    CREATE DATABASE main CHARACTER SET utf8mb4;
+  mysql.cnf: |
+    [mysqld]
+    character-set-server = utf8mb4
+    default_authentication_plugin = mysql_native_password
+
+    [mysql]
+    default-character-set = utf8mb4
+
+    [client]
+    default-character-set = utf8mb4
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: database
+spec:
+  selector:
+    matchLabels:
+      app: database
+  serviceName: database
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: database
+    spec:
+      containers:
+      - name: database
+        image: mysql:8.0
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 3306
+          name: database
+        env:
+        - name: TZ
+          value: Asia/Tokyo
+        - name: BIND-ADDRESS
+          value: "0.0.0.0"
+        envFrom:
+        - secretRef:
+            name: envs
+        volumeMounts:
+        - name: sql-init
+          mountPath: /docker-entrypoint-initdb.d
+        - name: mysql-cnf
+          mountPath: /etc/mysql/conf.d
+      volumes:
+      - name: sql-init
+        configMap:
+          name: database-config
+          items:
+          - key: init.sql
+            path: init.sql
+      - name: mysql-cnf
+        configMap:
+          name: database-config
+          items:
+          - key: mysql.cnf
+            path: mysql.cnf        

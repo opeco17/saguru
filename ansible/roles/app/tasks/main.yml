@@ -1,0 +1,11 @@
+- name: build docker image
+  include_tasks: docker.yml
+  when: type == "install"
+
+- name: install application
+  include_tasks: install.yml
+  when: type == "install"
+
+- name: uninstall application
+  include_tasks: uninstall.yml
+  when: type == "uninstall"

@@ -1,0 +1,32 @@
+- name: delete old envs
+  command:
+    cmd: "kubectl delete secret envs"
+  ignore_errors: true
+
+- name: deploy envs
+  command:
+    cmd: "kubectl create secret generic envs --from-env-file={{ ansible_env.PWD }}/../.prodenv"
+
+- name: deploy app into local
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ namespace }}"
+    template: 'kubernetes/{{ item }}.yaml'
+  with_items:
+    - api
+    - database
+    - job
+  when: env == "local"
+
+- name: deploy app into prod
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ namespace }}"
+    template: 'kubernetes-prod/{{ item }}.yaml'
+  with_items:
+    - ingress
+    - api
+    - database
+    - job
+    - issuer
+  when: env == "prod"

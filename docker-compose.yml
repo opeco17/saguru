@@ -7,9 +7,10 @@ services:
       dockerfile: api.Dockerfile
     ports:
       - "8000:8000"
-    restart: always
     volumes:
       - ./backend:/usr/src/app
+    env_file:
+      - .env
     depends_on:
       - database
 
@@ -17,34 +18,24 @@ services:
     build:
       context: ./backend
       dockerfile: job.Dockerfile
-    restart: always
     volumes:
       - ./backend:/usr/src/app
+    env_file:
+      - .env
     depends_on:
       - database
     tty: true
 
-  nginx:
-    build:
-      context: ./nginx
-      dockerfile: nginx.Dockerfile
-    ports:
-      - "80:80"
-      - "443:443"
-    restart: always
-    volumes:
-      - ./nginx/public:/usr/share/nginx/html
-    depends_on:
-      - api
-
   database:
-    build:
-      context: ./database
-      dockerfile: database.Dockerfile
+    image: mysql:8.0
     ports:
       - "3306:3306"
-    restart: always
     volumes:
-      - ./database/mysql_data:/var/lib/mysql
+      - ./database/mysql_init:/docker-entrypoint-initdb.d
+      - ./database/conf.d:/etc/mysql/conf.d
+      - ./mysql_data:/var/lib/mysql
+    environment:
+      - TZ=Asia/Tokyo
+      - BIND-ADDRESS=0.0.0.0
     env_file:
-      - ./database/.env
+      - .env
