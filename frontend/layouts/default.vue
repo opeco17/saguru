@@ -76,8 +76,8 @@ export default {
     },
     languages () {
       return [
-        { label: 'English', code: 'en' },
         { label: 'Japanese', code: 'ja' },
+        { label: 'English', code: 'en' },
       ]
     }
   }
