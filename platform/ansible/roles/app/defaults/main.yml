@@ -1,4 +1,0 @@
-app_path: /home/ec2-user/gitnavi
-repository_name: gitnavi
-repository_url: "https://github.com/opeco17/{{ repository_name }}.git"
-run_service: false

@@ -1,0 +1,21 @@
+- name: build image
+  community.docker.docker_image:
+    name: "opeco17/gitnavi-{{ item }}"
+    build:
+      dockerfile: "{{ item }}-prod.Dockerfile"
+      path: "{{ ansible_env.PWD }}/../backend"
+    source: build
+  with_items:
+    - api
+    - job
+  
+- name: push image to docker hub
+  community.docker.docker_image:
+    name: "opeco17/gitnavi-{{ item }}"
+    repository: "opeco17/gitnavi-{{ item }}"
+    push: yes
+    source: local
+  with_items:
+    - api
+    - job
+  when: env == "prod"

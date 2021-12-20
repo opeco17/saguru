@@ -5,10 +5,13 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/enable-cors: 'true'
+    nginx.ingress.kubernetes.io/cors-allow-origin: '*'
+    nginx.ingress.kubernetes.io/force-ssl-redirect: 'true'
   name: ingress
 spec:
   rules:
-  - host: test1.gitnavi.dev
+  - host: api.gitnavi.dev
     http:
       paths:
       - backend:
@@ -20,5 +23,5 @@ spec:
         pathType: Prefix
   tls:
   - hosts:
-    - test1.gitnavi.dev
+    - api.gitnavi.dev
     secretName: kubernetes-tls

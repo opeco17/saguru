@@ -1,7 +1,0 @@
-- hosts: backend
-  tasks:
-    - name: update cert
-      include_role:
-        name: cert
-      vars:
-        update_cert: true

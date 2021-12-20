@@ -1,5 +1,0 @@
-- hosts: backend
-  tasks:
-    - name: set cron
-      include_role:
-        name: cron

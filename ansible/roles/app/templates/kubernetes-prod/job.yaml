@@ -12,7 +12,7 @@ spec:
           containers:
           - name: update-all-job
             image: opeco17/gitnavi-job
-            imagePullPolicy: Never
+            imagePullPolicy: Always
             envFrom:
             - secretRef:
                 name: envs
