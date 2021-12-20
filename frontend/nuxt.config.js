@@ -91,13 +91,8 @@ export default {
     defaultLocale: 'ja',
     langDir: 'locales/',
     strategy: 'prefix_and_default',
+    detectBrowserLanguage: false,
     lazy: true,
-    detectBrowserLanguage: {
-      fallbackLocale: 'ja',
-      useCookie: true,
-      cookieKey: 'gitnavi_i18n',
-      detectBrowserLanguage: true
-    },
   },
 
   googleAnalytics: {
