@@ -8,20 +8,20 @@ export default {
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
     titleTemplate: 'gitnavi - %s',
-    title: 'Good first issues in GitHub for open-source contribution',
+    title: 'OSS活動のためのGitHub issue検索サービス',
     htmlAttrs: {
-      lang: 'en'
+      lang: 'ja'
     },
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       { name: 'format-detection', content: 'telephone=no' },
       
-      { hid: 'description', name: 'description', content: 'Flexible and powerful filter help you search for good first issues from GitHub. gitnavi support your open-source contribution.' },
+      { hid: 'description', name: 'description', content: '強力なGitHub issueフィルタリング機能で初めてのOSS活動をサポートします。gitnaviを使ってお気に入りのGood first issueやhelp wanted issueを探しましょう。' },
       { hid: 'keywords', name: 'keywords', content: 'GitHub,good first issue,help wanted,open-source' },
       
-      { hid: 'og:title', property: 'og:title', content: 'gitnavi - Good first issues in GitHub for open-source contribution' },
-      { hid: 'og:description', property: 'og:description', content: 'Flexible and powerful filter help you search for good first issues from GitHub. gitnavi support your open-source contribution.' },
+      { hid: 'og:title', property: 'og:title', content: 'OSS活動のためのGitHub issue検索サービス' },
+      { hid: 'og:description', property: 'og:description', content: '強力なGitHub issueフィルタリング機能で初めてのOSS活動をサポートします。gitnaviを使ってお気に入りのGood first issueやhelp wanted issueを探しましょう。' },
       { hid: 'og:site_name', property: 'og:site_name', content: 'gitnavi' },
       { hid: 'og:type', property: 'og:type', content: 'website' },
       { hid: 'og:url', property: 'og:url', content: 'https://gitnavi.dev' },
@@ -31,8 +31,8 @@ export default {
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
-      { rel: "alternate", hreflang: 'en', href: 'https://gitnavi.dev' },
-      { rel: "alternate", hreflang: 'ja', href: 'https://gitnavi.dev/ja' }
+      { rel: "alternate", hreflang: 'ja', href: 'https://gitnavi.dev' },
+      { rel: "alternate", hreflang: 'en', href: 'https://gitnavi.dev/en' },
     ]
   },
 
@@ -84,16 +84,16 @@ export default {
 
   i18n: {
     locales: [
-      { code: 'en', name: 'English', iso: 'en-US', file: 'en.json' },
       { code: 'ja', name: 'Japanese', iso: 'ja_JP', file: 'ja.json' },
+      { code: 'en', name: 'English', iso: 'en-US', file: 'en.json' },
     ],
     baseUrl: 'https://gitnavi.dev',
-    defaultLocale: 'en',
+    defaultLocale: 'ja',
     langDir: 'locales/',
     strategy: 'prefix_and_default',
     lazy: true,
     detectBrowserLanguage: {
-      fallbackLocale: 'en',
+      fallbackLocale: 'ja',
       useCookie: true,
       cookieKey: 'gitnavi_i18n',
       detectBrowserLanguage: true
