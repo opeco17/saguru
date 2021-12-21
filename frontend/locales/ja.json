@@ -1,10 +1,10 @@
 {
     "headerLang": "ja",
-    "headerTitle": "OSS活動のためのGitHub issue検索サービス",
-    "headerDescription": "強力なGitHub issueフィルタリング機能で初めてのOSS活動をサポートします。gitnaviを使ってお気に入りのGood first issueやhelp wanted issueを探しましょう。",
+    "headerTitle": "OSS活動のためのGitHub Issue検索サービス",
+    "headerDescription": "gitnaviは豊富なIssueフィルタリング機能で初めてのOSS活動をサポートします。お気に入りのGood first issueやHelp wanted issueを探してOSS開発に参加しましょう。",
 
-    "title": "お気に入りのissueをGitHubから見つける",
-    "subTitle": "は強力なissue検索機能であなたのOSS活動をサポートします",
+    "title": "お気に入りのIssueをGitHubから見つける",
+    "subTitle": "は強力なIssue検索機能であなたのOSS活動をサポートします",
     "languageLabel": "プログラミング言語",
     "labelLabel": "ラベル",
     "starCountLabel": "スター数",

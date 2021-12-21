@@ -8,7 +8,7 @@ export default {
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
     titleTemplate: 'gitnavi - %s',
-    title: 'OSS活動のためのGitHub issue検索サービス',
+    title: 'OSS活動のためのGitHub Issue検索サービス',
     htmlAttrs: {
       lang: 'ja'
     },
@@ -17,11 +17,11 @@ export default {
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       { name: 'format-detection', content: 'telephone=no' },
       
-      { hid: 'description', name: 'description', content: '強力なGitHub issueフィルタリング機能で初めてのOSS活動をサポートします。gitnaviを使ってお気に入りのGood first issueやhelp wanted issueを探しましょう。' },
-      { hid: 'keywords', name: 'keywords', content: 'GitHub,good first issue,help wanted,open-source' },
+      { hid: 'description', name: 'description', content: 'gitnaviは豊富なIssueフィルタリング機能で初めてのOSS活動をサポートします。お気に入りのGood first issueやHelp wanted issueを探してOSS開発に参加しましょう。' },
+      { hid: 'keywords', name: 'keywords', content: 'GitHub,good first issue,help wanted,open-source,oss活動,oss開発' },
       
-      { hid: 'og:title', property: 'og:title', content: 'OSS活動のためのGitHub issue検索サービス' },
-      { hid: 'og:description', property: 'og:description', content: '強力なGitHub issueフィルタリング機能で初めてのOSS活動をサポートします。gitnaviを使ってお気に入りのGood first issueやhelp wanted issueを探しましょう。' },
+      { hid: 'og:title', property: 'og:title', content: 'OSS活動のためのGitHub Issue検索サービス' },
+      { hid: 'og:description', property: 'og:description', content: 'gitnaviは豊富なIssueフィルタリング機能で初めてのOSS活動をサポートします。お気に入りのGood first issueやHelp wanted issueを探してOSS開発に参加しましょう。' },
       { hid: 'og:site_name', property: 'og:site_name', content: 'gitnavi' },
       { hid: 'og:type', property: 'og:type', content: 'website' },
       { hid: 'og:url', property: 'og:url', content: 'https://gitnavi.dev' },
