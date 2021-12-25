@@ -11,7 +11,7 @@ spec:
         spec:
           containers:
           - name: update-all-job
-            image: gitnavi/job
+            image: "opeco17/gitnavi-job:{{ image_tag }}"
             imagePullPolicy: Never
             envFrom:
             - secretRef:
@@ -34,7 +34,7 @@ spec:
         spec:
           containers:
           - name: update-issue-job
-            image: opeco17/gitnavi-job
+            image: "opeco17/gitnavi-job:{{ image_tag }}"
             imagePullPolicy: Never
             envFrom:
             - secretRef:

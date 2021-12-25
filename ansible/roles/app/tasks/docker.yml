@@ -1,20 +1,18 @@
+- name: set facts
+  set_fact:
+    backend_dir_path: "{{ ansible_env.PWD }}/../backend"
+
 - name: build image
-  community.docker.docker_image:
-    name: "opeco17/gitnavi-{{ item }}"
-    build:
-      dockerfile: "{{ item }}-prod.Dockerfile"
-      path: "{{ ansible_env.PWD }}/../backend"
-    source: build
+  command:
+    cmd: "docker image build -t {{ image_prefix }}-{{ item }}:{{ image_tag }} -f {{ item }}-prod.Dockerfile ."
+    chdir: "{{ backend_dir_path }}"
   with_items:
     - api
     - job
-  
-- name: push image to docker hub
-  community.docker.docker_image:
-    name: "opeco17/gitnavi-{{ item }}"
-    repository: "opeco17/gitnavi-{{ item }}"
-    push: yes
-    source: local
+
+- name: push image
+  command:
+    cmd: "docker push {{ image_prefix }}-{{ item }}:{{ image_tag }}"
   with_items:
     - api
     - job

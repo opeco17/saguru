@@ -17,6 +17,8 @@ kind: Deployment
 metadata:
   name: api
 spec:
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: api
@@ -27,7 +29,7 @@ spec:
     spec:
       containers:
       - name: api
-        image: opeco17/gitnavi-api
+        image: "opeco17/gitnavi-api:{{ image_tag }}"
         imagePullPolicy: Never
         resources:
           limits:
