@@ -39,3 +39,13 @@ services:
       - BIND-ADDRESS=0.0.0.0
     env_file:
       - .env
+
+  nginx:
+    image: nginx:1.20
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/conf/default.conf:/etc/nginx/conf.d/default.conf
+    restart: always
+    depends_on:
+      - api

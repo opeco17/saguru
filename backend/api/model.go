@@ -6,7 +6,7 @@ import (
 
 type (
 	GetRepositoriesInput struct {
-		Page           *uint  `query:"page"`
+		Page           uint   `query:"page"`
 		Labels         string `query:"labels"`
 		Assigned       *bool  `query:"assigned"`
 		Languages      string `query:"languages"`
@@ -63,10 +63,6 @@ type (
 )
 
 func (input *GetRepositoriesInput) validator() error {
-	if input.Page == nil {
-		return fmt.Errorf("page is required")
-	}
-
 	if input.StarCountLower != nil && input.StarCountUpper != nil && *input.StarCountLower > *input.StarCountUpper {
 		return fmt.Errorf("star_count_lower should be less than star_count_upper")
 	}

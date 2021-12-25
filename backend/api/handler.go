@@ -9,11 +9,11 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func index(c echo.Context) error {
+func Index(c echo.Context) error {
 	return c.String(http.StatusOK, "healthy")
 }
 
-func getRepositories(c echo.Context) error {
+func GetRepositories(c echo.Context) error {
 	logrus.Info("Get repositories")
 
 	// Validation
@@ -34,16 +34,22 @@ func getRepositories(c echo.Context) error {
 
 	// Fetch data
 	now := time.Now()
-	issueIDs := fetchIssueIDs(gormDB, input)
-	repositoryIDs := fetchRepositoryIDs(gormDB, input, issueIDs)
-	repositories := fetchRepositoryEntities(gormDB, input, issueIDs, repositoryIDs)
+	useIssueIDs := false
+	issueIDs := []uint{}
+	logrus.Info(input.Labels)
+	if input.Labels != "" || input.Assigned != nil {
+		useIssueIDs = true
+		issueIDs = FetchIssueIDs(gormDB, input)
+	}
+	repositoryIDs := FetchRepositoryIDs(gormDB, input, useIssueIDs, issueIDs)
+	repositories := FetchRepositoryEntities(gormDB, input, useIssueIDs, issueIDs, repositoryIDs)
 	getRepositoriesOutput := convertGetRepositoriesOutput(repositories)
 	logrus.Info(fmt.Sprintf("Total time to fetch repositories: %vms\n", time.Since(now).Milliseconds()))
 
 	return c.JSON(http.StatusOK, getRepositoriesOutput)
 }
 
-func getLanguages(c echo.Context) error {
+func GetLanguages(c echo.Context) error {
 	logrus.Info("Get languages")
 
 	// Connect DB
@@ -55,14 +61,14 @@ func getLanguages(c echo.Context) error {
 
 	// Fetch data
 	now := time.Now()
-	frontLanguages := fetchFrontLanguages(gormDB)
+	frontLanguages := FetchFrontLanguages(gormDB)
 	getLanguagesOutput := convertGetLanguagesOutput(frontLanguages)
 	logrus.Info(fmt.Sprintf("Total time to fetch front languages: %vms\n", time.Since(now).Milliseconds()))
 
 	return c.JSON(http.StatusOK, getLanguagesOutput)
 }
 
-func getLicenses(c echo.Context) error {
+func GetLicenses(c echo.Context) error {
 	logrus.Info("Get licenses")
 
 	// Connect DB
@@ -74,14 +80,14 @@ func getLicenses(c echo.Context) error {
 
 	// Fetch data
 	now := time.Now()
-	frontLicenses := fetchFrontLicenses(gormDB)
+	frontLicenses := FetchFrontLicenses(gormDB)
 	getLicensesOutput := convertGetLicensesOutput(frontLicenses)
 	logrus.Info(fmt.Sprintf("Total time to fetch front licenses: %vms\n", time.Since(now).Milliseconds()))
 
 	return c.JSON(http.StatusOK, getLicensesOutput)
 }
 
-func getLabels(c echo.Context) error {
+func GetLabels(c echo.Context) error {
 	logrus.Info("Get labels")
 
 	// Connect DB
@@ -93,14 +99,14 @@ func getLabels(c echo.Context) error {
 
 	// Fetch data
 	now := time.Now()
-	frontLabels := fetchFrontLabels(gormDB)
+	frontLabels := FetchFrontLabels(gormDB)
 	getLabelsOutput := convertGetLabelsOutput(frontLabels)
 	logrus.Info(fmt.Sprintf("Total time to fetch front labels: %vms\n", time.Since(now).Milliseconds()))
 
 	return c.JSON(http.StatusOK, getLabelsOutput)
 }
 
-func getOrderMetrics(c echo.Context) error {
+func GetOrderMetrics(c echo.Context) error {
 	logrus.Info("Get order metrics")
 	metrics := []string{}
 	for _, metric := range orderMetrics() {

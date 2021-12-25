@@ -6,12 +6,12 @@ import (
 
 func main() {
 	e := echo.New()
-	e.GET("/", index)
-	e.GET("/repositories", getRepositories)
-	e.GET("/languages", getLanguages)
-	e.GET("/licenses", getLicenses)
-	e.GET("/labels", getLabels)
-	e.GET("/ordermetrics", getOrderMetrics)
+	e.GET("/", Index)
+	e.GET("/repositories", GetRepositories)
+	e.GET("/languages", GetLanguages)
+	e.GET("/licenses", GetLicenses)
+	e.GET("/labels", GetLabels)
+	e.GET("/ordermetrics", GetOrderMetrics)
 
 	e.Logger.Fatal(e.Start(":8000"))
 }
