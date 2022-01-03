@@ -25,11 +25,11 @@ func UpdateRepositories() error {
 	// Fetch and save repositories
 	uniqueQuery := [...]string{
 		"stars:30..100",
-		"stars:100..200",
-		"stars:200..400",
-		"stars:400..1000",
-		"stars:1000..3000",
-		"stars:>3000",
+		// "stars:100..200",
+		// "stars:200..400",
+		// "stars:400..1000",
+		// "stars:1000..3000",
+		// "stars:>3000",
 	}
 	for _, eachQuery := range uniqueQuery {
 		now := time.Now()
@@ -83,7 +83,7 @@ func UpdateIssues() error {
 
 	repositories := append(notInitializedRepositories, initializedRepositories...)
 
-	// Update issue
+	// Update issues
 	var (
 		wg    sync.WaitGroup
 		mutex = &sync.Mutex{}
