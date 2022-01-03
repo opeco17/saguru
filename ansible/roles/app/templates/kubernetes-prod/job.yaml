@@ -5,10 +5,15 @@ metadata:
   name: update-all-job
 spec:
   schedule: "*/30 3 * * *"
+  concurrencyPolicy: Forbid
   jobTemplate:
     spec:
       template:
         spec:
+          restartPolicy: OnFailure
+          completions: 1
+          parallelism: 1
+          backoffLimit: 1
           containers:
           - name: update-all-job
             image: "opeco17/gitnavi-job:{{ image_tag }}"
@@ -19,7 +24,6 @@ spec:
             command:
               - /job
               - all
-          restartPolicy: OnFailure
 
 ---
 apiVersion: batch/v1
@@ -28,10 +32,15 @@ metadata:
   name: update-issue-job
 spec:
   schedule: "*/30 0-2,4-23 * * *"
+  concurrencyPolicy: Forbid
   jobTemplate:
     spec:
       template:
         spec:
+          restartPolicy: OnFailure
+          completions: 1
+          parallelism: 1
+          backoffLimit: 1
           containers:
           - name: update-issue-job
             image: "opeco17/gitnavi-job:{{ image_tag }}"
@@ -42,4 +51,3 @@ spec:
             command:
               - /job
               - issue
-          restartPolicy: OnFailure
