@@ -8,10 +8,10 @@ func convertGetRepositoriesOutputItemIssue(issue lib.Issue) GetRepositoriesOutpu
 		getRepositoryIssueLabels = append(getRepositoryIssueLabels, label.Name)
 	}
 	getRepositoryIssue := GetRepositoriesOutputItemIssue{
-		ID:             issue.ID,
+		ID:             int(issue.ID),
 		Title:          issue.Title,
 		URL:            issue.URL,
-		AssigneesCount: issue.AssigneesCount,
+		AssigneesCount: *issue.AssigneesCount,
 		Labels:         getRepositoryIssueLabels,
 	}
 	return getRepositoryIssue
@@ -20,16 +20,16 @@ func convertGetRepositoriesOutputItemIssue(issue lib.Issue) GetRepositoriesOutpu
 func convertGetRepositoriesOutputItem(repository lib.Repository) GetRepositoriesOutputItem {
 	getRepositoryIssues := make([]GetRepositoriesOutputItemIssue, 0, len(repository.Issues)-1)
 	for _, issue := range repository.Issues {
-		getRepositoryIssues = append(getRepositoryIssues, convertGetRepositoriesOutputItemIssue(issue))
+		getRepositoryIssues = append(getRepositoryIssues, convertGetRepositoriesOutputItemIssue(*issue))
 	}
 	getRepositoriesOutputItem := GetRepositoriesOutputItem{
-		ID:             repository.ID,
+		ID:             int(repository.ID),
 		Name:           repository.Name,
 		URL:            repository.URL,
 		Description:    repository.Description,
-		StarCount:      repository.StarCount,
-		ForkCount:      repository.ForkCount,
-		OpenIssueCount: repository.OpenIssueCount,
+		StarCount:      *repository.StarCount,
+		ForkCount:      *repository.ForkCount,
+		OpenIssueCount: *repository.OpenIssueCount,
 		Topics:         repository.Topics,
 		License:        repository.License,
 		Language:       repository.Language,

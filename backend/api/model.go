@@ -6,34 +6,34 @@ import (
 
 type (
 	GetRepositoriesInput struct {
-		Page           uint   `query:"page"`
+		Page           int    `query:"page"`
 		Labels         string `query:"labels"`
 		Assigned       *bool  `query:"assigned"`
 		Languages      string `query:"languages"`
-		StarCountLower *uint  `query:"star_count_lower"`
-		StarCountUpper *uint  `query:"star_count_upper"`
-		ForkCountLower *uint  `query:"fork_count_lower"`
-		ForkCountUpper *uint  `query:"fork_count_upper"`
+		StarCountLower *int   `query:"star_count_lower"`
+		StarCountUpper *int   `query:"star_count_upper"`
+		ForkCountLower *int   `query:"fork_count_lower"`
+		ForkCountUpper *int   `query:"fork_count_upper"`
 		License        string `query:"license"`
 		Orderby        string `query:"orderby"`
 	}
 
 	GetRepositoriesOutputItemIssue struct {
-		ID             uint     `json:"id"`
+		ID             int      `json:"id"`
 		Title          string   `json:"title"`
 		URL            string   `json:"url"`
-		AssigneesCount uint     `json:"assigneesCount"`
+		AssigneesCount int      `json:"assigneesCount"`
 		Labels         []string `json:"labels"`
 	}
 
 	GetRepositoriesOutputItem struct {
-		ID             uint                             `json:"id"`
+		ID             int                              `json:"id"`
 		Name           string                           `json:"name"`
 		URL            string                           `json:"url"`
 		Description    string                           `json:"description"`
-		StarCount      uint                             `json:"starCount"`
-		ForkCount      uint                             `json:"forkCount"`
-		OpenIssueCount uint                             `json:"openIssueCount"`
+		StarCount      int                              `json:"starCount"`
+		ForkCount      int                              `json:"forkCount"`
+		OpenIssueCount int                              `json:"openIssueCount"`
 		Topics         string                           `json:"topics"`
 		License        string                           `json:"license"`
 		Language       string                           `json:"language"`
