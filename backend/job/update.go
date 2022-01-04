@@ -23,22 +23,26 @@ func UpdateRepositories() error {
 	defer sqlDB.Close()
 
 	// Fetch and save repositories
-	uniqueQuery := [...]string{
+	threeMonthAgo := time.Now().AddDate(0, -3, 0).Format("2006-01-02T15:04:05+09:00")
+	queries := [...]string{
 		"stars:30..100",
-		// "stars:100..200",
-		// "stars:200..400",
-		// "stars:400..1000",
-		// "stars:1000..3000",
-		// "stars:>3000",
+		"stars:100..200",
+		"stars:200..400",
+		"stars:400..600",
+		"stars:600..1000",
+		"stars:1000..2000",
+		"stars:2000..4000",
+		"stars:>4000",
 	}
-	for _, eachQuery := range uniqueQuery {
+	for _, eachQuery := range queries {
 		now := time.Now()
-		repositories := FetchRepositories(eachQuery)
-		gormDB.Clauses(clause.OnConflict{
-			UpdateAll: true,
-		}).Create(&repositories)
-		restTimeSecond := int(REPOSITORIES_API_INTERVAL_SECOND) - int(time.Since(now).Seconds())
-		if restTimeSecond > 0 {
+		repositories := FetchRepositories(
+			eachQuery,
+			"good-first-issues:>0",
+			fmt.Sprintf("pushed:>%s", threeMonthAgo),
+		)
+		gormDB.Clauses(clause.OnConflict{UpdateAll: true}).Create(&repositories)
+		if restTimeSecond := REPOSITORIES_API_INTERVAL_SECOND - int(time.Since(now).Seconds()); restTimeSecond > 0 {
 			time.Sleep(time.Second * time.Duration(restTimeSecond))
 		}
 	}
@@ -46,12 +50,12 @@ func UpdateRepositories() error {
 	// Adjust number of repositories by removing old repositories
 	var (
 		repositoryCount    int64
-		removeRepositories []lib.Repository
+		removeRepositories []*lib.Repository
 	)
 	gormDB.Model(&lib.Repository{}).Count(&repositoryCount)
-	if removeRepositoryCount := int(repositoryCount) - int(MAX_REPOSITORY_RECORES); removeRepositoryCount > 0 {
+	if removeRepositoryCount := int(repositoryCount) - MAX_REPOSITORY_RECORES; removeRepositoryCount > 0 {
 		logrus.Info(fmt.Sprintf("%d repositories will be removed.", removeRepositoryCount))
-		gormDB.Model(&lib.Repository{}).Order("updated_at ASC").Limit(removeRepositoryCount).Find(&removeRepositories)
+		gormDB.Model(&lib.Repository{}).Order("git_hub_updated_at ASC").Limit(removeRepositoryCount).Find(&removeRepositories)
 		gormDB.Unscoped().Delete(&removeRepositories)
 	}
 	logrus.Info("Successfully finished to update repositories.")
@@ -71,11 +75,11 @@ func UpdateIssues() error {
 
 	// Get target repositories to update issue
 	var (
-		notInitializedRepositories []lib.Repository
-		initializedRepositories    []lib.Repository
+		notInitializedRepositories []*lib.Repository
+		initializedRepositories    []*lib.Repository
 	)
-	gormDB.Where("issue_initialized = ?", false).Limit(int(UPDATE_ISSUE_BATCH_SIZE)).Find(&notInitializedRepositories)
-	if restRepositoryNum := int(UPDATE_ISSUE_BATCH_SIZE) - len(notInitializedRepositories); restRepositoryNum > 0 {
+	gormDB.Where("issue_initialized = ?", false).Limit(UPDATE_ISSUE_BATCH_SIZE).Find(&notInitializedRepositories)
+	if restRepositoryNum := UPDATE_ISSUE_BATCH_SIZE - len(notInitializedRepositories); restRepositoryNum > 0 {
 		gormDB.Where("issue_initialized = ?", true).Order("updated_at ASC").Limit(restRepositoryNum).Find(&initializedRepositories)
 	}
 	logrus.Info(fmt.Sprintf("not initialized repository: %d", len(notInitializedRepositories)))
@@ -88,17 +92,22 @@ func UpdateIssues() error {
 		wg    sync.WaitGroup
 		mutex = &sync.Mutex{}
 	)
-	for i := 0; i < len(repositories)/int(UPDATE_ISSUE_MINI_BATCH_SIZE); i++ {
+	for i := 0; i < len(repositories)/UPDATE_ISSUE_MINI_BATCH_SIZE; i++ {
+		// Print progress
+		if i%50 == 0 {
+			logrus.Info(fmt.Sprintf("Updating issues: %d/%d", i*UPDATE_ISSUE_MINI_BATCH_SIZE, len(repositories)))
+		}
+
 		// Create mini batch of repository
-		lower := i * int(UPDATE_ISSUE_MINI_BATCH_SIZE)
-		upper := lib.Min((i+1)*int(UPDATE_ISSUE_MINI_BATCH_SIZE), len(repositories)-1)
+		lower := i * UPDATE_ISSUE_MINI_BATCH_SIZE
+		upper := lib.Min((i+1)*UPDATE_ISSUE_MINI_BATCH_SIZE, len(repositories)-1)
 		miniBatchRepositories := repositories[lower:upper]
 
 		// Fetch issues concurrently for each mini batchn
-		modelMiniBatchRepositories := make([]lib.Repository, 0, UPDATE_ISSUE_MINI_BATCH_SIZE)
+		modelMiniBatchRepositories := make([]*lib.Repository, 0, UPDATE_ISSUE_MINI_BATCH_SIZE)
 		for _, repository := range miniBatchRepositories {
 			wg.Add(1)
-			go func(repository lib.Repository) {
+			go func(repository *lib.Repository) {
 				defer wg.Done()
 				issues := FetchIssues(repository.Name)
 				repository.Issues = issues
@@ -132,8 +141,8 @@ func UpdateFrontLanguages() error {
 
 	// Fetch languages from other table
 	var (
-		languages    []lib.FrontLanguage
-		oldLanguages []lib.FrontLanguage
+		languages    []*lib.FrontLanguage
+		oldLanguages []*lib.FrontLanguage
 	)
 	query := gormDB.Model(&lib.Repository{})
 	query.Select("language AS name, COUNT(language) AS repository_count")
@@ -171,8 +180,8 @@ func UpdateLicenses() error {
 
 	// Fetch licenses from other table
 	var (
-		licenses    []lib.FrontLicense
-		oldLicenses []lib.FrontLicense
+		licenses    []*lib.FrontLicense
+		oldLicenses []*lib.FrontLicense
 	)
 	query := gormDB.Model(&lib.Repository{})
 	query.Select("license AS name, COUNT(license) AS repository_count")
@@ -209,8 +218,8 @@ func UpdateLabels() error {
 
 	// Fetch labels from other table
 	var (
-		labels    []lib.FrontLabel
-		oldLabels []lib.FrontLabel
+		labels    []*lib.FrontLabel
+		oldLabels []*lib.FrontLabel
 	)
 	query := gormDB.Model(&lib.Label{})
 	query.Select("name, COUNT(name) AS issue_count")

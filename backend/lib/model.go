@@ -10,7 +10,7 @@ type (
 	Label struct {
 		gorm.Model
 		Name    string
-		IssueID int
+		IssueID uint
 	}
 
 	User struct {
@@ -18,7 +18,7 @@ type (
 		Name      string
 		URL       string
 		AvatarURL string
-		IssueID   int
+		IssueID   uint
 	}
 
 	Issue struct {
@@ -30,9 +30,9 @@ type (
 		PullRequestURL  string
 		AssigneesCount  *int
 		CommentCount    *int
-		Issuer          *User   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-		Labels          []Label `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-		RepositoryID    int
+		Issuer          *User    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+		Labels          []*Label `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+		RepositoryID    uint
 	}
 
 	Repository struct {

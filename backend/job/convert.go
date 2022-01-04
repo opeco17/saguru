@@ -82,14 +82,14 @@ func convertUser(gitHubUser *github.User) *lib.User {
 	return user
 }
 
-func convertLabels(gitHubLabels []*github.Label) []lib.Label {
-	labels := make([]lib.Label, 0, len(gitHubLabels))
+func convertLabels(gitHubLabels []*github.Label) []*lib.Label {
+	labels := make([]*lib.Label, 0, len(gitHubLabels))
 	for _, gitHubLabel := range gitHubLabels {
 		name := ""
 		if gitHubLabel.Name != nil {
 			name = *gitHubLabel.Name
 		}
-		label := lib.Label{
+		label := &lib.Label{
 			Model: gorm.Model{ID: uint(*gitHubLabel.ID)},
 			Name:  name,
 		}
@@ -104,7 +104,7 @@ func convertIssue(gitHubIssue *github.Issue) *lib.Issue {
 		issuer = convertUser(gitHubIssue.User)
 	}
 
-	labels := make([]lib.Label, 0)
+	labels := make([]*lib.Label, 0)
 	if gitHubIssue.Labels != nil {
 		labels = convertLabels(gitHubIssue.Labels)
 	}
