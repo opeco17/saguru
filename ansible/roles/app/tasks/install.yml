@@ -3,9 +3,19 @@
     cmd: "kubectl delete secret envs"
   ignore_errors: true
 
+- name: set env file for local
+  set_fact:
+    env_file: .env
+  when: env == "local"
+
+- name: set env file for prod
+  set_fact:
+    env_file: .prodenv
+  when: env == "prod"
+
 - name: deploy envs
   command:
-    cmd: "kubectl create secret generic envs --from-env-file={{ ansible_env.PWD }}/../.prodenv"
+    cmd: "kubectl create secret generic envs --from-env-file={{ ansible_env.PWD }}/../{{ env_file }}"
 
 - name: deploy app into local
   kubernetes.core.k8s:
