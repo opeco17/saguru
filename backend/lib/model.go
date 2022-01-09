@@ -28,10 +28,10 @@ type (
 		Title           string
 		URL             string
 		PullRequestURL  string
-		AssigneesCount  uint
-		CommentCount    uint
-		Issuer          User    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-		Labels          []Label `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+		AssigneesCount  *int
+		CommentCount    *int
+		Issuer          *User    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+		Labels          []*Label `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 		RepositoryID    uint
 	}
 
@@ -42,31 +42,31 @@ type (
 		Name             string
 		URL              string
 		Description      string
-		StarCount        uint
-		ForkCount        uint
-		OpenIssueCount   uint
+		StarCount        *int
+		ForkCount        *int
+		OpenIssueCount   *int
 		Topics           string
 		License          string
 		Language         string
 		IssueInitialized bool
-		Issues           []Issue `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+		Issues           []*Issue `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	}
 
 	FrontLanguage struct {
 		gorm.Model
 		Name            string
-		RepositoryCount uint
+		RepositoryCount int
 	}
 
 	FrontLicense struct {
 		gorm.Model
 		Name            string
-		RepositoryCount uint
+		RepositoryCount int
 	}
 
 	FrontLabel struct {
 		gorm.Model
 		Name       string
-		IssueCount uint
+		IssueCount int
 	}
 )
