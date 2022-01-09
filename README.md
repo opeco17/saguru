@@ -12,7 +12,7 @@ First, it's necessary to create `.env` in the root directory of this project.
 
 As this project access to GitHub API, GitHub user name and token need to be provided in `.env`.
 
-Replace `YOUR_GITHUB_USERNAME` and `YOUR_GITHUB_API_TOKEN` with your user GitHub name and token respectively.
+Replace `YOUR_GITHUB_USERNAME` and `YOUR_GITHUB_API_TOKEN` with your GitHub user name and token respectively.
 
 ```sh
 cat <<EOF > .env
