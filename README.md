@@ -47,4 +47,4 @@ cd frontend
 npm run dev
 ```
 
-You can check frontend page from `http://localhost:3000`.
+You can check frontend page from http://localhost:3000.
