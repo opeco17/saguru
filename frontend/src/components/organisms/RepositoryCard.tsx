@@ -14,6 +14,7 @@ import Collapse from '@mui/material/Collapse';
 import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
 import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { useState } from 'react';
 
 type RepositoryCardProps = {
@@ -57,10 +58,13 @@ const RepositoryCard = (props: RepositoryCardProps) => {
           label={formatKilo(props.repository.starCount)}
           icon={<StarBorderIcon sx={{ width: '0.8em' }} />}
         />
-        <RepositoryCardChip
-          label={formatKilo(props.repository.forkCount)}
-          icon={<Icon path={mdiSourceFork} size={0.6} />}
-        />
+        {useMediaQuery(theme.breakpoints.up('md')) ? (
+          <RepositoryCardChip
+            label={formatKilo(props.repository.forkCount)}
+            icon={<Icon path={mdiSourceFork} size={0.6} />}
+          />
+        ) : null}
+
         <Button
           variant='outlined'
           size='small'

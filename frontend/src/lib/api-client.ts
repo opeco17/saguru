@@ -8,6 +8,4 @@ const client = axios.create({
   timeout: 10000,
 });
 
-console.log(process.env.NEXT_PUBLIC_API_BASE_URL)
-
 export default client;
