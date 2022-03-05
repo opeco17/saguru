@@ -20,7 +20,7 @@ const SimpleSelectWrapper = (props: SimpleSelectWrapperProps) => {
           sx={{ width: '100%' }}
           MenuProps={{
             sx: { maxHeight: 300 },
-            anchorOrigin: { vertical: 'top', horizontal: 'left' },
+            anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
             transformOrigin: { vertical: 'top', horizontal: 'left' },
           }}
         >

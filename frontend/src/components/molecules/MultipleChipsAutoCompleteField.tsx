@@ -6,7 +6,7 @@ import Checkbox from '@mui/material/Checkbox';
 import Chip from '@mui/material/Chip';
 import TextField from '@mui/material/TextField';
 
-type MultipleChipsFieldProps = {
+type MultipleChipsAutoCompleteProps = {
   options: string[];
   value: string[];
   onChange: any;
@@ -15,24 +15,24 @@ type MultipleChipsFieldProps = {
 const icon = <CheckBoxOutlineBlankIcon fontSize='small' />;
 const checkedIcon = <CheckBoxIcon fontSize='small' />;
 
-const MultipleChipsField = (props: MultipleChipsFieldProps) => {
+const MultipleChipsAutoCompleteField = (props: MultipleChipsAutoCompleteProps) => {
   const { t } = useLocale();
   return (
     <>
       <Autocomplete
         multiple
-        id='tags-outlined'
         options={props.options}
         value={props.value}
         onChange={props.onChange}
+        disableClearable
         renderTags={(value: readonly string[], getTagProps) =>
-          value.map((option: string, index: number) => (
+          value.map((each: string, index: number) => (
             <Chip
               variant='outlined'
               size='small'
               // @ts-ignore to use custom color
               color='greyChip'
-              label={option === 'ALL' ? t.ALL : option}
+              label={each === 'ALL' ? t.ALL : each}
               {...getTagProps({ index })}
               key={index}
               sx={{ px: 0.5 }}
@@ -56,4 +56,4 @@ const MultipleChipsField = (props: MultipleChipsFieldProps) => {
   );
 };
 
-export default MultipleChipsField;
+export default MultipleChipsAutoCompleteField;

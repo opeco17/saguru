@@ -40,6 +40,8 @@ import LinearProgress from '@mui/material/LinearProgress';
 import Head from 'next/head';
 import { useState, useEffect } from 'react';
 import * as React from 'react';
+import MultipleChipsSelectField from '../components/molecules/MultipleChipsSelectField';
+import MultipleChipsAutoCompleteField from '../components/molecules/MultipleChipsAutoCompleteField';
 
 const Index = () => {
   const {
@@ -151,18 +153,28 @@ const Index = () => {
                 <FormControl fullWidth size='small'>
                   <Box sx={{ mb: fieldSpacing }}>
                     <FieldLabel>{t.LANGUAGES_FIELD_LABEL}</FieldLabel>
-                    <MultipleChipsField
+                    <MultipleChipsAutoCompleteField
                       options={languageChoices}
                       value={languages}
                       onChange={(event: any, values: any) => setLanguages(values as string[])}
                     />
+                    <MultipleChipsSelectField
+                      options={languageChoices}
+                      value={languages}
+                      onChange={(event: any) => setLanguages(event.target.value)}
+                    />
                   </Box>
                   <Box sx={{ mb: fieldSpacing }}>
                     <FieldLabel>{t.LABELS_FIELD_LABEL}</FieldLabel>
-                    <MultipleChipsField
+                    <MultipleChipsAutoCompleteField
                       options={labelChoices}
                       value={labels}
                       onChange={(event: any, values: any) => setLabels(values as string[])}
+                    />
+                    <MultipleChipsSelectField
+                      options={labelChoices}
+                      value={labels}
+                      onChange={(event: any) => setLabels(event.target.value)}
                     />
                   </Box>
                   <Box sx={{ mb: fieldSpacing }}>

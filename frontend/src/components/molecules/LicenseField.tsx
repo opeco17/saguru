@@ -1,7 +1,7 @@
+import { useLocale } from '../../hooks/locale';
 import SimpleSelectWrapper from '../atoms/SimpleSelectWrapper';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
-import { useLocale } from '../../hooks/locale';
 
 type LicenseFieldProps = {
   value: string;
