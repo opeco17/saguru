@@ -1,0 +1,35 @@
+type Locale = {
+  ENGLISH: string;
+  JAPANESE: string;
+  HEADER_TITLE: string;
+  HEADER_DESCRIPTION: string;
+  TITLE: string;
+  SUB_TITLE_PREFIX: string;
+  SUB_TITLE: string;
+  TRANSLATE_ICON_MESSAGE: string;
+  GITHUB_ICON_MESSAGE: string;
+  ALL: string;
+  ASSIGNED: string;
+  UNASSIGNED: string;
+  LANGUAGES_FIELD_LABEL: string;
+  LABELS_FIELD_LABEL: string;
+  ASSIGN_STATUS_FIELD_LABEL: string;
+  ORDER_BY_FIELD_LABEL: string;
+  STAR_COUNT_FIELD_LABEL: string;
+  FORK_COUNT_FIELD_LABEL: string;
+  LICENSE_FIELD_LABEL: string;
+  STAR_COUNT_DESC: string;
+  STAR_COUNT_ASC: string;
+  FORK_COUNT_DESC: string;
+  FORK_COUNT_ASC: string;
+  DETAIL_BUTTON_LABEL: string;
+  RESET_BUTTON_LABEL: string;
+  SEARCH_BUTTON_LABEL: string;
+  SHOW_MORE_BUTTON_LABEL: string;
+  EQUAL_OR_GREATER_THAN_ZERO_ERROR_MESSAGE: string;
+  MIN_MUST_BE_LESS_THAN_MAX_ERROR_MESSAGE: string;
+  MAX_MUST_BE_GREATER_THAN_MIN_ERROR_MESSAGE: string;
+  [key: string]: string;
+};
+
+export default Locale;
