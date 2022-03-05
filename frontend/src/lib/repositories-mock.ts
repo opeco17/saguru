@@ -1,0 +1,133 @@
+const repositoriesMock = [
+  {
+    id: 19438,
+    name: 'tidyverse/ggplot2',
+    url: 'https://github.com/tidyverse/ggplot2',
+    description: 'An implementation of the Grammar of Graphics in R',
+    starCount: 5289,
+    forkCount: 1825,
+    openIssueCount: 297,
+    topics: 'data-visualisation,r,visualisation',
+    license: 'Other',
+    language: 'R',
+    issues: [
+      {
+        id: 1031466477,
+        title: 'Width argument to geom_errorbar not passed on when using stat_summary_bin',
+        url: 'https://github.com/tidyverse/ggplot2/issues/4647',
+        assigneesCount: 0,
+        labels: ['bug'],
+      },
+    ],
+  },
+  {
+    id: 20724,
+    name: 'neo4jrb/activegraph',
+    url: 'https://github.com/neo4jrb/activegraph',
+    description: 'An active model wrapper for the Neo4j Graph Database for Ruby.',
+    starCount: 1347,
+    forkCount: 272,
+    openIssueCount: 235,
+    topics: 'graph-database,neo4j,orm,railtie,ruby',
+    license: 'MIT License',
+    language: 'Ruby',
+    issues: [
+      {
+        id: 829295882,
+        title:
+          'After migration, saving to the database throws Neo4j::Driver::Exceptions::DatabaseException',
+        url: 'https://github.com/neo4jrb/activegraph/issues/1648',
+        assigneesCount: 0,
+        labels: ['bug'],
+      },
+    ],
+  },
+  {
+    id: 65646,
+    name: 'mojolicious/mojo',
+    url: 'https://github.com/mojolicious/mojo',
+    description: ':sparkles: Mojolicious - Perl real-time web framework',
+    starCount: 2312,
+    forkCount: 546,
+    openIssueCount: 53,
+    topics:
+      'cloud-native,event-loop,html,http,json,mojolicious,mvc,perl,user-agent,web-framework,web-server,websocket',
+    license: 'Artistic License 2.0',
+    language: 'Perl',
+    issues: [
+      {
+        id: 837076181,
+        title: 'IPv6 issues with trusted proxies',
+        url: 'https://github.com/mojolicious/mojo/issues/1741',
+        assigneesCount: 1,
+        labels: ['bug'],
+      },
+    ],
+  },
+  {
+    id: 20723,
+    name: 'neo4jrb/activegraph',
+    url: 'https://github.com/neo4jrb/activegraph',
+    description: 'An active model wrapper for the Neo4j Graph Database for Ruby.',
+    starCount: 1348,
+    forkCount: 272,
+    openIssueCount: 235,
+    topics: 'graph-database,neo4j,orm,railtie,ruby',
+    license: 'MIT License',
+    language: 'Ruby',
+    issues: [
+      {
+        id: 829295882,
+        title:
+          'After migration, saving to the database throws Neo4j::Driver::Exceptions::DatabaseException',
+        url: 'https://github.com/neo4jrb/activegraph/issues/1648',
+        assigneesCount: 0,
+        labels: ['bug'],
+      },
+    ],
+  },
+  {
+    id: 66801,
+    name: 'publify/publify',
+    url: 'https://github.com/publify/publify',
+    description: 'A self hosted Web publishing platform on Rails.',
+    starCount: 1776,
+    forkCount: 3801,
+    openIssueCount: 78,
+    topics: 'blog-engine,hacktoberfest,rails,ruby',
+    license: 'MIT License',
+    language: 'Ruby',
+    issues: [
+      {
+        id: 367846279,
+        title: 'Search may leak password-protected article content',
+        url: 'https://github.com/publify/publify/issues/892',
+        assigneesCount: 1,
+        labels: ['bug'],
+      },
+    ],
+  },
+  {
+    id: 70148,
+    name: 'newrelic/newrelic-ruby-agent',
+    url: 'https://github.com/newrelic/newrelic-ruby-agent',
+    description: 'New Relic RPM Ruby Agent',
+    starCount: 1137,
+    forkCount: 557,
+    openIssueCount: 79,
+    topics: 'agent,apm-agent,ruby',
+    license: 'Apache License 2.0',
+    language: 'Ruby',
+    issues: [
+      {
+        id: 1116296641,
+        title: 'expected_status_codes is not marking errors as expected',
+        url: 'https://github.com/newrelic/newrelic-ruby-agent/issues/929',
+        assigneesCount: 1,
+        labels: ['bug', 'feedback', 'community'],
+      },
+    ],
+  },
+];
+
+export default repositoriesMock;
