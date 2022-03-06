@@ -106,20 +106,20 @@ const Index = () => {
   };
 
   const setParameters = () => {
-    setEstablishedLanguages(languages)
-    setEstablishedLabels(labels)
-    setEstablishedAssignStatus(assignStatus)
-    setEstablishedOrdermetric(ordermetric)
-    setEstablishedLicense(license)
-    setEstablishedStarCountLower(starCountLower)
-    setEstablishedStarCountUpper(starCountUpper)
-    setEstablishedForkCountLower(forkCountLower)
-    setEstablishedForkCountUpper(forkCountUpper)
-  }
+    setEstablishedLanguages(languages);
+    setEstablishedLabels(labels);
+    setEstablishedAssignStatus(assignStatus);
+    setEstablishedOrdermetric(ordermetric);
+    setEstablishedLicense(license);
+    setEstablishedStarCountLower(starCountLower);
+    setEstablishedStarCountUpper(starCountUpper);
+    setEstablishedForkCountLower(forkCountLower);
+    setEstablishedForkCountUpper(forkCountUpper);
+  };
 
   const fetchRepositoriesWrapper = (type: 'init' | 'search' | 'showmore') => {
     if (type === 'init') {
-      setParameters()
+      setParameters();
     }
     return () =>
       fetchRepositories(
@@ -132,7 +132,7 @@ const Index = () => {
         establishedStarCountLower,
         establishedStarCountUpper,
         establishedForkCountLower,
-        establishedForkCountUpper
+        establishedForkCountUpper,
       );
   };
 
