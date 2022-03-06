@@ -8,7 +8,7 @@ import TextField from '@mui/material/TextField';
 
 type MultipleChipsAutoCompleteProps = {
   options: string[];
-  value: string[];
+  values: string[];
   onChange: any;
 };
 
@@ -22,17 +22,17 @@ const MultipleChipsAutoCompleteField = (props: MultipleChipsAutoCompleteProps) =
       <Autocomplete
         multiple
         options={props.options}
-        value={props.value}
+        value={props.values}
         onChange={props.onChange}
         disableClearable
-        renderTags={(value: readonly string[], getTagProps) =>
-          value.map((each: string, index: number) => (
+        renderTags={(values: readonly string[], getTagProps) =>
+          values.map((value: string, index: number) => (
             <Chip
               variant='outlined'
               size='small'
               // @ts-ignore to use custom color
               color='greyChip'
-              label={each === 'ALL' ? t.ALL : each}
+              label={value === 'ALL' ? t.ALL : value}
               {...getTagProps({ index })}
               key={index}
               sx={{ px: 0.5 }}

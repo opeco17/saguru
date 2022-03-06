@@ -10,8 +10,9 @@ import Select from '@mui/material/Select';
 
 type MultipleChipsSelectFieldProps = {
   options: string[];
-  value: string[];
+  values: string[];
   onChange: any;
+  onChipDelete: any;
 };
 
 const icon = <CheckBoxOutlineBlankIcon fontSize='small' />;
@@ -26,26 +27,26 @@ const MultipleChipsSelectField = (props: MultipleChipsSelectFieldProps) => {
           size='medium'
           multiple
           sx={{ width: '100%' }}
-          value={props.value}
+          value={props.values}
           onChange={props.onChange}
           MenuProps={{
             sx: { maxHeight: 330 },
             anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
             transformOrigin: { vertical: 'top', horizontal: 'left' },
           }}
-          renderValue={(value: readonly string[]) => (
+          renderValue={(values: readonly string[]) => (
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-              {value.map((each, index) => (
+              {values.map((value, index) => (
                 <Chip
                   variant='outlined'
                   size='small'
                   // @ts-ignore to use custom color
                   color='greyChip'
-                  label={each === 'ALL' ? t.ALL : each}
+                  label={value === 'ALL' ? t.ALL : value}
                   key={index}
                   sx={{ px: 0.5 }}
                   onDelete={() => {
-                    alert(each);
+                    props.onChipDelete(props.values.filter((each) => each !== value));
                   }}
                   onMouseDown={(event: any) => {
                     event.stopPropagation();
@@ -60,7 +61,7 @@ const MultipleChipsSelectField = (props: MultipleChipsSelectFieldProps) => {
               <Checkbox
                 icon={icon}
                 checkedIcon={checkedIcon}
-                checked={props.value.indexOf(option) > -1}
+                checked={props.values.indexOf(option) > -1}
               />
               {option}
             </MenuItem>
