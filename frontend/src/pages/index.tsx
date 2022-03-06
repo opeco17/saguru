@@ -79,6 +79,16 @@ const Index = () => {
   const [forkCountLower, setForkCountLower] = useState(defaultForkCountLower);
   const [forkCountUpper, setForkCountUpper] = useState(defaultForkCountUpper);
 
+  const [establishedLanguages, setEstablishedLanguages] = useState(defaultLanguages);
+  const [establishedLabels, setEstablishedLabels] = useState(defaultLabels);
+  const [establishedAssignStatus, setEstablishedAssignStatus] = useState(defaultAssignStatus);
+  const [establishedOrdermetric, setEstablishedOrdermetric] = useState(defaultOrdermetric);
+  const [establishedLicense, setEstablishedLicense] = useState(defaultLicense);
+  const [establishedStarCountLower, setEstablishedStarCountLower] = useState(defaultStarCountLower);
+  const [establishedStarCountUpper, setEstablishedStarCountUpper] = useState(defaultStarCountUpper);
+  const [establishedForkCountLower, setEstablishedForkCountLower] = useState(defaultForkCountLower);
+  const [establishedForkCountUpper, setEstablishedForkCountUpper] = useState(defaultForkCountUpper);
+
   const fieldSpacing = 2.5;
 
   const detailOpenIcon = isDetailOpen ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />;
@@ -95,19 +105,34 @@ const Index = () => {
     setForkCountUpper(defaultForkCountUpper);
   };
 
+  const setParameters = () => {
+    setEstablishedLanguages(languages)
+    setEstablishedLabels(labels)
+    setEstablishedAssignStatus(assignStatus)
+    setEstablishedOrdermetric(ordermetric)
+    setEstablishedLicense(license)
+    setEstablishedStarCountLower(starCountLower)
+    setEstablishedStarCountUpper(starCountUpper)
+    setEstablishedForkCountLower(forkCountLower)
+    setEstablishedForkCountUpper(forkCountUpper)
+  }
+
   const fetchRepositoriesWrapper = (type: 'init' | 'search' | 'showmore') => {
+    if (type === 'init') {
+      setParameters()
+    }
     return () =>
       fetchRepositories(
         type,
-        languages,
-        labels,
-        assignStatus,
-        ordermetric,
-        license,
-        starCountLower,
-        starCountUpper,
-        forkCountLower,
-        forkCountUpper,
+        establishedLanguages,
+        establishedLabels,
+        establishedAssignStatus,
+        establishedOrdermetric,
+        establishedLicense,
+        establishedStarCountLower,
+        establishedStarCountUpper,
+        establishedForkCountLower,
+        establishedForkCountUpper
       );
   };
 
