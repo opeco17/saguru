@@ -14,17 +14,7 @@ import RepositoryCard from '../components/organisms/RepositoryCard';
 import { useLocale } from '../hooks/locale';
 import useFetchChoices from '../hooks/useFetchChoices';
 import useFetchRepositories from '../hooks/useFetchRepositories';
-import {
-  defaultLabels,
-  defaultLanguages,
-  defaultLicense,
-  defaultOrdermetric,
-  defaultAssignStatus,
-  defaultStarCountLower,
-  defaultStarCountUpper,
-  defaultForkCountLower,
-  defaultForkCountUpper,
-} from '../lib/default-values';
+import { defaultParameters } from '../lib/default-values';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import LoadingButton from '@mui/lab/LoadingButton';
@@ -45,7 +35,9 @@ import { useState, useEffect } from 'react';
 import * as React from 'react';
 
 const Index = () => {
+  const { t } = useLocale();
   const theme = useTheme();
+
   const {
     labelChoices,
     languageChoices,
@@ -66,83 +58,32 @@ const Index = () => {
     fetchRepositories,
   } = useFetchRepositories();
 
-  const { t } = useLocale();
   const [isDetailOpen, setIsDetailOpen] = useState(false);
-
-  const [languages, setLanguages] = useState(defaultLanguages);
-  const [labels, setLabels] = useState(defaultLabels);
-  const [assignStatus, setAssignStatus] = useState(defaultAssignStatus);
-  const [ordermetric, setOrdermetric] = useState(defaultOrdermetric);
-  const [license, setLicense] = useState(defaultLicense);
-  const [starCountLower, setStarCountLower] = useState(defaultStarCountLower);
-  const [starCountUpper, setStarCountUpper] = useState(defaultStarCountUpper);
-  const [forkCountLower, setForkCountLower] = useState(defaultForkCountLower);
-  const [forkCountUpper, setForkCountUpper] = useState(defaultForkCountUpper);
-
-  const [establishedLanguages, setEstablishedLanguages] = useState(defaultLanguages);
-  const [establishedLabels, setEstablishedLabels] = useState(defaultLabels);
-  const [establishedAssignStatus, setEstablishedAssignStatus] = useState(defaultAssignStatus);
-  const [establishedOrdermetric, setEstablishedOrdermetric] = useState(defaultOrdermetric);
-  const [establishedLicense, setEstablishedLicense] = useState(defaultLicense);
-  const [establishedStarCountLower, setEstablishedStarCountLower] = useState(defaultStarCountLower);
-  const [establishedStarCountUpper, setEstablishedStarCountUpper] = useState(defaultStarCountUpper);
-  const [establishedForkCountLower, setEstablishedForkCountLower] = useState(defaultForkCountLower);
-  const [establishedForkCountUpper, setEstablishedForkCountUpper] = useState(defaultForkCountUpper);
+  const [parameters, setParameters] = useState(defaultParameters);
+  const [establishedParameters, setEstablishedParameters] = useState(defaultParameters);
 
   const fieldSpacing = 2.5;
 
   const detailOpenIcon = isDetailOpen ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />;
 
-  const resetValues = () => {
-    setLanguages(defaultLanguages);
-    setLabels(defaultLabels);
-    setAssignStatus(defaultAssignStatus);
-    setOrdermetric(defaultOrdermetric);
-    setLicense(defaultLicense);
-    setStarCountLower(defaultStarCountLower);
-    setStarCountUpper(defaultStarCountUpper);
-    setForkCountLower(defaultForkCountLower);
-    setForkCountUpper(defaultForkCountUpper);
+  const init = () => {
+    fetchRepositories('init', establishedParameters);
   };
 
-  const setParameters = () => {
-    setEstablishedLanguages(languages);
-    setEstablishedLabels(labels);
-    setEstablishedAssignStatus(assignStatus);
-    setEstablishedOrdermetric(ordermetric);
-    setEstablishedLicense(license);
-    setEstablishedStarCountLower(starCountLower);
-    setEstablishedStarCountUpper(starCountUpper);
-    setEstablishedForkCountLower(forkCountLower);
-    setEstablishedForkCountUpper(forkCountUpper);
+  const search = () => {
+    setEstablishedParameters(parameters);
+    fetchRepositories('search', establishedParameters);
   };
 
-  const fetchRepositoriesWrapper = (type: 'init' | 'search' | 'showmore') => {
-    if (type === 'init') {
-      setParameters();
-    }
-    return () =>
-      fetchRepositories(
-        type,
-        establishedLanguages,
-        establishedLabels,
-        establishedAssignStatus,
-        establishedOrdermetric,
-        establishedLicense,
-        establishedStarCountLower,
-        establishedStarCountUpper,
-        establishedForkCountLower,
-        establishedForkCountUpper,
-      );
+  const showmore = () => {
+    fetchRepositories('showmore', establishedParameters);
   };
 
   useEffect(() => {
     fetchChoices();
   }, []);
 
-  useEffect(() => {
-    fetchRepositoriesWrapper('init')();
-  }, []);
+  useEffect(init, []);
 
   let errorMessages: string[] = [];
   if (fetchChoicesErrorMessage) {
@@ -160,6 +101,10 @@ const Index = () => {
       </Head>
       <NavBar />
       <Container sx={{ mb: 4 }}>
+        {/* <Box sx={{ textAlign: 'center' }}>
+          <div>{JSON.stringify(parameters)}</div>
+          <div>{JSON.stringify(establishedParameters)}</div>
+        </Box> */}
         <Box sx={{ mt: 4, textAlign: 'center', width: '100%' }} id='back-to-top-anchor'>
           <Title />
           <SubTitle />
@@ -183,15 +128,24 @@ const Index = () => {
                     {useMediaQuery(theme.breakpoints.up('sm')) ? (
                       <MultipleChipsAutoCompleteField
                         options={languageChoices}
-                        values={languages}
-                        onChange={(event: any, values: string[]) => setLanguages(values)}
+                        values={parameters.languages}
+                        onChange={(event, values) =>
+                          setParameters({ ...parameters, languages: values })
+                        }
                       />
                     ) : (
                       <MultipleChipsSelectField
                         options={languageChoices}
-                        values={languages}
-                        onChange={(event: any) => setLanguages(event.target.value)}
-                        onChipDelete={(values: string[]) => setLanguages(values)}
+                        values={parameters.languages}
+                        onChange={(event) =>
+                          setParameters({
+                            ...parameters,
+                            languages: event.target.value as string[],
+                          })
+                        }
+                        onChipDelete={(values) =>
+                          setParameters({ ...parameters, languages: values })
+                        }
                       />
                     )}
                   </Box>
@@ -200,35 +154,41 @@ const Index = () => {
                     {useMediaQuery(theme.breakpoints.up('sm')) ? (
                       <MultipleChipsAutoCompleteField
                         options={labelChoices}
-                        values={labels}
-                        onChange={(event: any, values: string[]) => setLabels(values)}
+                        values={parameters.labels}
+                        onChange={(event, values) =>
+                          setParameters({ ...parameters, labels: values })
+                        }
                       />
                     ) : (
                       <MultipleChipsSelectField
                         options={labelChoices}
-                        values={labels}
-                        onChange={(event: any) => setLabels(event.target.value)}
-                        onChipDelete={(values: string[]) => setLabels(values)}
+                        values={parameters.labels}
+                        onChange={(event) =>
+                          setParameters({ ...parameters, labels: event.target.value as string[] })
+                        }
+                        onChipDelete={(values: string[]) =>
+                          setParameters({ ...parameters, labels: values })
+                        }
                       />
                     )}
                   </Box>
                   <Box sx={{ mb: fieldSpacing }}>
                     <FieldLabel>{t.ASSIGN_STATUS_FIELD_LABEL}</FieldLabel>
                     <AssignStatusField
-                      value={assignStatus}
+                      value={parameters.assignStatus}
                       items={assignStatusChoices}
-                      onChange={(event: any) => {
-                        setAssignStatus(event.target.value);
+                      onChange={(event) => {
+                        setParameters({ ...parameters, assignStatus: event.target.value });
                       }}
                     />
                   </Box>
                   <Box sx={{ mb: fieldSpacing }}>
                     <FieldLabel>{t.ORDER_BY_FIELD_LABEL}</FieldLabel>
                     <OrderByField
-                      value={ordermetric}
+                      value={parameters.ordermetric}
                       items={ordermetricChoices}
-                      onChange={(event: any) => {
-                        setOrdermetric(event.target.value);
+                      onChange={(event) => {
+                        setParameters({ ...parameters, ordermetric: event.target.value });
                       }}
                     />
                   </Box>
@@ -249,28 +209,36 @@ const Index = () => {
                     <Box sx={{ mb: fieldSpacing }}>
                       <FieldLabel>{t.STAR_COUNT_FIELD_LABEL}</FieldLabel>
                       <MinMaxNumberFields
-                        minValue={starCountLower}
-                        maxValue={starCountUpper}
-                        onChangeMin={(event: any) => setStarCountLower(event.target.value)}
-                        onChangeMax={(event: any) => setStarCountUpper(event.target.value)}
+                        minValue={parameters.starCountLower}
+                        maxValue={parameters.starCountUpper}
+                        onChangeMin={(event) =>
+                          setParameters({ ...parameters, starCountLower: event.target.value })
+                        }
+                        onChangeMax={(event) =>
+                          setParameters({ ...parameters, starCountUpper: event.target.value })
+                        }
                       />
                     </Box>
                     <Box sx={{ mb: fieldSpacing }}>
                       <FieldLabel>{t.FORK_COUNT_FIELD_LABEL}</FieldLabel>
                       <MinMaxNumberFields
-                        minValue={forkCountLower}
-                        maxValue={forkCountUpper}
-                        onChangeMin={(event: any) => setForkCountLower(event.target.value)}
-                        onChangeMax={(event: any) => setForkCountUpper(event.target.value)}
+                        minValue={parameters.forkCountLower}
+                        maxValue={parameters.forkCountUpper}
+                        onChangeMin={(event) =>
+                          setParameters({ ...parameters, forkCountLower: event.target.value })
+                        }
+                        onChangeMax={(event) =>
+                          setParameters({ ...parameters, forkCountUpper: event.target.value })
+                        }
                       />
                     </Box>
                     <Box sx={{ mb: fieldSpacing }}>
                       <FieldLabel>{t.LICENSE_FIELD_LABEL}</FieldLabel>
                       <LicenseField
-                        value={license}
+                        value={parameters.license}
                         items={licenseChoices}
-                        onChange={(event: any) => {
-                          setLicense(event.target.value);
+                        onChange={(event) => {
+                          setParameters({ ...parameters, license: event.target.value });
                         }}
                       />
                     </Box>
@@ -281,7 +249,9 @@ const Index = () => {
                         variant='outlined'
                         color='info'
                         disableElevation
-                        onClick={resetValues}
+                        onClick={() => {
+                          setParameters(defaultParameters);
+                        }}
                         sx={{ py: 0.7, width: '100px' }}
                       >
                         {t.RESET_BUTTON_LABEL}
@@ -294,7 +264,7 @@ const Index = () => {
                         color='info'
                         disableElevation
                         sx={{ py: 0.7, width: '100px' }}
-                        onClick={fetchRepositoriesWrapper('search')}
+                        onClick={search}
                       >
                         {t.SEARCH_BUTTON_LABEL}
                       </LoadingButton>
@@ -316,7 +286,7 @@ const Index = () => {
                   disabled={!hasNext}
                   disableElevation
                   sx={{ px: 2.5, py: 0.7 }}
-                  onClick={fetchRepositoriesWrapper('showmore')}
+                  onClick={showmore}
                 >
                   {t.SHOW_MORE_BUTTON_LABEL}
                 </LoadingButton>

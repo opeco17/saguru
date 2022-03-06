@@ -10,7 +10,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import { useRouter } from 'next/router';
-import * as React from 'react';
+import { useState, MouseEvent } from 'react';
 
 type LanguageMenuItemProps = {
   onClick: any;
@@ -29,8 +29,8 @@ const NavBar = () => {
   const router = useRouter();
   const { t } = useLocale();
 
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
   const handleCangeLocale = (locale: string) => {

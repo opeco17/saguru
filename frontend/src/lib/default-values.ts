@@ -1,21 +1,15 @@
-const defaultLabels: string[] = ['good first issue'];
-const defaultLanguages: string[] = ['ALL'];
-const defaultLicense: string = 'ALL';
-const defaultOrdermetric: string = 'star_count_desc';
-const defaultAssignStatus: string = 'ALL';
-const defaultStarCountLower: number | '' = '';
-const defaultStarCountUpper: number | '' = '';
-const defaultForkCountLower: number | '' = '';
-const defaultForkCountUpper: number | '' = '';
+import { Parameters } from '../types/parameters';
 
-export {
-  defaultLabels,
-  defaultLanguages,
-  defaultLicense,
-  defaultOrdermetric,
-  defaultAssignStatus,
-  defaultStarCountLower,
-  defaultStarCountUpper,
-  defaultForkCountLower,
-  defaultForkCountUpper,
+const defaultParameters: Parameters = {
+  languages: ['ALL'],
+  labels: ['good first issue'],
+  assignStatus: 'ALL',
+  license: 'ALL',
+  ordermetric: 'star_count_desc',
+  starCountLower: '',
+  starCountUpper: '',
+  forkCountLower: '',
+  forkCountUpper: '',
 };
+
+export { defaultParameters };

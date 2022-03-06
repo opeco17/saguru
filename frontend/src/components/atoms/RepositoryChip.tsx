@@ -1,19 +1,20 @@
 import Chip from '@mui/material/Chip';
 import { useTheme } from '@mui/material/styles';
+import { ReactElement } from 'react';
 
 type RepositoryChipProps = {
   label: string;
-  icon?: any;
+  icon?: ReactElement;
 };
 
-const RepositoryChip = (props: RepositoryChipProps) => {
+const RepositoryChip = ({ label, icon }: RepositoryChipProps) => {
   const theme = useTheme();
-  const pl = props.icon ? 1 : 0.7;
+  const pl = icon ? 1 : 0.7;
 
   return (
     <Chip
-      label={props.label}
-      icon={props.icon}
+      label={label}
+      icon={icon}
       // @ts-ignore to use custom color
       color='info'
       variant='outlined'

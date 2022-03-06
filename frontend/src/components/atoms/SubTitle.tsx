@@ -1,15 +1,13 @@
 import { useLocale } from '../../hooks/locale';
 import Typography from '@mui/material/Typography';
 import { grey } from '@mui/material/colors';
-import { Theme, useTheme } from '@mui/material/styles';
+import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
 const SubTitle = () => {
   const { t } = useLocale();
   const theme = useTheme();
-  const isXSmall = useMediaQuery((theme: Theme) => theme.breakpoints.only('xs'));
-  const greyColor = grey['700'];
-  const infoColor = theme.palette.info.main;
+  const isXSmall = useMediaQuery(theme.breakpoints.only('xs'));
 
   return (
     <Typography
@@ -22,8 +20,8 @@ const SubTitle = () => {
         display: 'inline-block',
       }}
     >
-      <span style={{ color: infoColor }}>{t.SUB_TITLE_PREFIX}</span>
-      <span style={{ color: greyColor }}>{t.SUB_TITLE}</span>
+      <span style={{ color: theme.palette.info.main }}>{t.SUB_TITLE_PREFIX}</span>
+      <span style={{ color: grey['700'] }}>{t.SUB_TITLE}</span>
     </Typography>
   );
 };

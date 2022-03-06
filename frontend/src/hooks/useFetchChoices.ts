@@ -1,10 +1,5 @@
 import client from '../lib/api-client';
-import {
-  defaultLabels,
-  defaultLanguages,
-  defaultLicense,
-  defaultOrdermetric,
-} from '../lib/default-values';
+import { defaultParameters } from '../lib/default-values';
 import {
   LabelsResponseBody,
   LanguagesResponseBody,
@@ -14,10 +9,14 @@ import {
 import { useState } from 'react';
 
 const useFetchChoices = () => {
-  const [labelChoices, setLabelChoices] = useState([...defaultLabels] as string[]);
-  const [languageChoices, setLanguageChoices] = useState([...defaultLanguages] as string[]);
-  const [licenseChoices, setLicenseChoices] = useState([defaultLicense] as string[]);
-  const [ordermetricChoices, setOrdermetricChoices] = useState([defaultOrdermetric] as string[]);
+  const [labelChoices, setLabelChoices] = useState([...defaultParameters.labels] as string[]);
+  const [languageChoices, setLanguageChoices] = useState([
+    ...defaultParameters.languages,
+  ] as string[]);
+  const [licenseChoices, setLicenseChoices] = useState([defaultParameters.license] as string[]);
+  const [ordermetricChoices, setOrdermetricChoices] = useState([
+    defaultParameters.ordermetric,
+  ] as string[]);
   const assignStatusChoices = ['ALL', 'ASSIGNED', 'UNASSIGNED'];
   const [fetchChoicesErrorMessage, setFetchChoicesErrorMessage] = useState('');
 
