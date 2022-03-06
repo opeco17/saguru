@@ -67,12 +67,12 @@ const Index = () => {
   const detailOpenIcon = isDetailOpen ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />;
 
   const init = () => {
-    fetchRepositories('init', establishedParameters);
+    fetchRepositories('init', parameters);
   };
 
   const search = () => {
     setEstablishedParameters(parameters);
-    fetchRepositories('search', establishedParameters);
+    fetchRepositories('search', parameters);
   };
 
   const showmore = () => {

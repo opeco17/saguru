@@ -27,7 +27,7 @@ const useFetchChoices = () => {
       const results = [];
       results.push(
         client.get<LabelsResponseBody>('/labels').then((res) => {
-          setLabelChoices(['ALL', ...res.data.items]);
+          setLabelChoices(['ALL', ...res.data.items.slice(0, 200)]); // Reduce the size
         }),
       );
       results.push(
