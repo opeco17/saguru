@@ -63,7 +63,7 @@ const MultipleChipsSelectField = (props: MultipleChipsSelectFieldProps) => {
                 checkedIcon={checkedIcon}
                 checked={props.values.indexOf(option) > -1}
               />
-              {option}
+              {option === 'ALL' ? t.ALL : option}
             </MenuItem>
           ))}
         </Select>
