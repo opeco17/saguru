@@ -1,31 +1,31 @@
 import { GA_TRACKING_ID, pageview } from '../../lib/gtag';
-import { useEffect } from 'react'
-import Script from 'next/script'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/router';
+import Script from 'next/script';
+import { useEffect } from 'react';
 
 const GoogleAnalytics = () => {
-  const router = useRouter()
+  const router = useRouter();
   useEffect(() => {
     const handleRouteChange = (url: string) => {
-      pageview(url)
-    }
-    router.events.on('routeChangeComplete', handleRouteChange)
+      pageview(url);
+    };
+    router.events.on('routeChangeComplete', handleRouteChange);
     return () => {
-      router.events.off('routeChangeComplete', handleRouteChange)
-    }
-  }, [router.events])
+      router.events.off('routeChangeComplete', handleRouteChange);
+    };
+  }, [router.events]);
 
   return (
     <>
       {GA_TRACKING_ID !== '' && (
         <>
           <Script
-            strategy="afterInteractive"
+            strategy='afterInteractive'
             src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`}
           />
           <Script
-            id="gtag-init"
-            strategy="afterInteractive"
+            id='gtag-init'
+            strategy='afterInteractive'
             dangerouslySetInnerHTML={{
               __html: `
                 window.dataLayer = window.dataLayer || [];
@@ -40,7 +40,7 @@ const GoogleAnalytics = () => {
         </>
       )}
     </>
-  )
-}
+  );
+};
 
 export default GoogleAnalytics;
