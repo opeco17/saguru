@@ -5,7 +5,8 @@ import AssignStatusField from '../components/molecules/AssignStatusField';
 import ErrorMessages from '../components/molecules/ErrorMessages';
 import LicenseField from '../components/molecules/LicenseField';
 import MinMaxNumberFields from '../components/molecules/MinMaxNumberFields';
-import MultipleChipsField from '../components/molecules/MultipleChipsField';
+import MultipleChipsAutoCompleteField from '../components/molecules/MultipleChipsAutoCompleteField';
+import MultipleChipsSelectField from '../components/molecules/MultipleChipsSelectField';
 import OrderByField from '../components/molecules/OrderByField';
 import ScrollTopButton from '../components/molecules/ScrollTopButton';
 import NavBar from '../components/organisms/NavBar';
@@ -37,11 +38,14 @@ import Divider from '@mui/material/Divider';
 import Fab from '@mui/material/Fab';
 import Grid from '@mui/material/Grid';
 import LinearProgress from '@mui/material/LinearProgress';
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import Head from 'next/head';
 import { useState, useEffect } from 'react';
 import * as React from 'react';
 
 const Index = () => {
+  const theme = useTheme();
   const {
     labelChoices,
     languageChoices,
@@ -151,19 +155,37 @@ const Index = () => {
                 <FormControl fullWidth size='small'>
                   <Box sx={{ mb: fieldSpacing }}>
                     <FieldLabel>{t.LANGUAGES_FIELD_LABEL}</FieldLabel>
-                    <MultipleChipsField
-                      options={languageChoices}
-                      value={languages}
-                      onChange={(event: any, values: any) => setLanguages(values as string[])}
-                    />
+                    {useMediaQuery(theme.breakpoints.up('sm')) ? (
+                      <MultipleChipsAutoCompleteField
+                        options={languageChoices}
+                        values={languages}
+                        onChange={(event: any, values: string[]) => setLanguages(values)}
+                      />
+                    ) : (
+                      <MultipleChipsSelectField
+                        options={languageChoices}
+                        values={languages}
+                        onChange={(event: any) => setLanguages(event.target.value)}
+                        onChipDelete={(values: string[]) => setLanguages(values)}
+                      />
+                    )}
                   </Box>
                   <Box sx={{ mb: fieldSpacing }}>
                     <FieldLabel>{t.LABELS_FIELD_LABEL}</FieldLabel>
-                    <MultipleChipsField
-                      options={labelChoices}
-                      value={labels}
-                      onChange={(event: any, values: any) => setLabels(values as string[])}
-                    />
+                    {useMediaQuery(theme.breakpoints.up('sm')) ? (
+                      <MultipleChipsAutoCompleteField
+                        options={labelChoices}
+                        values={labels}
+                        onChange={(event: any, values: string[]) => setLabels(values)}
+                      />
+                    ) : (
+                      <MultipleChipsSelectField
+                        options={labelChoices}
+                        values={labels}
+                        onChange={(event: any) => setLabels(event.target.value)}
+                        onChipDelete={(values: string[]) => setLabels(values)}
+                      />
+                    )}
                   </Box>
                   <Box sx={{ mb: fieldSpacing }}>
                     <FieldLabel>{t.ASSIGN_STATUS_FIELD_LABEL}</FieldLabel>
