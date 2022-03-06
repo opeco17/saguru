@@ -102,7 +102,7 @@ const Index = () => {
         <meta property='og:description' content={t.HEADER_DESCRIPTION} />
         <meta property='og:type' content='website' />
         <meta property='og:url' content={`https://gitnavi.dev/${locale}`} />
-        <meta property='og:image' content='https://gitnavi.dev/logo.png' />
+        <meta property='og:image' content='https://gitnavi.dev/logo_large.png' />
         <meta property='og:site_name' content='gitnavi' />
       </Head>
       <NavBar />
