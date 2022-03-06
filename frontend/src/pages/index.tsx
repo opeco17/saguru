@@ -35,7 +35,7 @@ import { useState, useEffect } from 'react';
 import * as React from 'react';
 
 const Index = () => {
-  const { t } = useLocale();
+  const { locale, t } = useLocale();
   const theme = useTheme();
 
   const {
@@ -98,6 +98,12 @@ const Index = () => {
       <Head>
         <title>{t.HEADER_TITLE} - gitnavi</title>
         <meta name='description' content={t.HEADER_DESCRIPTION}></meta>
+        <meta property='og:title' content={t.HEADER_TITLE} />
+        <meta property='og:description' content={t.HEADER_DESCRIPTION} />
+        <meta property='og:type' content='website' />
+        <meta property='og:url' content={`https://gitnavi.dev/${locale}`} />
+        <meta property='og:image' content='https://gitnavi.dev/logo.png' />
+        <meta property='og:site_name' content='gitnavi' />
       </Head>
       <NavBar />
       <Container sx={{ mb: 4 }}>
