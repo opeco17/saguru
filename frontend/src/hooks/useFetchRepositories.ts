@@ -28,7 +28,7 @@ const useFetchRepositories = () => {
       forkCountUpper,
     }: Parameters,
   ) => {
-    setFetchRepositoriesErrorMessage('')
+    setFetchRepositoriesErrorMessage('');
 
     let targetPage: number;
     if (type === 'init') {

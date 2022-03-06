@@ -81,9 +81,8 @@ const Index = () => {
 
   useEffect(() => {
     fetchChoices();
+    init();
   }, []);
-
-  useEffect(init, []);
 
   let errorMessages: string[] = [];
   if (fetchChoicesErrorMessage) {
