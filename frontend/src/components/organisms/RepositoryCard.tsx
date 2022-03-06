@@ -1,6 +1,6 @@
 import { Repository } from '../../types/repository';
 import RepositoryCardChip from '../atoms/RepositoryChip';
-import IssueCard from './IssueCard';
+import IssueCard from '../molecules/IssueCard';
 import { mdiSourceFork } from '@mdi/js';
 import Icon from '@mdi/react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -21,7 +21,7 @@ type RepositoryCardProps = {
   repository: Repository;
 };
 
-const RepositoryCard = (props: RepositoryCardProps) => {
+const RepositoryCard = ({ repository }: RepositoryCardProps) => {
   const theme = useTheme();
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const detailOpenIcon = isDetailOpen ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />;
@@ -38,12 +38,12 @@ const RepositoryCard = (props: RepositoryCardProps) => {
         >
           <Box
             component='a'
-            href={props.repository.url}
+            href={repository.url}
             target='_blank'
             rel='noreferrer'
             sx={{ '&:hover': { color: theme.palette.info.main } }}
           >
-            {props.repository.name}
+            {repository.name}
           </Box>
         </Typography>
         <Typography
@@ -51,16 +51,16 @@ const RepositoryCard = (props: RepositoryCardProps) => {
           color='text.secondary'
           sx={{ fontSize: 14, fontWeight: 'regular', mb: 2 }}
         >
-          {props.repository.description}
+          {repository.description}
         </Typography>
-        <RepositoryCardChip label={`# ${props.repository.language}`} />
+        <RepositoryCardChip label={`# ${repository.language}`} />
         <RepositoryCardChip
-          label={formatKilo(props.repository.starCount)}
+          label={formatKilo(repository.starCount)}
           icon={<StarBorderIcon sx={{ width: '0.8em' }} />}
         />
         {useMediaQuery(theme.breakpoints.up('md')) ? (
           <RepositoryCardChip
-            label={formatKilo(props.repository.forkCount)}
+            label={formatKilo(repository.forkCount)}
             icon={<Icon path={mdiSourceFork} size={0.6} />}
           />
         ) : null}
@@ -73,12 +73,12 @@ const RepositoryCard = (props: RepositoryCardProps) => {
           sx={{ pl: 2, pr: 1, py: 0.1, float: 'right' }}
           onClick={() => setIsDetailOpen((prev) => !prev)}
         >
-          {props.repository.issues.length} issues {detailOpenIcon}
+          {repository.issues.length} issues {detailOpenIcon}
         </Button>
         <Box sx={{ mb: 0.5 }}></Box>
         <Collapse orientation='vertical' in={isDetailOpen}>
           <Box sx={{ mt: 3 }}></Box>
-          {props.repository.issues.map((issue) => {
+          {repository.issues.map((issue) => {
             return (
               <Box key={issue.id}>
                 <Divider />

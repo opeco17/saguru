@@ -5,11 +5,11 @@ type IssueChipProps = {
   label: string;
 };
 
-const IssueChip = (props: IssueChipProps) => {
+const IssueChip = ({ label }: IssueChipProps) => {
   const theme = useTheme();
   return (
     <Chip
-      label={props.label}
+      label={label}
       // @ts-ignore to use custom color
       color='lightGreyChip'
       variant='outlined'

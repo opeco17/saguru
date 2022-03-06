@@ -1,4 +1,4 @@
-import Locale from './base';
+import Locale from '../types/locale';
 
 const en: Locale = {
   ENGLISH: 'English',

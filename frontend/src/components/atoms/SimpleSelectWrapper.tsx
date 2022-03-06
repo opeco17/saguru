@@ -1,33 +1,31 @@
 import { FormControl } from '@mui/material';
+import { SelectChangeEvent } from '@mui/material';
 import Select from '@mui/material/Select';
 import { ReactNode } from 'react';
 
 type SimpleSelectWrapperProps = {
   value: string;
-  onChange: any;
-  items: (string | boolean)[];
+  onChange: (event: SelectChangeEvent<string>) => void;
   children: ReactNode;
 };
 
-const SimpleSelectWrapper = (props: SimpleSelectWrapperProps) => {
+const SimpleSelectWrapper = ({ value, onChange, children }: SimpleSelectWrapperProps) => {
   return (
-    <>
-      <FormControl fullWidth>
-        <Select
-          size='small'
-          value={props.value}
-          onChange={props.onChange}
-          sx={{ width: '100%' }}
-          MenuProps={{
-            sx: { maxHeight: 300 },
-            anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
-            transformOrigin: { vertical: 'top', horizontal: 'left' },
-          }}
-        >
-          {props.children}
-        </Select>
-      </FormControl>
-    </>
+    <FormControl fullWidth>
+      <Select
+        size='small'
+        value={value}
+        onChange={onChange}
+        sx={{ width: '100%' }}
+        MenuProps={{
+          sx: { maxHeight: 300 },
+          anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
+          transformOrigin: { vertical: 'top', horizontal: 'left' },
+        }}
+      >
+        {children}
+      </Select>
+    </FormControl>
   );
 };
 

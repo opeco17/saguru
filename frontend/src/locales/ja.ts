@@ -1,4 +1,4 @@
-import Locale from './base';
+import Locale from '../types/locale';
 
 const ja: Locale = {
   ENGLISH: '英語',

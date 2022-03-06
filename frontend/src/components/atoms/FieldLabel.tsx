@@ -6,19 +6,17 @@ type FieldLabelProps = {
   children: ReactNode;
 };
 
-const FieldLabel = (props: FieldLabelProps) => {
-  const greyColor = grey['700'];
-
+const FieldLabel = ({ children }: FieldLabelProps) => {
   return (
     <Typography
       sx={{
         textAlign: 'left',
-        color: greyColor,
+        color: grey['700'],
         fontSize: 15,
         mb: 0.5,
       }}
     >
-      {props.children}
+      {children}
     </Typography>
   );
 };

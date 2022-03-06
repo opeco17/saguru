@@ -1,4 +1,5 @@
 import client from '../lib/api-client';
+import { Parameters } from '../types/parameters';
 import { RepositoriesParams } from '../types/repositories-params';
 import { RepositoriesResponseBody } from '../types/repositories-response-body';
 import { Repository } from '../types/repository';
@@ -15,15 +16,17 @@ const useFetchRepositories = () => {
 
   const fetchRepositories = async (
     type: 'init' | 'search' | 'showmore',
-    languages: string[],
-    labels: string[],
-    assignStatus: string,
-    ordermetric: string,
-    license: string,
-    starCountLower: number | '',
-    starCountUpper: number | '',
-    forkCountLower: number | '',
-    forkCountUpper: number | '',
+    {
+      languages,
+      labels,
+      assignStatus,
+      ordermetric,
+      license,
+      starCountLower,
+      starCountUpper,
+      forkCountLower,
+      forkCountUpper,
+    }: Parameters,
   ) => {
     let targetPage: number;
     if (type === 'init') {

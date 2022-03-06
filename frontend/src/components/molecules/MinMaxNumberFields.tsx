@@ -6,11 +6,16 @@ import { useState } from 'react';
 type MinMaxNumberFieldsProps = {
   minValue: number | '';
   maxValue: number | '';
-  onChangeMin: any;
-  onChangeMax: any;
+  onChangeMin: (event: any) => void;
+  onChangeMax: (event: any) => void;
 };
 
-const MinMaxNumberFields = (props: MinMaxNumberFieldsProps) => {
+const MinMaxNumberFields = ({
+  minValue,
+  maxValue,
+  onChangeMin,
+  onChangeMax,
+}: MinMaxNumberFieldsProps) => {
   const { t } = useLocale();
 
   const [minInputError, setMinInputError] = useState(false);
@@ -28,7 +33,7 @@ const MinMaxNumberFields = (props: MinMaxNumberFieldsProps) => {
       setMinInputError(true);
       setMinInputErrorMessage(t.EQUAL_OR_GREATER_THAN_ZERO_ERROR_MESSAGE);
     }
-    props.onChangeMin(event);
+    onChangeMin(event);
   };
 
   const onChangeMaxHandler = (event: any) => {
@@ -40,7 +45,7 @@ const MinMaxNumberFields = (props: MinMaxNumberFieldsProps) => {
       setMaxInputError(true);
       setMaxInputErrorMessage(t.EQUAL_OR_GREATER_THAN_ZERO_ERROR_MESSAGE);
     }
-    props.onChangeMax(event);
+    onChangeMax(event);
   };
 
   return (
@@ -51,8 +56,8 @@ const MinMaxNumberFields = (props: MinMaxNumberFieldsProps) => {
             placeholder='Min'
             size='small'
             type='number'
-            value={props.minValue}
-            onChange={props.onChangeMin}
+            value={minValue}
+            onChange={onChangeMin}
             error={minInputError}
             helperText={minInputErrorMessage}
           ></TextField>
@@ -62,8 +67,8 @@ const MinMaxNumberFields = (props: MinMaxNumberFieldsProps) => {
             placeholder='Max'
             size='small'
             type='number'
-            value={props.maxValue}
-            onChange={props.onChangeMax}
+            value={maxValue}
+            onChange={onChangeMax}
             error={maxInputError}
             helperText={maxInputErrorMessage}
           ></TextField>
