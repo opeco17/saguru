@@ -62,7 +62,7 @@ const Index = () => {
   const [parameters, setParameters] = useState(defaultParameters);
   const [establishedParameters, setEstablishedParameters] = useState(defaultParameters);
 
-  const isXLarge = useMediaQuery(theme.breakpoints.only('xl'))
+  const isXLarge = useMediaQuery(theme.breakpoints.only('xl'));
   const fieldSpacing = 2.5;
   const boxSpacing = isXLarge ? 3 : 2;
   const pageWidth = isXLarge ? 'xl' : 'lg';

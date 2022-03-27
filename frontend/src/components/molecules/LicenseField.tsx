@@ -1,8 +1,8 @@
 import { useLocale } from '../../hooks/locale';
+import InputText from '../atoms/InputTest';
 import SimpleSelectWrapper from '../atoms/SimpleSelectWrapper';
 import { SelectChangeEvent } from '@mui/material';
 import MenuItem from '@mui/material/MenuItem';
-import Typography from '@mui/material/Typography';
 
 type LicenseFieldProps = {
   value: string;
@@ -17,7 +17,7 @@ const LicenseField = ({ value, onChange, items }: LicenseFieldProps) => {
       {items.map((each) => {
         return (
           <MenuItem value={each} key={each}>
-            <Typography>{each === 'ALL' ? t.ALL : each}</Typography>
+            <InputText>{each === 'ALL' ? t.ALL : each}</InputText>
           </MenuItem>
         );
       })}

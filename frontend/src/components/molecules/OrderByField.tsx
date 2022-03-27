@@ -1,8 +1,8 @@
 import { useLocale } from '../../hooks/locale';
+import InputText from '../atoms/InputTest';
 import SimpleSelectWrapper from '../atoms/SimpleSelectWrapper';
 import { SelectChangeEvent } from '@mui/material';
 import MenuItem from '@mui/material/MenuItem';
-import Typography from '@mui/material/Typography';
 
 type OrderByFieldProps = {
   value: string;
@@ -19,7 +19,7 @@ const OrderByField = ({ value, items, onChange }: OrderByFieldProps) => {
         {items.map((each) => {
           return (
             <MenuItem value={each} key={each}>
-              <Typography>{t[each.toUpperCase()]}</Typography>
+              <InputText>{t[each.toUpperCase()]}</InputText>
             </MenuItem>
           );
         })}
