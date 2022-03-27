@@ -105,7 +105,7 @@ const Index = () => {
         <meta property='og:site_name' content='gitnavi' />
       </Head>
       <NavBar />
-      <Container sx={{ mb: 4 }}>
+      <Container sx={{ mb: 4 }} maxWidth='xl'>
         {/* <Box sx={{ textAlign: 'center' }}>
           <div>{JSON.stringify(parameters)}</div>
           <div>{JSON.stringify(establishedParameters)}</div>
