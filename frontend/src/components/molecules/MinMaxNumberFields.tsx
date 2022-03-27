@@ -1,6 +1,7 @@
 import { useLocale } from '../../hooks/locale';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
+import { useTheme } from '@mui/material/styles';
 import { useState } from 'react';
 
 type MinMaxNumberFieldsProps = {
@@ -16,6 +17,7 @@ const MinMaxNumberFields = ({
   onChangeMin,
   onChangeMax,
 }: MinMaxNumberFieldsProps) => {
+  const theme = useTheme();
   const { t } = useLocale();
 
   const [minInputError, setMinInputError] = useState(false);
@@ -24,6 +26,7 @@ const MinMaxNumberFields = ({
   const [minInputErrorMessage, setMinInputErrorMessage] = useState('');
   const [maxInputErrorMessage, setMaxInputErrorMessage] = useState('');
 
+  // Now it's not used
   const onChangeMinHandler = (event: any) => {
     setMinInputError(false);
     setMinInputErrorMessage('');
@@ -36,6 +39,7 @@ const MinMaxNumberFields = ({
     onChangeMin(event);
   };
 
+  // Now it's not used
   const onChangeMaxHandler = (event: any) => {
     setMaxInputError(false);
     setMaxInputErrorMessage('');
@@ -60,6 +64,9 @@ const MinMaxNumberFields = ({
             onChange={onChangeMin}
             error={minInputError}
             helperText={minInputErrorMessage}
+            InputProps={{
+              sx: { color: theme.palette.greyText.main },
+            }}
           ></TextField>
         </Grid>
         <Grid item xs={6}>
@@ -71,6 +78,9 @@ const MinMaxNumberFields = ({
             onChange={onChangeMax}
             error={maxInputError}
             helperText={maxInputErrorMessage}
+            InputProps={{
+              sx: { color: theme.palette.greyText.main },
+            }}
           ></TextField>
         </Grid>
       </Grid>

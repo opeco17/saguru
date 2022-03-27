@@ -62,7 +62,10 @@ const Index = () => {
   const [parameters, setParameters] = useState(defaultParameters);
   const [establishedParameters, setEstablishedParameters] = useState(defaultParameters);
 
+  const isXLarge = useMediaQuery(theme.breakpoints.only('xl'));
   const fieldSpacing = 2.5;
+  const boxSpacing = isXLarge ? 3 : 2;
+  const pageWidth = isXLarge ? 'xl' : 'lg';
 
   const detailOpenIcon = isDetailOpen ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />;
 
@@ -105,7 +108,7 @@ const Index = () => {
         <meta property='og:site_name' content='gitnavi' />
       </Head>
       <NavBar />
-      <Container sx={{ mb: 4 }}>
+      <Container sx={{ mb: 4 }} maxWidth={pageWidth}>
         {/* <Box sx={{ textAlign: 'center' }}>
           <div>{JSON.stringify(parameters)}</div>
           <div>{JSON.stringify(establishedParameters)}</div>
@@ -124,7 +127,7 @@ const Index = () => {
           <Box>
             {errorMessages.length === 0 ? null : <ErrorMessages errorMessages={errorMessages} />}
           </Box>
-          <Grid container spacing={2}>
+          <Grid container spacing={boxSpacing}>
             <Grid item xs={12} sm={5} md={4}>
               <Card variant='outlined' sx={{ px: 2, py: 2 }}>
                 <FormControl fullWidth size='small'>

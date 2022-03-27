@@ -17,10 +17,12 @@ interface ColorOptions {
 
 declare module '@mui/material/styles' {
   interface Palette {
+    greyText: Color;
     greyChip: Color;
     lightGreyChip: Color;
   }
   interface PaletteOptions {
+    greyText?: ColorOptions;
     greyChip?: ColorOptions;
     lightGreyChip?: ColorOptions;
   }
@@ -41,6 +43,10 @@ const theme = createTheme({
       main: '#F85758',
       light: '#f57879',
       dark: '#F85758',
+      contrastText: '#fff',
+    },
+    greyText: {
+      main: '#525252',
       contrastText: '#fff',
     },
     greyChip: {

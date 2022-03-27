@@ -1,8 +1,8 @@
 import { useLocale } from '../../hooks/locale';
+import InputText from '../atoms/InputTest';
 import SimpleSelectWrapper from '../atoms/SimpleSelectWrapper';
 import { SelectChangeEvent } from '@mui/material';
 import MenuItem from '@mui/material/MenuItem';
-import Typography from '@mui/material/Typography';
 
 type SimpleSelectFieldProps = {
   value: string;
@@ -18,7 +18,7 @@ const SimpleSelectField = ({ value, items, onChange }: SimpleSelectFieldProps) =
       {items.map((each) => {
         return (
           <MenuItem value={each} key={each}>
-            <Typography>{t[each]}</Typography>
+            <InputText>{t[each]}</InputText>
           </MenuItem>
         );
       })}
