@@ -2,71 +2,63 @@ package lib
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type (
 	Label struct {
-		gorm.Model
-		Name    string
-		IssueID uint
+		LabelID uint   `bson:"label_id"`
+		Name    string `bson:"name"`
 	}
 
 	User struct {
-		gorm.Model
-		Name      string
-		URL       string
-		AvatarURL string
-		IssueID   uint
+		UserID    uint   `bson:"user_id"`
+		Name      string `bson:"name"`
+		URL       string `bson:"url"`
+		AvatarURL string `bson:"avatar_url"`
 	}
 
 	Issue struct {
-		gorm.Model
-		GitHubCreatedAt time.Time
-		GitHubUpdatedAt time.Time
-		Title           string
-		URL             string
-		PullRequestURL  string
-		AssigneesCount  *int
-		CommentCount    *int
-		Issuer          *User    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-		Labels          []*Label `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-		RepositoryID    uint
+		IssueID         uint      `bson:"issue_id"`
+		Title           string    `bson:"title"`
+		URL             string    `bson:"url"`
+		PullRequestURL  string    `bson:"pull_request_url"`
+		AssigneesCount  *int      `bson:"assignees_count"`
+		CommentCount    *int      `bson:"comment_count"`
+		Issuer          *User     `bson:"issuer"`
+		Labels          []*Label  `bson:"labels"`
+		GitHubCreatedAt time.Time `bson:"github_created_at"`
+		GitHubUpdatedAt time.Time `bson:"github_updated_at"`
 	}
 
 	Repository struct {
-		gorm.Model
-		GitHubCreatedAt  time.Time
-		GitHubUpdatedAt  time.Time
-		Name             string
-		URL              string
-		Description      string
-		StarCount        *int
-		ForkCount        *int
-		OpenIssueCount   *int
-		Topics           string
-		License          string
-		Language         string
-		IssueInitialized bool
-		Issues           []*Issue `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+		RepositoryID     uint      `bson:"repository_id"`
+		Name             string    `bson:"name"`
+		URL              string    `bson:"url"`
+		Description      string    `bson:"description"`
+		StarCount        *int      `bson:"star_count"`
+		ForkCount        *int      `bson:"fork_count"`
+		OpenIssueCount   *int      `bson:"open_issue_count"`
+		Topics           string    `bson:"topics"`
+		License          string    `bson:"license"`
+		Language         string    `bson:"language"`
+		GitHubCreatedAt  time.Time `bson:"github_created_at"`
+		GitHubUpdatedAt  time.Time `bson:"github_updated_at"`
+		IssueInitialized bool      `bson:"issue_initialized"`
+		Issues           []*Issue  `bson:"issues"`
 	}
 
 	FrontLanguage struct {
-		gorm.Model
-		Name            string
-		RepositoryCount int
+		Name            string `bson:"name"`
+		RepositoryCount int    `bson:"repository_count"`
 	}
 
 	FrontLicense struct {
-		gorm.Model
-		Name            string
-		RepositoryCount int
+		Name            string `bson:"name"`
+		RepositoryCount int    `bson:"repository_count"`
 	}
 
 	FrontLabel struct {
-		gorm.Model
-		Name       string
-		IssueCount int
+		Name       string `bson:"name"`
+		IssueCount int    `bson:"issue_count"`
 	}
 )

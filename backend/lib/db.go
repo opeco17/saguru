@@ -1,43 +1,40 @@
 package lib
 
 import (
-	"database/sql"
+	"context"
 	"fmt"
-	"log"
-	"os"
-	"time"
 
 	"github.com/sirupsen/logrus"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func GetDBClient(user string, password string, host string) (*gorm.DB, *sql.DB, error) {
-	dsn := fmt.Sprintf(
-		"%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-		user, password, host, DBPORT, DBNAME,
-	)
-	gormLogger := logger.New(
-		log.New(os.Stdout, "\r\n", log.LstdFlags),
-		logger.Config{
-			SlowThreshold: 3 * time.Second,
-			LogLevel:      logger.Warn,
-			Colorful:      true,
-		},
-	)
-	gormDB, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
-		CreateBatchSize: 1000,
-		Logger:          gormLogger,
-	})
-	if err != nil {
-		return nil, nil, fmt.Errorf("error occurred when connecting database\n%s", err)
+func GetMongoDBClient(user string, password string, host string) (*mongo.Client, error) {
+	if host == "" {
+		message := "You must set 'host' to connect to MongoDB"
+		logrus.Error(message)
+		return nil, fmt.Errorf(message)
 	}
-	logrus.Info("Successfully connect database.")
-	logrus.Info(fmt.Sprintf("User: %s, Host: %s, Database: %s", user, host, DBNAME))
-	sqlDB, err := gormDB.DB()
-	if err != nil {
-		return nil, nil, err
+	if user == "" {
+		message := "You must set 'user' to connect to MongoDB"
+		logrus.Error(message)
+		return nil, fmt.Errorf(message)
 	}
-	return gormDB, sqlDB, nil
+	if password == "" {
+		message := "You must set 'password' to connect to MongoDB"
+		logrus.Error(message)
+		return nil, fmt.Errorf(message)
+	}
+
+	credential := options.Credential{
+		Username: user,
+		Password: password,
+	}
+	clientOpts := options.Client().ApplyURI("mongodb://" + host).SetAuth(credential)
+	client, err := mongo.Connect(context.TODO(), clientOpts)
+	if err != nil {
+		logrus.Error(err)
+		return nil, err
+	}
+	return client, nil
 }

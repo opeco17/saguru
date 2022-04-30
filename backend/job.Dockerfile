@@ -1,4 +1,4 @@
-FROM --platform=linux/x86_64 golang:1.16.5
+FROM golang:1.16.5
 
 WORKDIR /usr/src/app/lib/
 COPY lib/go.mod lib/go.sum ./

@@ -11,7 +11,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func FetchGitHubRepositoriesSubset(page int, queries ...string) (*github.RepositoriesSearchResult, string, error) {
+func fetchGitHubRepositoriesSubset(page int, queries ...string) (*github.RepositoriesSearchResult, string, error) {
 	ctx := context.Background()
 	client := getGitHubClient(ctx)
 	opts := &github.SearchOptions{
@@ -28,10 +28,10 @@ func FetchGitHubRepositoriesSubset(page int, queries ...string) (*github.Reposit
 	return body, strings.Join(queries, " "), nil
 }
 
-func FetchGitHubRepositories(queries ...string) []*github.Repository {
+func fetchGitHubRepositories(queries ...string) []*github.Repository {
 	gitHubRepositories := make([]*github.Repository, 0, REPOSITORIES_API_MAX_RESULTS)
 	for page := 0; page < REPOSITORIES_API_MAX_RESULTS/REPOSITORIES_API_RESULTS_PER_PAGE; page++ {
-		gitHubRepositoriesResponse, queries, err := FetchGitHubRepositoriesSubset(page, queries...)
+		gitHubRepositoriesResponse, queries, err := fetchGitHubRepositoriesSubset(page, queries...)
 		if err != nil {
 			logrus.Error(err)
 			continue
@@ -46,8 +46,8 @@ func FetchGitHubRepositories(queries ...string) []*github.Repository {
 	return gitHubRepositories
 }
 
-func FetchRepositories(queries ...string) []*lib.Repository {
-	gitHubRepositories := FetchGitHubRepositories(queries...)
+func fetchRepositories(queries ...string) []*lib.Repository {
+	gitHubRepositories := fetchGitHubRepositories(queries...)
 	repositories := make([]*lib.Repository, 0, len(gitHubRepositories))
 	for _, gitHubRepository := range gitHubRepositories {
 		repositories = append(repositories, convertRepository(gitHubRepository))
@@ -55,7 +55,7 @@ func FetchRepositories(queries ...string) []*lib.Repository {
 	return repositories
 }
 
-func FetchGitHubIssues(repositoryName string) ([]*github.Issue, error) {
+func fetchGitHubIssues(repositoryName string) ([]*github.Issue, error) {
 	ctx := context.Background()
 	client := getGitHubClient(ctx)
 	repositoryOwner, repositoryName := strings.Split(repositoryName, "/")[0], strings.Split(repositoryName, "/")[1]
@@ -67,8 +67,8 @@ func FetchGitHubIssues(repositoryName string) ([]*github.Issue, error) {
 	return body, nil
 }
 
-func FetchIssues(RepositoryName string) []*lib.Issue {
-	gitHubIssues, err := FetchGitHubIssues(RepositoryName)
+func fetchIssues(RepositoryName string) []*lib.Issue {
+	gitHubIssues, err := fetchGitHubIssues(RepositoryName)
 	if err != nil {
 		logrus.Error(err)
 		return []*lib.Issue{}
