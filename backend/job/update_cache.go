@@ -8,7 +8,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type AggregationResult struct {
@@ -46,7 +45,7 @@ func updateCachedLanguages() error {
 
 	// Get languages cursor
 	repositoryCollection := client.Database("main").Collection("repositories")
-	cacheCollection := client.Database("main").Collection("caches")
+	cacheCollection := client.Database("main").Collection("cached_languages")
 
 	groupStage := bson.D{{Key: "$group", Value: bson.M{"_id": "$language", "count": bson.M{"$sum": 1}}}}
 	sortStage := bson.D{{Key: "$sort", Value: bson.M{"count": -1}}}
@@ -58,7 +57,7 @@ func updateCachedLanguages() error {
 	defer cursor.Close(context.TODO())
 
 	// Update cached languages
-	if err = updateCachedItems(cacheCollection, cursor, "languages"); err != nil {
+	if err = updateCachedItems(cacheCollection, cursor); err != nil {
 		logrus.Error(err)
 		return err
 	}
@@ -81,7 +80,7 @@ func updateCachedLicenses() error {
 
 	// Get licenses cursor
 	repositoryCollection := client.Database("main").Collection("repositories")
-	cacheCollection := client.Database("main").Collection("caches")
+	cacheCollection := client.Database("main").Collection("cached_licenses")
 
 	groupStage := bson.D{{Key: "$group", Value: bson.M{"_id": "$license", "count": bson.M{"$sum": 1}}}}
 	sortStage := bson.D{{Key: "$sort", Value: bson.M{"count": -1}}}
@@ -93,7 +92,7 @@ func updateCachedLicenses() error {
 	defer cursor.Close(context.TODO())
 
 	// Update cached licenses
-	if err = updateCachedItems(cacheCollection, cursor, "licenses"); err != nil {
+	if err = updateCachedItems(cacheCollection, cursor); err != nil {
 		logrus.Error(err)
 		return err
 	}
@@ -116,7 +115,7 @@ func updateCachedLabels() error {
 
 	// Get labels cursor
 	repositoryCollection := client.Database("main").Collection("repositories")
-	cacheCollection := client.Database("main").Collection("caches")
+	cacheCollection := client.Database("main").Collection("cached_labels")
 
 	unwindStage1 := bson.D{{Key: "$unwind", Value: "$issues"}}
 	unwindStage2 := bson.D{{Key: "$unwind", Value: "$issues.labels"}}
@@ -130,7 +129,7 @@ func updateCachedLabels() error {
 	defer cursor.Close(context.TODO())
 
 	// Update cached labels
-	if err = updateCachedItems(cacheCollection, cursor, "labels"); err != nil {
+	if err = updateCachedItems(cacheCollection, cursor); err != nil {
 		logrus.Error(err)
 		return err
 	}
@@ -139,7 +138,7 @@ func updateCachedLabels() error {
 	return nil
 }
 
-func updateCachedItems(collection *mongo.Collection, cursor *mongo.Cursor, typeName string) error {
+func updateCachedItems(collection *mongo.Collection, cursor *mongo.Cursor) error {
 	// Get items
 	var cachedItems = make([]lib.CachedItem, 0)
 	for cursor.Next(context.TODO()) {
@@ -158,14 +157,16 @@ func updateCachedItems(collection *mongo.Collection, cursor *mongo.Cursor, typeN
 	}
 
 	// Update cached items
-	filter := bson.M{"name": typeName}
-	update := bson.M{"$set": lib.CachedItems{Name: typeName, Items: cachedItems}}
-	_, err := collection.UpdateOne(context.TODO(), filter, update, options.Update().SetUpsert(true))
+	var cachedDocs = make([]interface{}, 0)
+	for _, cachedItem := range cachedItems {
+		cachedDocs = append(cachedDocs, cachedItem)
+	}
+	collection.Drop(context.TODO())
+	_, err := collection.InsertMany(context.TODO(), cachedDocs)
 	if err != nil {
 		logrus.Error(err)
 		return err
 	}
-
 	return nil
 }
 

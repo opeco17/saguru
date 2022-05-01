@@ -11,8 +11,8 @@ func main() {
 	flag.Parse()
 	if flag.Arg(0) == "all" {
 		initDBAction()
-		// updateRepositoriesAction()
-		// updateIssuesAction()
+		updateRepositoriesAction()
+		updateIssuesAction()
 		updateCache()
 	} else if flag.Arg(0) == "issue" {
 		initDBAction()

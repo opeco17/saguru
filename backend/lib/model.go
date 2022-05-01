@@ -52,15 +52,4 @@ type (
 		Name  string `bson:"name"`
 		Count int    `bson:"count"`
 	}
-
-	CachedItems struct {
-		Name  string       `bson:"name"`
-		Items []CachedItem `bson:"items"`
-	}
-
-	CachedLanguages CachedItems
-
-	CachedLicenses CachedItems
-
-	CachedLabels CachedItems
 )
