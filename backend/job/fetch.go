@@ -21,9 +21,15 @@ func fetchGitHubRepositoriesSubset(page int, queries ...string) (*github.Reposit
 			PerPage: REPOSITORIES_API_RESULTS_PER_PAGE,
 		},
 	}
-	body, resp, _ := client.Search.Repositories(ctx, strings.Join(queries, " "), opts)
+	body, resp, err := client.Search.Repositories(ctx, strings.Join(queries, " "), opts)
+	if err != nil {
+		logrus.Error(err)
+		return nil, "", err
+	}
 	if resp.StatusCode >= 400 {
-		return nil, "", fmt.Errorf("bad response status code %d\n%v", resp.StatusCode, body)
+		message := fmt.Sprintf("bad response status code %d\n%v", resp.StatusCode, body)
+		logrus.Error(message)
+		return nil, "", fmt.Errorf(message)
 	}
 	return body, strings.Join(queries, " "), nil
 }
@@ -33,7 +39,7 @@ func fetchGitHubRepositories(queries ...string) []*github.Repository {
 	for page := 0; page < REPOSITORIES_API_MAX_RESULTS/REPOSITORIES_API_RESULTS_PER_PAGE; page++ {
 		gitHubRepositoriesResponse, queries, err := fetchGitHubRepositoriesSubset(page, queries...)
 		if err != nil {
-			logrus.Error(err)
+			logrus.Error("Failed to fetch repositories from GitHub API")
 			continue
 		}
 		gitHubRepositories = append(gitHubRepositories, gitHubRepositoriesResponse.Repositories...)

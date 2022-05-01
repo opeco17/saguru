@@ -11,58 +11,45 @@ func main() {
 	flag.Parse()
 	if flag.Arg(0) == "all" {
 		initDBAction()
-		updateRepositoriesAction()
-		updateIssuesAction()
-		updateFrontLanguagesAction()
-		updateLicensesAction()
-		updateLabelsAction()
+		// updateRepositoriesAction()
+		// updateIssuesAction()
+		updateCache()
 	} else if flag.Arg(0) == "issue" {
 		initDBAction()
 		updateIssuesAction()
-		updateLabelsAction()
+		updateCache()
 	} else if flag.Arg(0) == "init" {
 		initDBAction()
 	} else {
-		logrus.Error("please specify all, isssue, or init")
+		logrus.Error("Must specify all, isssue, or init as a sub command.")
 		os.Exit(1)
 	}
 }
 
 func initDBAction() {
 	if err := initDB(); err != nil {
-		logrus.Error(err)
+		logrus.Error("Failed to initialize DB.")
 		os.Exit(1)
 	}
 }
 
 func updateRepositoriesAction() {
-	if err := UpdateRepositories(); err != nil {
-		logrus.Error(err)
+	if err := updateRepositories(); err != nil {
+		logrus.Error("Failed to update repositories.")
 		os.Exit(1)
 	}
 }
 
 func updateIssuesAction() {
-	if err := UpdateIssues(); err != nil {
-		logrus.Error(err)
+	if err := updateIssues(); err != nil {
+		logrus.Error("Failed to update issues.")
 		os.Exit(1)
 	}
 }
 
-func updateFrontLanguagesAction() {
-	if err := UpdateFrontLanguages(); err != nil {
-		logrus.Error(err)
-	}
-}
-
-func updateLicensesAction() {
-	if err := UpdateLicenses(); err != nil {
-		logrus.Error(err)
-	}
-}
-
-func updateLabelsAction() {
-	if err := UpdateLabels(); err != nil {
-		logrus.Error(err)
+func updateCacheAction() {
+	if err := updateCache(); err != nil {
+		logrus.Error("Failed to update caches.")
+		os.Exit(1)
 	}
 }

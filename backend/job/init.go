@@ -16,5 +16,7 @@ func initDB() error {
 	defer client.Disconnect(context.TODO())
 
 	client.Database("main").Collection("repositories")
+
+	logrus.Info("Finished to initialize DB.")
 	return nil
 }

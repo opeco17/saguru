@@ -41,24 +41,26 @@ type (
 		Topics           string    `bson:"topics"`
 		License          string    `bson:"license"`
 		Language         string    `bson:"language"`
+		UpdatedAt        time.Time `bson:"updated_at"`
 		GitHubCreatedAt  time.Time `bson:"github_created_at"`
 		GitHubUpdatedAt  time.Time `bson:"github_updated_at"`
 		IssueInitialized bool      `bson:"issue_initialized"`
 		Issues           []*Issue  `bson:"issues"`
 	}
 
-	FrontLanguage struct {
-		Name            string `bson:"name"`
-		RepositoryCount int    `bson:"repository_count"`
+	CachedItem struct {
+		Name  string `bson:"name"`
+		Count int    `bson:"count"`
 	}
 
-	FrontLicense struct {
-		Name            string `bson:"name"`
-		RepositoryCount int    `bson:"repository_count"`
+	CachedItems struct {
+		Name  string       `bson:"name"`
+		Items []CachedItem `bson:"items"`
 	}
 
-	FrontLabel struct {
-		Name       string `bson:"name"`
-		IssueCount int    `bson:"issue_count"`
-	}
+	CachedLanguages CachedItems
+
+	CachedLicenses CachedItems
+
+	CachedLabels CachedItems
 )
