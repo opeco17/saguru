@@ -58,26 +58,26 @@ func convertGetRepositoriesOutput(repositories []lib.Repository) GetRepositories
 	return GetRepositoriesOutput
 }
 
-func convertGetLanguagesOutput(frontLanguages []lib.FrontLanguage) GetLanguagesOutput {
-	GetLanguagesOutputItems := make([]string, 0, len(frontLanguages))
-	for _, frontLanguage := range frontLanguages {
-		GetLanguagesOutputItems = append(GetLanguagesOutputItems, frontLanguage.Name)
+func convertGetLanguagesOutput(cachedLanguages []lib.CachedItem) GetLanguagesOutput {
+	outputItems := make([]string, 0, len(cachedLanguages))
+	for _, cachedLanguage := range cachedLanguages {
+		outputItems = append(outputItems, cachedLanguage.Name)
 	}
-	return GetLanguagesOutput{Items: GetLanguagesOutputItems}
+	return GetLanguagesOutput{Items: outputItems}
 }
 
-func convertGetLicensesOutput(frontLicenses []lib.FrontLicense) GetLicensesOutput {
-	getLicensesOutputItems := make([]string, 0, len(frontLicenses))
-	for _, frontLicense := range frontLicenses {
-		getLicensesOutputItems = append(getLicensesOutputItems, frontLicense.Name)
+func convertGetLicensesOutput(cachedLicenses []lib.CachedItem) GetLicensesOutput {
+	outputItems := make([]string, 0, len(cachedLicenses))
+	for _, cachedLicense := range cachedLicenses {
+		outputItems = append(outputItems, cachedLicense.Name)
 	}
-	return GetLicensesOutput{Items: getLicensesOutputItems}
+	return GetLicensesOutput{Items: outputItems}
 }
 
-func convertGetLabelsOutput(frontLabels []lib.FrontLabel) GetLabelsOutput {
-	getLabelsOutputItems := make([]string, 0, len(frontLabels))
-	for _, frontLabel := range frontLabels {
-		getLabelsOutputItems = append(getLabelsOutputItems, frontLabel.Name)
+func convertGetLabelsOutput(cachedLabels []lib.CachedItem) GetLabelsOutput {
+	outputItems := make([]string, 0, len(cachedLabels))
+	for _, cachedLabel := range cachedLabels {
+		outputItems = append(outputItems, cachedLabel.Name)
 	}
-	return GetLabelsOutput{Items: getLabelsOutputItems}
+	return GetLabelsOutput{Items: outputItems}
 }

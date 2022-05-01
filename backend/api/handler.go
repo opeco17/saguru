@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"time"
@@ -9,15 +10,16 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func Index(c echo.Context) error {
+func index(c echo.Context) error {
 	return c.String(http.StatusOK, "healthy")
 }
 
-func GetRepositories(c echo.Context) error {
+func getRepositories(c echo.Context) error {
 	logrus.Info("Get repositories")
 
 	// Validation
 	input := new(GetRepositoriesInput)
+	logrus.Info(fmt.Sprintf("Input %+v", input))
 	if err := c.Bind(input); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
@@ -26,88 +28,95 @@ func GetRepositories(c echo.Context) error {
 	}
 
 	// Connect DB
-	gormDB, sqlDB, err := getDBClient()
+	client, err := getMongoDBClient()
 	if err != nil {
-		return c.String(http.StatusServiceUnavailable, "")
+		return c.String(http.StatusServiceUnavailable, "Failed to connect database.")
 	}
-	defer sqlDB.Close()
+	defer client.Disconnect(context.TODO())
 
-	// Fetch data
+	// Get data
 	now := time.Now()
-	useIssueIDs := false
-	issueIDs := []uint{}
-	logrus.Info(input.Labels)
-	if input.Labels != "" || input.Assigned != nil {
-		useIssueIDs = true
-		issueIDs = FetchIssueIDs(gormDB, input)
+	repositories, err := getRepositoriesFromDB(client, input)
+	if err != nil {
+		return c.String(http.StatusServiceUnavailable, "Failed to get repositories from database.")
 	}
-	repositoryIDs := FetchRepositoryIDs(gormDB, input, useIssueIDs, issueIDs)
-	repositories := FetchRepositoryEntities(gormDB, input, useIssueIDs, issueIDs, repositoryIDs)
-	getRepositoriesOutput := convertGetRepositoriesOutput(repositories)
+	repositories = filterRepositories(repositories, input)
+	output := convertGetRepositoriesOutput(repositories)
+
 	logrus.Info(fmt.Sprintf("Total time to fetch repositories: %vms\n", time.Since(now).Milliseconds()))
 
-	return c.JSON(http.StatusOK, getRepositoriesOutput)
+	return c.JSON(http.StatusOK, output)
 }
 
-func GetLanguages(c echo.Context) error {
+func getLanguages(c echo.Context) error {
 	logrus.Info("Get languages")
 
 	// Connect DB
-	gormDB, sqlDB, err := getDBClient()
+	client, err := getMongoDBClient()
 	if err != nil {
-		return c.String(http.StatusServiceUnavailable, "")
+		return c.String(http.StatusServiceUnavailable, "Failed to connect database.")
 	}
-	defer sqlDB.Close()
+	defer client.Disconnect(context.TODO())
 
-	// Fetch data
+	// Get data
 	now := time.Now()
-	frontLanguages := FetchFrontLanguages(gormDB)
-	getLanguagesOutput := convertGetLanguagesOutput(frontLanguages)
-	logrus.Info(fmt.Sprintf("Total time to fetch front languages: %vms\n", time.Since(now).Milliseconds()))
+	cachedLanguages, err := getCachedLanguagesFromDB(client)
+	if err != nil {
+		return c.String(http.StatusServiceUnavailable, "Failed to get languages from database.")
+	}
+	output := convertGetLanguagesOutput(cachedLanguages)
+	logrus.Info(fmt.Sprintf("Total time to get cached languages: %vms\n", time.Since(now).Milliseconds()))
 
-	return c.JSON(http.StatusOK, getLanguagesOutput)
+	return c.JSON(http.StatusOK, output)
 }
 
-func GetLicenses(c echo.Context) error {
+func getLicenses(c echo.Context) error {
 	logrus.Info("Get licenses")
 
 	// Connect DB
-	gormDB, sqlDB, err := getDBClient()
+	client, err := getMongoDBClient()
 	if err != nil {
-		return c.String(http.StatusServiceUnavailable, "")
+		return c.String(http.StatusServiceUnavailable, "Failed to connect database.")
 	}
-	defer sqlDB.Close()
+	defer client.Disconnect(context.TODO())
 
-	// Fetch data
+	// Get data
 	now := time.Now()
-	frontLicenses := FetchFrontLicenses(gormDB)
-	getLicensesOutput := convertGetLicensesOutput(frontLicenses)
-	logrus.Info(fmt.Sprintf("Total time to fetch front licenses: %vms\n", time.Since(now).Milliseconds()))
+	cachedLicenses, err := getCachedLicenses(client)
+	if err != nil {
+		return c.String(http.StatusServiceUnavailable, "Failed to get licenses from database.")
+	}
+	output := convertGetLicensesOutput(cachedLicenses)
+	logrus.Info(fmt.Sprintf("Total time to get cached licenses: %vms\n", time.Since(now).Milliseconds()))
 
-	return c.JSON(http.StatusOK, getLicensesOutput)
+	return c.JSON(http.StatusOK, output)
 }
 
-func GetLabels(c echo.Context) error {
+func getLabels(c echo.Context) error {
 	logrus.Info("Get labels")
 
 	// Connect DB
-	gormDB, sqlDB, err := getDBClient()
+	client, err := getMongoDBClient()
 	if err != nil {
-		return c.String(http.StatusServiceUnavailable, "")
+		return c.String(http.StatusServiceUnavailable, "Failed to connect database.")
 	}
-	defer sqlDB.Close()
+	defer client.Disconnect(context.TODO())
 
-	// Fetch data
+	// Get data
 	now := time.Now()
-	frontLabels := FetchFrontLabels(gormDB)
-	getLabelsOutput := convertGetLabelsOutput(frontLabels)
+	cachedLabels, err := getCachedLabels(client)
+	if err != nil {
+		return c.String(http.StatusServiceUnavailable, "Failed to get licenses from database.")
+	}
+	getLabelsOutput := convertGetLabelsOutput(cachedLabels)
 	logrus.Info(fmt.Sprintf("Total time to fetch front labels: %vms\n", time.Since(now).Milliseconds()))
 
 	return c.JSON(http.StatusOK, getLabelsOutput)
 }
 
-func GetOrderMetrics(c echo.Context) error {
+func getOrderMetrics(c echo.Context) error {
 	logrus.Info("Get order metrics")
+
 	metrics := []string{}
 	for _, metric := range orderMetrics() {
 		metrics = append(metrics, metric+"_desc", metric+"_asc")

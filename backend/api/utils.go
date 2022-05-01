@@ -1,19 +1,26 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"opeco17/gitnavi/lib"
 	"os"
 
+	"github.com/sirupsen/logrus"
+	"go.mongodb.org/mongo-driver/mongo"
 	"gorm.io/gorm"
 )
 
-func getDBClient() (*gorm.DB, *sql.DB, error) {
-	gormDB, sqlDB, err := lib.GetDBClient(
-		os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_HOST"),
-	)
-	return gormDB, sqlDB, err
+func getMongoDBClient() (*mongo.Client, error) {
+	user := os.Getenv("MONGO_INITDB_ROOT_USERNAME")
+	password := os.Getenv("MONGO_INITDB_ROOT_PASSWORD")
+	host := os.Getenv("MONGODB_HOST")
+
+	client, err := lib.GetMongoDBClient(user, password, host)
+	if err != nil {
+		logrus.Error(err)
+		return nil, err
+	}
+	return client, nil
 }
 
 func orderMetrics() []string {
