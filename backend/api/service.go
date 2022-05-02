@@ -12,92 +12,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// func FetchIssueIDs(gormDB *gorm.DB, input *GetRepositoriesInput) []uint {
-// 	var (
-// 		issues   []*lib.Issue
-// 		issueIDs []uint
-// 	)
-// 	query := gormDB.Model(&lib.Issue{})
-// 	query.Joins("INNER JOIN labels ON labels.issue_id = issues.id")
-// 	if input.Labels != "" {
-// 		query.Where("labels.name IN ?", strings.Split(input.Labels, ","))
-// 	}
-// 	if input.Assigned != nil && *input.Assigned {
-// 		query.Where("issues.assignees_count > ?", 0)
-// 	} else if input.Assigned != nil && !*input.Assigned {
-// 		query.Where("issues.assignees_count = ?", 0)
-// 	}
-// 	query.Distinct("issues.id")
-// 	query.Find(&issues)
-// 	for _, issue := range issues {
-// 		issueIDs = append(issueIDs, issue.ID)
-// 	}
-// 	logrus.Info(fmt.Sprintf("Issue: %d record\n", len(issues)))
-// 	return issueIDs
-// }
-
-// func FetchRepositoryIDs(gormDB *gorm.DB, input *GetRepositoriesInput, useIssueIDs bool, issueIDs []uint) []uint {
-// 	var (
-// 		repositories  []*lib.Repository
-// 		repositoryIDs []uint
-// 	)
-// 	query := gormDB.Model(&lib.Repository{})
-// 	query.Joins("INNER JOIN issues ON issues.repository_id = repositories.id")
-// 	if input.Languages != "" {
-// 		query.Where("repositories.language IN ?", strings.Split(input.Languages, ","))
-// 	}
-// 	if input.License != "" {
-// 		query.Where("repositories.license = ?", input.License)
-// 	}
-// 	if input.StarCountLower != nil {
-// 		query.Where("repositories.star_count > ?", *input.StarCountLower)
-// 	}
-// 	if input.StarCountUpper != nil {
-// 		query.Where("repositories.star_count < ?", *input.StarCountUpper)
-// 	}
-// 	if input.ForkCountLower != nil {
-// 		query.Where("repositories.fork_count > ?", *input.ForkCountLower)
-// 	}
-// 	if input.ForkCountUpper != nil {
-// 		query.Where("repositories.fork_count < ?", *input.ForkCountUpper)
-// 	}
-// 	if useIssueIDs {
-// 		query.Where("issues.id IN ?", issueIDs)
-// 	}
-// 	setOrderQuery(query, input.Orderby)
-// 	setDistinctQuery(query, input.Orderby)
-// 	query.Offset(int(input.Page) * int(RESULTS_PER_PAGE))
-// 	query.Limit(int(RESULTS_PER_PAGE) + 1)
-// 	query.Find(&repositories)
-
-// 	for _, repository := range repositories {
-// 		repositoryIDs = append(repositoryIDs, repository.ID)
-// 	}
-// 	logrus.Info(fmt.Sprintf("Repository: %d record\n", len(repositories)))
-// 	return repositoryIDs
-// }
-
-// func FetchRepositoryEntities(gormDB *gorm.DB, input *GetRepositoriesInput, useIssueIDs bool, issueIDs []uint, repositoryIDs []uint) []lib.Repository {
-// 	var repositories []lib.Repository
-
-// 	query := gormDB.Model(&repositories)
-// 	if useIssueIDs {
-// 		query.Preload("Issues", "id IN ?", issueIDs)
-// 	} else {
-// 		query.Preload("Issues")
-// 	}
-// 	query.Preload("Issues.Labels")
-// 	query.Preload("Issues.Issuer")
-// 	query.Where("id IN ?", repositoryIDs)
-// 	setOrderQuery(query, input.Orderby)
-// 	query.Find(&repositories)
-
-// 	for _, repository := range repositories {
-// 		logrus.Info(fmt.Sprintf("%v: %v", repository.Name, len(repository.Issues)))
-// 	}
-// 	return repositories
-// }
-
 func getRepositoriesFromDB(client *mongo.Client, input *GetRepositoriesInput) ([]lib.Repository, error) {
 	repositoryCollection := client.Database("main").Collection("repositories")
 	filter := bson.M{}
@@ -131,24 +45,37 @@ func getRepositoriesFromDB(client *mongo.Client, input *GetRepositoriesInput) ([
 	}
 
 	// Filter about issues
+	issueFilter := bson.M{"assignees_count": bson.M{"$gte": 0}} // To remove empty issues
 	if input.Assigned != nil && *input.Assigned {
-		filter["issues.assignees_count"] = bson.M{"$gte": 1}
+		issueFilter["assignees_count"] = bson.M{"$gte": 1}
 	} else if input.Assigned != nil && !*input.Assigned {
-		filter["issues.assignees_count"] = 0
+		issueFilter["assignees_count"] = 0
 	}
-
-	// Filter about labels
 	if input.Labels != "" {
-		filter["issues.labels.name"] = bson.M{"$in": strings.Split(input.Labels, ",")}
+		issueFilter["labels.name"] = bson.M{"$in": strings.Split(input.Labels, ",")}
 	}
+	filter["issues"] = bson.M{"$elemMatch": issueFilter, "$exists": true}
 
 	logrus.Info(fmt.Sprintf("Filter %+v", filter))
 
 	// Set options
-	opts := options.Find().SetLimit(int64(RESULTS_PER_PAGE)).SetSkip(int64(RESULTS_PER_PAGE * input.Page))
-	if input.Orderby != "" {
-		// TODO
+	var metric string
+	var direction int
+	orderBy := input.Orderby
+	if orderBy == "" {
+		orderBy = "star_count_desc"
 	}
+	if strings.Contains(orderBy, "star_count") {
+		metric = "star_count"
+	} else if strings.Contains(orderBy, "fork_count") {
+		metric = "fork_count"
+	}
+	if strings.Contains(orderBy, "desc") {
+		direction = -1
+	} else if strings.Contains(orderBy, "asc") {
+		direction = 1
+	}
+	opts := options.Find().SetLimit(int64(RESULTS_PER_PAGE + 1)).SetSkip(int64(RESULTS_PER_PAGE * input.Page)).SetSort(bson.M{metric: direction})
 
 	cursor, err := repositoryCollection.Find(context.TODO(), filter, opts)
 	if err != nil {
@@ -163,9 +90,55 @@ func getRepositoriesFromDB(client *mongo.Client, input *GetRepositoriesInput) ([
 	return repositories, nil
 }
 
-func filterRepositories(repositories []lib.Repository, input *GetRepositoriesInput) []lib.Repository {
-	// TODO
-	return repositories
+func filterIssuesInRepositories(repositories []lib.Repository, input *GetRepositoriesInput) []lib.Repository {
+	filteredRepositories := make([]lib.Repository, 0, len(repositories))
+	assigneeFilter := func(assigneesCount int) bool { return true }
+	labelFilter := func(labels []*lib.Label) bool { return true }
+
+	// Set filter
+	if input.Assigned != nil && *input.Assigned {
+		assigneeFilter = func(assigneesCount int) bool { return assigneesCount > 0 }
+	} else if input.Assigned != nil && !*input.Assigned {
+		assigneeFilter = func(assigneesCount int) bool { return assigneesCount == 0 }
+	}
+
+	if input.Labels != "" {
+		labelFilter = func(labels []*lib.Label) bool {
+			inputLabelNames := strings.Split(input.Labels, ",")
+			for _, label := range labels {
+				for _, inputLabelName := range inputLabelNames {
+					if label.Name == inputLabelName {
+						return true
+					}
+				}
+			}
+			return false
+		}
+	}
+
+	// Filter issues
+	for _, repository := range repositories {
+		filteredIssues := make([]*lib.Issue, 0, len(repository.Issues))
+		for _, issue := range repository.Issues {
+			fmt.Println(*issue.AssigneesCount)
+			for _, label := range issue.Labels {
+				fmt.Print(label.Name)
+			}
+			if assigneeFilter(*issue.AssigneesCount) && labelFilter(issue.Labels) {
+				filteredIssues = append(filteredIssues, issue)
+			}
+		}
+		if len(filteredIssues) == 0 {
+			fmt.Println("NG")
+			fmt.Println(repository.Name)
+		} else {
+			fmt.Println("OK")
+			fmt.Println(repository.Name)
+		}
+		repository.Issues = filteredIssues
+		filteredRepositories = append(filteredRepositories, repository)
+	}
+	return filteredRepositories
 }
 
 func getCachedLanguagesFromDB(client *mongo.Client) ([]lib.CachedItem, error) {

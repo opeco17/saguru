@@ -40,7 +40,7 @@ func getRepositories(c echo.Context) error {
 	if err != nil {
 		return c.String(http.StatusServiceUnavailable, "Failed to get repositories from database.")
 	}
-	repositories = filterRepositories(repositories, input)
+	repositories = filterIssuesInRepositories(repositories, input)
 	output := convertGetRepositoriesOutput(repositories)
 
 	logrus.Info(fmt.Sprintf("Total time to fetch repositories: %vms\n", time.Since(now).Milliseconds()))

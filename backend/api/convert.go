@@ -1,6 +1,8 @@
 package main
 
-import "opeco17/gitnavi/lib"
+import (
+	"opeco17/gitnavi/lib"
+)
 
 func convertGetRepositoriesOutputItemIssue(issue lib.Issue) GetRepositoriesOutputItemIssue {
 	getRepositoryIssueLabels := make([]string, 0, len(issue.Labels))
@@ -8,7 +10,7 @@ func convertGetRepositoriesOutputItemIssue(issue lib.Issue) GetRepositoriesOutpu
 		getRepositoryIssueLabels = append(getRepositoryIssueLabels, label.Name)
 	}
 	getRepositoryIssue := GetRepositoriesOutputItemIssue{
-		ID:             int(issue.ID),
+		ID:             int(issue.IssueID),
 		Title:          issue.Title,
 		URL:            issue.URL,
 		AssigneesCount: *issue.AssigneesCount,
@@ -23,7 +25,7 @@ func convertGetRepositoriesOutputItem(repository lib.Repository) GetRepositories
 		getRepositoryIssues = append(getRepositoryIssues, convertGetRepositoriesOutputItemIssue(*issue))
 	}
 	getRepositoriesOutputItem := GetRepositoriesOutputItem{
-		ID:             int(repository.ID),
+		ID:             int(repository.RepositoryID),
 		Name:           repository.Name,
 		URL:            repository.URL,
 		Description:    repository.Description,

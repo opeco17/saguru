@@ -4,8 +4,11 @@ import { RepositoriesParams } from '../types/repositories-params';
 import { RepositoriesResponseBody } from '../types/repositories-response-body';
 import { Repository } from '../types/repository';
 import { useState } from 'react';
+import sleep from '../lib/sleep'
 
 const useFetchRepositories = () => {
+  const wait = 500 // ms
+
   const [repositories, setRepositories] = useState([] as Repository[]);
   const [page, setPage] = useState(0);
   const [hasNext, setHasNext] = useState(false);
@@ -28,6 +31,7 @@ const useFetchRepositories = () => {
       forkCountUpper,
     }: Parameters,
   ) => {
+    const start = Date.now();
     setFetchRepositoriesErrorMessage('');
 
     let targetPage: number;
@@ -75,6 +79,13 @@ const useFetchRepositories = () => {
 
     try {
       const res = await client.get<RepositoriesResponseBody>('/repositories', { params: params });
+
+      // Sleep for usability
+      const end = Date.now();
+      if ((end - start) < wait) {
+        await sleep(wait - (end - start))
+      }
+
       setHasNext(res.data.hasNext);
       if (type === 'init' || type === 'search') {
         setPage(1);
