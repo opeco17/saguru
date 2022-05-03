@@ -39,6 +39,6 @@
     - api
     - job
     - mongo
-    - mongo-express
+    # - mongo-express
     - ingress
   when: env == "prod"
