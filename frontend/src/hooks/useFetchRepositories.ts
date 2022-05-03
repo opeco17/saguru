@@ -7,7 +7,7 @@ import { useState } from 'react';
 import sleep from '../lib/sleep'
 
 const useFetchRepositories = () => {
-  const wait = 500 // ms
+  const wait = 400 // ms
 
   const [repositories, setRepositories] = useState([] as Repository[]);
   const [page, setPage] = useState(0);
