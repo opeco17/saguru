@@ -31,12 +31,14 @@ func updateRepositories() error {
 	queries := [...]string{
 		"stars:30..100",
 		"stars:100..200",
-		"stars:200..400",
+		"stars:200..300",
+		"stars:300..400",
 		"stars:400..600",
 		"stars:600..1000",
 		"stars:1000..2000",
-		"stars:2000..4000",
-		"stars:>4000",
+		"stars:2000..3000",
+		"stars:4000..5000",
+		"stars:>5000",
 	}
 	for _, eachQuery := range queries {
 		now := time.Now()
@@ -48,9 +50,18 @@ func updateRepositories() error {
 		for _, repository := range repositories {
 			repository.UpdatedAt = time.Now()
 
-			filter := bson.M{"repository_id": repository.RepositoryID}
+			// Set existing issues
+			var oldRepository lib.Repository
+			findFilter := bson.M{"repository_id": repository.RepositoryID}
+			repositoryCollection.FindOne(context.TODO(), findFilter).Decode(&oldRepository)
+			if oldRepository.RepositoryID != 0 {
+				repository.Issues = oldRepository.Issues
+			}
+
+			// Update
+			updateFilter := bson.M{"repository_id": repository.RepositoryID}
 			update := bson.M{"$set": repository}
-			_, err = repositoryCollection.UpdateOne(context.TODO(), filter, update, options.Update().SetUpsert(true))
+			_, err = repositoryCollection.UpdateOne(context.TODO(), updateFilter, update, options.Update().SetUpsert(true))
 			if err != nil {
 				logrus.Warn(err)
 			}
@@ -128,7 +139,7 @@ func updateIssuesMinibach(repositoryCollection *mongo.Collection, updateCount in
 
 	// Fetch not initialized repositories
 	var notInitializedRepositories []*SimpleRepository
-	opts := options.Find().SetLimit(int64(updateCount)).SetProjection(simpleRepoFields)
+	opts := options.Find().SetLimit(int64(updateCount)).SetSort(bson.M{"star_count": -1}).SetProjection(simpleRepoFields)
 	filter := bson.M{"issue_initialized": false}
 	initializedIssueCursor, err := repositoryCollection.Find(context.TODO(), filter, opts)
 	if err != nil {
@@ -143,7 +154,7 @@ func updateIssuesMinibach(repositoryCollection *mongo.Collection, updateCount in
 	// Fetch initialized repositories
 	var initializedRepositories []*SimpleRepository
 	if restRepositoryCount := updateCount - len(notInitializedRepositories); restRepositoryCount > 0 {
-		opts = options.Find().SetLimit(int64(updateCount)).SetSort(bson.M{}).SetProjection(simpleRepoFields)
+		opts = options.Find().SetLimit(int64(updateCount)).SetSort(bson.M{"star_count": -1}).SetProjection(simpleRepoFields)
 		filter = bson.M{"issue_initialized": true}
 		notInitializedIssueCursor, err := repositoryCollection.Find(context.TODO(), filter, opts)
 		if err != nil {

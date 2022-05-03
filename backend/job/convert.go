@@ -2,7 +2,6 @@ package main
 
 import (
 	"opeco17/gitnavi/lib"
-	"strings"
 
 	"github.com/google/go-github/v41/github"
 )
@@ -33,13 +32,13 @@ func convertRepository(gitHubRepository *github.Repository) *lib.Repository {
 		language = *gitHubRepository.Language
 	}
 
-	topics := ""
+	topics := make([]string, 0)
 	if gitHubRepository.Topics != nil {
-		topics = strings.Join(gitHubRepository.Topics, ",")
+		topics = gitHubRepository.Topics
 	}
 
 	repository := &lib.Repository{
-		RepositoryID:     uint(*gitHubRepository.ID),
+		RepositoryID:     *gitHubRepository.ID,
 		GitHubCreatedAt:  gitHubRepository.CreatedAt.Time,
 		GitHubUpdatedAt:  gitHubRepository.UpdatedAt.Time,
 		Name:             name,
@@ -74,7 +73,7 @@ func convertUser(gitHubUser *github.User) *lib.User {
 	}
 
 	user := &lib.User{
-		UserID:    uint(*gitHubUser.ID),
+		UserID:    *gitHubUser.ID,
 		Name:      name,
 		URL:       url,
 		AvatarURL: avatarURL,
@@ -90,7 +89,7 @@ func convertLabels(gitHubLabels []*github.Label) []*lib.Label {
 			name = *gitHubLabel.Name
 		}
 		label := &lib.Label{
-			LabelID: uint(*gitHubLabel.ID),
+			LabelID: *gitHubLabel.ID,
 			Name:    name,
 		}
 		labels = append(labels, label)
@@ -121,7 +120,7 @@ func convertIssue(gitHubIssue *github.Issue) *lib.Issue {
 	}
 
 	issue := &lib.Issue{
-		IssueID:         uint(*gitHubIssue.ID),
+		IssueID:         *gitHubIssue.ID,
 		GitHubCreatedAt: *gitHubIssue.CreatedAt,
 		GitHubUpdatedAt: *gitHubIssue.UpdatedAt,
 		Title:           *gitHubIssue.Title,

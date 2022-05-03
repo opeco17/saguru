@@ -9,17 +9,21 @@ import (
 
 func main() {
 	flag.Parse()
-	if flag.Arg(0) == "all" {
+	if flag.Arg(0) == "init" {
+		initDBAction()
+	} else if flag.Arg(0) == "all" {
 		initDBAction()
 		updateRepositoriesAction()
 		updateIssuesAction()
+		updateCache()
+	} else if flag.Arg(0) == "repository" {
+		initDBAction()
+		updateRepositoriesAction()
 		updateCache()
 	} else if flag.Arg(0) == "issue" {
 		initDBAction()
 		updateIssuesAction()
 		updateCache()
-	} else if flag.Arg(0) == "init" {
-		initDBAction()
 	} else {
 		logrus.Error("Must specify all, isssue, or init as a sub command.")
 		os.Exit(1)

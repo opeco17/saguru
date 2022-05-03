@@ -11,6 +11,33 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+func fetchRepositories(queries ...string) []*lib.Repository {
+	gitHubRepositories := fetchGitHubRepositories(queries...)
+	repositories := make([]*lib.Repository, 0, len(gitHubRepositories))
+	for _, gitHubRepository := range gitHubRepositories {
+		repositories = append(repositories, convertRepository(gitHubRepository))
+	}
+	return repositories
+}
+
+func fetchGitHubRepositories(queries ...string) []*github.Repository {
+	gitHubRepositories := make([]*github.Repository, 0, REPOSITORIES_API_MAX_RESULTS)
+	for page := 0; page < REPOSITORIES_API_MAX_RESULTS/REPOSITORIES_API_RESULTS_PER_PAGE; page++ {
+		gitHubRepositoriesResponse, queries, err := fetchGitHubRepositoriesSubset(page, queries...)
+		if err != nil {
+			logrus.Error("Failed to fetch repositories from GitHub API")
+			continue
+		}
+		gitHubRepositories = append(gitHubRepositories, gitHubRepositoriesResponse.Repositories...)
+		if page == 0 {
+			logrus.Info("Start fetching repositories.")
+			logrus.Info(fmt.Sprintf("Query: %v", queries))
+			logrus.Info(fmt.Sprintf("Total count: %v", *gitHubRepositoriesResponse.Total))
+		}
+	}
+	return gitHubRepositories
+}
+
 func fetchGitHubRepositoriesSubset(page int, queries ...string) (*github.RepositoriesSearchResult, string, error) {
 	ctx := context.Background()
 	client := getGitHubClient(ctx)
@@ -34,31 +61,17 @@ func fetchGitHubRepositoriesSubset(page int, queries ...string) (*github.Reposit
 	return body, strings.Join(queries, " "), nil
 }
 
-func fetchGitHubRepositories(queries ...string) []*github.Repository {
-	gitHubRepositories := make([]*github.Repository, 0, REPOSITORIES_API_MAX_RESULTS)
-	for page := 0; page < REPOSITORIES_API_MAX_RESULTS/REPOSITORIES_API_RESULTS_PER_PAGE; page++ {
-		gitHubRepositoriesResponse, queries, err := fetchGitHubRepositoriesSubset(page, queries...)
-		if err != nil {
-			logrus.Error("Failed to fetch repositories from GitHub API")
-			continue
-		}
-		gitHubRepositories = append(gitHubRepositories, gitHubRepositoriesResponse.Repositories...)
-		if page == 0 {
-			logrus.Info("Start fetching repositories.")
-			logrus.Info(fmt.Sprintf("Query: %v", queries))
-			logrus.Info(fmt.Sprintf("Total count: %v", *gitHubRepositoriesResponse.Total))
-		}
+func fetchIssues(RepositoryName string) []*lib.Issue {
+	gitHubIssues, err := fetchGitHubIssues(RepositoryName)
+	if err != nil {
+		logrus.Error(err)
+		return []*lib.Issue{}
 	}
-	return gitHubRepositories
-}
-
-func fetchRepositories(queries ...string) []*lib.Repository {
-	gitHubRepositories := fetchGitHubRepositories(queries...)
-	repositories := make([]*lib.Repository, 0, len(gitHubRepositories))
-	for _, gitHubRepository := range gitHubRepositories {
-		repositories = append(repositories, convertRepository(gitHubRepository))
+	issues := make([]*lib.Issue, 0, len(gitHubIssues))
+	for _, gitHubIssue := range gitHubIssues {
+		issues = append(issues, convertIssue(gitHubIssue))
 	}
-	return repositories
+	return issues
 }
 
 func fetchGitHubIssues(repositoryName string) ([]*github.Issue, error) {
@@ -71,17 +84,4 @@ func fetchGitHubIssues(repositoryName string) ([]*github.Issue, error) {
 		return nil, fmt.Errorf("bad response status code %d\n%v", resp.StatusCode, body)
 	}
 	return body, nil
-}
-
-func fetchIssues(RepositoryName string) []*lib.Issue {
-	gitHubIssues, err := fetchGitHubIssues(RepositoryName)
-	if err != nil {
-		logrus.Error(err)
-		return []*lib.Issue{}
-	}
-	issues := make([]*lib.Issue, 0, len(gitHubIssues))
-	for _, gitHubIssue := range gitHubIssues {
-		issues = append(issues, convertIssue(gitHubIssue))
-	}
-	return issues
 }

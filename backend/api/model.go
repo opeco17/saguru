@@ -34,7 +34,7 @@ type (
 		StarCount      int                              `json:"starCount"`
 		ForkCount      int                              `json:"forkCount"`
 		OpenIssueCount int                              `json:"openIssueCount"`
-		Topics         string                           `json:"topics"`
+		Topics         []string                         `json:"topics"`
 		License        string                           `json:"license"`
 		Language       string                           `json:"language"`
 		Issues         []GetRepositoriesOutputItemIssue `json:"issues"`
