@@ -1,4 +1,4 @@
-FROM --platform=linux/x86_64 golang:1.16.5
+FROM golang:1.16.5
 
 RUN go get github.com/cosmtrek/air
 

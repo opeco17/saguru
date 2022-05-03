@@ -21,22 +21,24 @@
   kubernetes.core.k8s:
     state: present
     namespace: "{{ namespace }}"
-    template: 'kubernetes/{{ item }}.yaml'
+    template: "kubernetes/{{ item }}.yaml"
   with_items:
     - api
-    - database
     - job
+    - mongo
+    - mongo-express
   when: env == "local"
 
 - name: deploy app into prod
   kubernetes.core.k8s:
     state: present
     namespace: "{{ namespace }}"
-    template: 'kubernetes-prod/{{ item }}.yaml'
+    template: "kubernetes-prod/{{ item }}.yaml"
   with_items:
-    - ingress
-    - api
-    - database
-    - job
     - issuer
+    - api
+    - job
+    - mongo
+    # - mongo-express
+    - ingress
   when: env == "prod"
