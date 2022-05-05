@@ -29,6 +29,7 @@ const useFetchRepositories = () => {
       starCountUpper,
       forkCountLower,
       forkCountUpper,
+      keyword,
     }: Parameters,
   ) => {
     const start = Date.now();
@@ -75,6 +76,9 @@ const useFetchRepositories = () => {
     }
     if (forkCountUpper !== '') {
       params.fork_count_upper = forkCountUpper;
+    }
+    if (keyword !== '') {
+      params.keyword = keyword
     }
 
     try {

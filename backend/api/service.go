@@ -23,6 +23,12 @@ func getRepositoriesFromDB(client *mongo.Client, input *GetRepositoriesInput) ([
 	if input.License != "" {
 		filter["license"] = input.License
 	}
+	if input.Keyword != "" {
+		filter["$or"] = bson.A{
+			bson.M{"name": bson.M{"$regex": input.Keyword}},
+			bson.M{"description": bson.M{"$regex": input.Keyword}},
+		}
+	}
 	if input.StarCountLower != nil || input.StarCountUpper != nil {
 		starCountFilter := bson.M{}
 		if input.StarCountLower != nil {
@@ -120,20 +126,9 @@ func filterIssuesInRepositories(repositories []lib.Repository, input *GetReposit
 	for _, repository := range repositories {
 		filteredIssues := make([]*lib.Issue, 0, len(repository.Issues))
 		for _, issue := range repository.Issues {
-			fmt.Println(*issue.AssigneesCount)
-			for _, label := range issue.Labels {
-				fmt.Print(label.Name)
-			}
 			if assigneeFilter(*issue.AssigneesCount) && labelFilter(issue.Labels) {
 				filteredIssues = append(filteredIssues, issue)
 			}
-		}
-		if len(filteredIssues) == 0 {
-			fmt.Println("NG")
-			fmt.Println(repository.Name)
-		} else {
-			fmt.Println("OK")
-			fmt.Println(repository.Name)
 		}
 		repository.Issues = filteredIssues
 		filteredRepositories = append(filteredRepositories, repository)

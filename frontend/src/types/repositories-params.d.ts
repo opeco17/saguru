@@ -9,6 +9,7 @@ type RepositoriesParams = {
   fork_count_upper?: number;
   license?: string;
   orderby?: string;
+  keyword?: string;
 };
 
 export type { RepositoriesParams };

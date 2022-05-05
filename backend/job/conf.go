@@ -2,7 +2,7 @@ package main
 
 const (
 	REPOSITORIES_API_URL              string = "https://api.github.com/search/repositories"
-	MAX_REPOSITORY_RECORES            int    = 10000
+	MAX_REPOSITORY_RECORES            int    = 20000
 	REPOSITORIES_API_MAX_RESULTS      int    = 1000 // Fixed by GitHub repositories API (search)
 	REPOSITORIES_API_RESULTS_PER_PAGE int    = 100
 	REPOSITORIES_API_INTERVAL_SECOND  int    = 30 // Fixed by GitHub repositories API (search)
