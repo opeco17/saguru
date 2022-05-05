@@ -28,24 +28,37 @@ func updateRepositories() error {
 
 	// Fetch and save repositories
 	threeMonthAgo := time.Now().AddDate(0, -3, 0).Format("2006-01-02T15:04:05+09:00")
-	queries := [...]string{
-		"stars:30..100",
-		"stars:100..200",
-		"stars:200..300",
-		"stars:300..400",
-		"stars:400..600",
-		"stars:600..1000",
-		"stars:1000..2000",
-		"stars:2000..3000",
-		"stars:4000..5000",
-		"stars:>5000",
+	pushedBeforeThreeMonthAgoQuery := "pushed:>" + threeMonthAgo
+	isGoodFirstIssueQuery := "good-first-issues:>0"
+	queries := [][]string{
+		{"stars:30..50", pushedBeforeThreeMonthAgoQuery, isGoodFirstIssueQuery},
+		{"stars:30..50", pushedBeforeThreeMonthAgoQuery, isGoodFirstIssueQuery},
+		{"stars:50..100", pushedBeforeThreeMonthAgoQuery, isGoodFirstIssueQuery},
+		{"stars:100..150", pushedBeforeThreeMonthAgoQuery, isGoodFirstIssueQuery},
+		{"stars:150..200", pushedBeforeThreeMonthAgoQuery, isGoodFirstIssueQuery},
+		{"stars:200..300", pushedBeforeThreeMonthAgoQuery, isGoodFirstIssueQuery},
+		{"stars:300..400", pushedBeforeThreeMonthAgoQuery, isGoodFirstIssueQuery},
+		{"stars:400..600", pushedBeforeThreeMonthAgoQuery, isGoodFirstIssueQuery},
+		{"stars:600..1000", pushedBeforeThreeMonthAgoQuery, isGoodFirstIssueQuery},
+		{"stars:1000..1300", pushedBeforeThreeMonthAgoQuery, isGoodFirstIssueQuery},
+		{"stars:1300..1500", pushedBeforeThreeMonthAgoQuery, isGoodFirstIssueQuery},
+		{"stars:1500..1700", pushedBeforeThreeMonthAgoQuery},
+		{"stars:1700..2000", pushedBeforeThreeMonthAgoQuery},
+		{"stars:2000..2500", pushedBeforeThreeMonthAgoQuery},
+		{"stars:2500..3000", pushedBeforeThreeMonthAgoQuery},
+		{"stars:3500..4000", pushedBeforeThreeMonthAgoQuery},
+		{"stars:4000..5000", pushedBeforeThreeMonthAgoQuery},
+		{"stars:5000..6000", pushedBeforeThreeMonthAgoQuery},
+		{"stars:6000..7000", pushedBeforeThreeMonthAgoQuery},
+		{"stars:7000..10000", pushedBeforeThreeMonthAgoQuery},
+		{"stars:10000..15000", pushedBeforeThreeMonthAgoQuery},
+		{"stars:15000..20000", pushedBeforeThreeMonthAgoQuery},
+		{"stars:>20000", pushedBeforeThreeMonthAgoQuery},
 	}
 	for _, eachQuery := range queries {
 		now := time.Now()
 		repositories := fetchRepositories(
-			eachQuery,
-			"good-first-issues:>0",
-			"pushed:>"+threeMonthAgo,
+			eachQuery...,
 		)
 		for _, repository := range repositories {
 			repository.UpdatedAt = time.Now()
@@ -139,7 +152,7 @@ func updateIssuesMinibach(repositoryCollection *mongo.Collection, updateCount in
 
 	// Fetch not initialized repositories
 	var notInitializedRepositories []*SimpleRepository
-	opts := options.Find().SetLimit(int64(updateCount)).SetSort(bson.M{"star_count": -1}).SetProjection(simpleRepoFields)
+	opts := options.Find().SetLimit(int64(updateCount)).SetSort(bson.M{"updated_at": 1}).SetProjection(simpleRepoFields)
 	filter := bson.M{"issue_initialized": false}
 	initializedIssueCursor, err := repositoryCollection.Find(context.TODO(), filter, opts)
 	if err != nil {
@@ -154,7 +167,7 @@ func updateIssuesMinibach(repositoryCollection *mongo.Collection, updateCount in
 	// Fetch initialized repositories
 	var initializedRepositories []*SimpleRepository
 	if restRepositoryCount := updateCount - len(notInitializedRepositories); restRepositoryCount > 0 {
-		opts = options.Find().SetLimit(int64(updateCount)).SetSort(bson.M{"star_count": -1}).SetProjection(simpleRepoFields)
+		opts = options.Find().SetLimit(int64(updateCount)).SetSort(bson.M{"updated_at": 1}).SetProjection(simpleRepoFields)
 		filter = bson.M{"issue_initialized": true}
 		notInitializedIssueCursor, err := repositoryCollection.Find(context.TODO(), filter, opts)
 		if err != nil {
