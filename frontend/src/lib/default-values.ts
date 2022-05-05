@@ -10,6 +10,7 @@ const defaultParameters: Parameters = {
   starCountUpper: '',
   forkCountLower: '',
   forkCountUpper: '',
+  keyword: '',
 };
 
 export { defaultParameters };

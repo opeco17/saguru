@@ -2,6 +2,7 @@ import FieldLabel from '../components/atoms/FieldLabel';
 import SubTitle from '../components/atoms/SubTitle';
 import Title from '../components/atoms/Title';
 import AssignStatusField from '../components/molecules/AssignStatusField';
+import SimpleTextField from '../components/atoms/SimpleTextField'
 import ErrorMessages from '../components/molecules/ErrorMessages';
 import LicenseField from '../components/molecules/LicenseField';
 import MinMaxNumberFields from '../components/molecules/MinMaxNumberFields';
@@ -181,14 +182,8 @@ const Index = () => {
                     )}
                   </Box>
                   <Box sx={{ mb: fieldSpacing }}>
-                    <FieldLabel>{t.ASSIGN_STATUS_FIELD_LABEL}</FieldLabel>
-                    <AssignStatusField
-                      value={parameters.assignStatus}
-                      items={assignStatusChoices}
-                      onChange={(event) => {
-                        setParameters({ ...parameters, assignStatus: event.target.value });
-                      }}
-                    />
+                    <FieldLabel>{t.KEYWORD_FIELD_LABEL}</FieldLabel>
+                    <SimpleTextField value={parameters.keyword} placeholder={t.KEYWORD_FIELD_PLACEHOLDER} onChange={(event) => setParameters({ ...parameters, keyword: event.target.value as string })} />
                   </Box>
                   <Box sx={{ mb: fieldSpacing }}>
                     <FieldLabel>{t.ORDER_BY_FIELD_LABEL}</FieldLabel>
@@ -238,6 +233,16 @@ const Index = () => {
                         onChangeMax={(event) =>
                           setParameters({ ...parameters, forkCountUpper: event.target.value })
                         }
+                      />
+                    </Box>
+                    <Box sx={{ mb: fieldSpacing }}>
+                      <FieldLabel>{t.ASSIGN_STATUS_FIELD_LABEL}</FieldLabel>
+                      <AssignStatusField
+                        value={parameters.assignStatus}
+                        items={assignStatusChoices}
+                        onChange={(event) => {
+                          setParameters({ ...parameters, assignStatus: event.target.value });
+                        }}
                       />
                     </Box>
                     <Box sx={{ mb: fieldSpacing }}>

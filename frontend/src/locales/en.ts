@@ -21,6 +21,8 @@ const en: Locale = {
   STAR_COUNT_FIELD_LABEL: 'Star Count',
   FORK_COUNT_FIELD_LABEL: 'Fork Count',
   LICENSE_FIELD_LABEL: 'License',
+  KEYWORD_FIELD_LABEL: 'Keyword',
+  KEYWORD_FIELD_PLACEHOLDER: 'Search for keyword',
   STAR_COUNT_DESC: 'Most star count',
   STAR_COUNT_ASC: 'Fewest star count',
   FORK_COUNT_DESC: 'Most fork count',

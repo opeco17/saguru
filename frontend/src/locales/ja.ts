@@ -21,6 +21,8 @@ const ja: Locale = {
   STAR_COUNT_FIELD_LABEL: 'スター数',
   FORK_COUNT_FIELD_LABEL: 'フォーク数',
   LICENSE_FIELD_LABEL: 'ライセンス',
+  KEYWORD_FIELD_LABEL: 'キーワード',
+  KEYWORD_FIELD_PLACEHOLDER: 'キーワード検索',
   STAR_COUNT_DESC: 'スターが多い順',
   STAR_COUNT_ASC: 'スターが少ない順',
   FORK_COUNT_DESC: 'フォークが多い順',

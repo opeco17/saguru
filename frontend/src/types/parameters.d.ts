@@ -8,6 +8,7 @@ type Parameters = {
   starCountUpper: number | '';
   forkCountLower: number | '';
   forkCountUpper: number | '';
+  keyword: string;
 };
 
 export type { Parameters };
