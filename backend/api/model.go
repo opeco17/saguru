@@ -8,12 +8,13 @@ type (
 	GetRepositoriesInput struct {
 		Page           int    `query:"page"`
 		Labels         string `query:"labels"`
-		Assigned       *bool  `query:"assigned"`
+		IsAssigned     *bool  `query:"assigned"`
+		IsPRCreated    *bool  `query:"isPRCreated"`
 		Languages      string `query:"languages"`
-		StarCountLower *int   `query:"star_count_lower"`
-		StarCountUpper *int   `query:"star_count_upper"`
-		ForkCountLower *int   `query:"fork_count_lower"`
-		ForkCountUpper *int   `query:"fork_count_upper"`
+		StarCountLower *int   `query:"starCountLower"`
+		StarCountUpper *int   `query:"starCountUpper"`
+		ForkCountLower *int   `query:"forkCountLower"`
+		ForkCountUpper *int   `query:"forkCountUpper"`
 		License        string `query:"license"`
 		Keyword        string `query:"keyword"`
 		Orderby        string `query:"orderby"`

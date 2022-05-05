@@ -57,7 +57,7 @@ const useFetchRepositories = () => {
       params.labels = labels.join(',');
     }
     if (assignStatus !== 'ALL') {
-      params.assigned = { ASSIGNED: true, UNASSIGNED: false }[assignStatus];
+      params.isAssigned = { ASSIGNED: true, UNASSIGNED: false }[assignStatus];
     }
     if (ordermetric) {
       params.orderby = ordermetric;
@@ -66,16 +66,16 @@ const useFetchRepositories = () => {
       params.license = license;
     }
     if (starCountLower !== '') {
-      params.star_count_lower = starCountLower;
+      params.starCountLower = starCountLower;
     }
     if (starCountUpper !== '') {
-      params.star_count_upper = starCountUpper;
+      params.starCountUpper = starCountUpper;
     }
     if (forkCountLower !== '') {
-      params.fork_count_lower = forkCountLower;
+      params.forkCountLower = forkCountLower;
     }
     if (forkCountUpper !== '') {
-      params.fork_count_upper = forkCountUpper;
+      params.forkCountUpper = forkCountUpper;
     }
     if (keyword !== '') {
       params.keyword = keyword

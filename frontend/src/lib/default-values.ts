@@ -5,7 +5,7 @@ const defaultParameters: Parameters = {
   labels: ['good first issue'],
   assignStatus: 'ALL',
   license: 'ALL',
-  ordermetric: 'star_count_desc',
+  ordermetric: 'STAR_COUNT_DESC',
   starCountLower: '',
   starCountUpper: '',
   forkCountLower: '',

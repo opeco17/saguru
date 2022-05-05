@@ -52,9 +52,9 @@ func getRepositoriesFromDB(client *mongo.Client, input *GetRepositoriesInput) ([
 
 	// Filter about issues
 	issueFilter := bson.M{"assignees_count": bson.M{"$gte": 0}} // To remove empty issues
-	if input.Assigned != nil && *input.Assigned {
+	if input.IsAssigned != nil && *input.IsAssigned {
 		issueFilter["assignees_count"] = bson.M{"$gte": 1}
-	} else if input.Assigned != nil && !*input.Assigned {
+	} else if input.IsAssigned != nil && !*input.IsAssigned {
 		issueFilter["assignees_count"] = 0
 	}
 	if input.Labels != "" {
@@ -69,16 +69,16 @@ func getRepositoriesFromDB(client *mongo.Client, input *GetRepositoriesInput) ([
 	var direction int
 	orderBy := input.Orderby
 	if orderBy == "" {
-		orderBy = "star_count_desc"
+		orderBy = "STAR_COUNT_DESC"
 	}
-	if strings.Contains(orderBy, "star_count") {
+	if strings.Contains(orderBy, "STAR_COUNT") {
 		metric = "star_count"
-	} else if strings.Contains(orderBy, "fork_count") {
+	} else if strings.Contains(orderBy, "FORK_COUNT") {
 		metric = "fork_count"
 	}
-	if strings.Contains(orderBy, "desc") {
+	if strings.Contains(orderBy, "DESC") {
 		direction = -1
-	} else if strings.Contains(orderBy, "asc") {
+	} else if strings.Contains(orderBy, "ASC") {
 		direction = 1
 	}
 	opts := options.Find().SetLimit(int64(RESULTS_PER_PAGE + 1)).SetSkip(int64(RESULTS_PER_PAGE * input.Page)).SetSort(bson.M{metric: direction})
@@ -102,9 +102,9 @@ func filterIssuesInRepositories(repositories []lib.Repository, input *GetReposit
 	labelFilter := func(labels []*lib.Label) bool { return true }
 
 	// Set filter
-	if input.Assigned != nil && *input.Assigned {
+	if input.IsAssigned != nil && *input.IsAssigned {
 		assigneeFilter = func(assigneesCount int) bool { return assigneesCount > 0 }
-	} else if input.Assigned != nil && !*input.Assigned {
+	} else if input.IsAssigned != nil && !*input.IsAssigned {
 		assigneeFilter = func(assigneesCount int) bool { return assigneesCount == 0 }
 	}
 
