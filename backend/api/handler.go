@@ -119,7 +119,7 @@ func getOrderMetrics(c echo.Context) error {
 
 	metrics := []string{}
 	for _, metric := range orderMetrics() {
-		metrics = append(metrics, metric+"_desc", metric+"_asc")
+		metrics = append(metrics, metric+"_DESC", metric+"_ASC")
 	}
 	getOrderMetricsOutput := GetOrderMetricsOutput{Items: metrics}
 	return c.JSON(http.StatusOK, getOrderMetricsOutput)

@@ -1,13 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"opeco17/gitnavi/lib"
 	"os"
 
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
-	"gorm.io/gorm"
 )
 
 func getMongoDBClient() (*mongo.Client, error) {
@@ -25,35 +23,7 @@ func getMongoDBClient() (*mongo.Client, error) {
 
 func orderMetrics() []string {
 	return []string{
-		"star_count",
-		"fork_count",
+		"STAR_COUNT",
+		"FORK_COUNT",
 	}
-}
-
-func setOrderQuery(query *gorm.DB, orderby string) {
-	order_query := "repositories.id"
-	for _, metric := range orderMetrics() {
-		if orderby == metric+"_asc" {
-			order_query = fmt.Sprintf("repositories.%s ASC", metric)
-			break
-		} else if orderby == metric+"_desc" {
-			order_query = fmt.Sprintf("repositories.%s DESC", metric)
-			break
-		}
-	}
-	query.Order(order_query)
-}
-
-func setDistinctQuery(query *gorm.DB, orderby string) {
-	distinct_query := "repositories.id"
-	for _, metric := range orderMetrics() {
-		if orderby == metric+"_asc" {
-			distinct_query = fmt.Sprintf("repositories.id, repositories.%s", metric)
-			break
-		} else if orderby == metric+"_desc" {
-			distinct_query = fmt.Sprintf("repositories.id, repositories.%s", metric)
-			break
-		}
-	}
-	query.Distinct(distinct_query)
 }
