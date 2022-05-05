@@ -25,8 +25,8 @@ func getRepositoriesFromDB(client *mongo.Client, input *GetRepositoriesInput) ([
 	}
 	if input.Keyword != "" {
 		filter["$or"] = bson.A{
-			bson.M{"name": bson.M{"$regex": input.Keyword}},
-			bson.M{"description": bson.M{"$regex": input.Keyword}},
+			bson.M{"name": bson.M{"$regex": input.Keyword, "$options": "i"}},
+			bson.M{"description": bson.M{"$regex": input.Keyword, "$options": "i"}},
 		}
 	}
 	if input.StarCountLower != nil || input.StarCountUpper != nil {
