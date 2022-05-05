@@ -15,6 +15,7 @@ type (
 		ForkCountLower *int   `query:"fork_count_lower"`
 		ForkCountUpper *int   `query:"fork_count_upper"`
 		License        string `query:"license"`
+		Keyword        string `query:"keyword"`
 		Orderby        string `query:"orderby"`
 	}
 
