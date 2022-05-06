@@ -13,6 +13,16 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+type SimpleRepository struct {
+	Name string `bson:"name,omitempty"`
+}
+
+type RepositoryDiff struct {
+	UpdatedAt        time.Time    `bson:"updated_at"`
+	IssueInitialized bool         `bson:"issue_initialized"`
+	Issues           []*lib.Issue `bson:"issues"`
+}
+
 func updateRepositories() error {
 	logrus.Info("Start updating repositories.")
 
@@ -89,7 +99,10 @@ func updateRepositories() error {
 	if removeRepositoryCount := int(repositoryCount) - MAX_REPOSITORY_RECORES; removeRepositoryCount > 0 {
 		logrus.Info(fmt.Sprintf("%d repositories will be removed.", removeRepositoryCount))
 
-		opts := options.Find().SetLimit(int64(removeRepositoryCount)).SetProjection(bson.M{"_id": 1}).SetSort(bson.M{"git_hub_updated_at": 1})
+		opts := options.Find()
+		opts.SetLimit(int64(removeRepositoryCount))
+		opts.SetProjection(bson.M{"_id": 1})
+		opts.SetSort(bson.M{"git_hub_updated_at": 1})
 		cursor, err := repositoryCollection.Find(context.TODO(), bson.M{}, opts)
 		if err != nil {
 			logrus.Error(err)
@@ -114,6 +127,8 @@ func updateRepositories() error {
 func updateIssues() error {
 	logrus.Info("Start updating issues.")
 
+	remainCount := UPDATE_ISSUE_COUNT_PER_BATCH
+
 	// Connect DB
 	client, err := getMongoDBClient()
 	if err != nil {
@@ -124,65 +139,68 @@ func updateIssues() error {
 	defer client.Disconnect(context.TODO())
 	repositoryCollection := client.Database("main").Collection("repositories")
 
-	// Update issues
-	for i := 0; i < UPDATE_ISSUE_BATCH_SIZE/UPDATE_ISSUE_MINIBATCH_SIZE; i++ {
-		if i%10 == 0 {
-			logrus.Info(fmt.Sprintf("Updating issues: %d/%d", i*UPDATE_ISSUE_MINIBATCH_SIZE, UPDATE_ISSUE_BATCH_SIZE))
-		}
-		if err := updateIssuesMinibach(repositoryCollection, UPDATE_ISSUE_MINIBATCH_SIZE); err != nil {
-			return err
-		}
+	remainCount = updateIssuesInNotInitializedRepositories(repositoryCollection, remainCount)
+
+	if remainCount > 0 {
+		updateIssuesInInitializedRepositories(repositoryCollection, remainCount)
 	}
 
 	logrus.Info("Successfully finished to update issues.")
 	return nil
 }
 
-func updateIssuesMinibach(repositoryCollection *mongo.Collection, updateCount int) error {
-	type SimpleRepository struct {
-		RepositoryID int    `bson:"repository_id,omitempty"`
-		Name         string `bson:"name,omitempty"`
-	}
-	type RepositoryDiff struct {
-		UpdatedAt        time.Time    `bson:"updated_at"`
-		IssueInitialized bool         `bson:"issue_initialized"`
-		Issues           []*lib.Issue `bson:"issues"`
-	}
-	simpleRepoFields := bson.M{"repository_id": 1, "name": 1}
-
+func updateIssuesInInitializedRepositories(collection *mongo.Collection, remainCount int) int {
 	// Fetch not initialized repositories
-	var notInitializedRepositories []*SimpleRepository
-	opts := options.Find().SetLimit(int64(updateCount)).SetSort(bson.M{"updated_at": 1}).SetProjection(simpleRepoFields)
+	opts := options.Find()
+	opts.SetLimit(int64(UPDATE_ISSUE_COUNT_PER_BATCH))
+	opts.SetSort(bson.M{"updated_at": 1})
+	opts.SetProjection(bson.M{"name": 1})
 	filter := bson.M{"issue_initialized": false}
-	initializedIssueCursor, err := repositoryCollection.Find(context.TODO(), filter, opts)
+	cursor, err := collection.Find(context.TODO(), filter, opts)
 	if err != nil {
 		logrus.Error(err)
-		return err
 	}
-	if err = initializedIssueCursor.All(context.TODO(), &notInitializedRepositories); err != nil {
+	defer cursor.Close(context.TODO())
+
+	var repository *SimpleRepository
+	for cursor.Next(context.TODO()) {
+		if err = cursor.Decode(repository); err != nil {
+			logrus.Error(err)
+		}
+		remainCount = updateIssuesInRepository(repository, remainCount)
+		if remainCount <= 0 {
+			break
+		}
+	}
+	return remainCount
+}
+
+func updateIssuesInNotInitializedRepositories(collection *mongo.Collection, remainCount int) int {
+	opts := options.Find()
+	opts.SetLimit(int64(UPDATE_ISSUE_COUNT_PER_BATCH))
+	opts.SetSort(bson.M{"updated_at": 1})
+	opts.SetProjection(bson.M{"name": 1})
+	filter := bson.M{"issue_initialized": true}
+	cursor, err := collection.Find(context.TODO(), filter, opts)
+	if err != nil {
 		logrus.Error(err)
-		return err
 	}
+	defer cursor.Close(context.TODO())
 
-	// Fetch initialized repositories
-	var initializedRepositories []*SimpleRepository
-	if restRepositoryCount := updateCount - len(notInitializedRepositories); restRepositoryCount > 0 {
-		opts = options.Find().SetLimit(int64(updateCount)).SetSort(bson.M{"updated_at": 1}).SetProjection(simpleRepoFields)
-		filter = bson.M{"issue_initialized": true}
-		notInitializedIssueCursor, err := repositoryCollection.Find(context.TODO(), filter, opts)
-		if err != nil {
+	var repository *SimpleRepository
+	for cursor.Next(context.TODO()) {
+		if err = cursor.Decode(repository); err != nil {
 			logrus.Error(err)
-			return err
 		}
-		if err = notInitializedIssueCursor.All(context.TODO(), &initializedRepositories); err != nil {
-			logrus.Error(err)
-			return err
+		remainCount = updateIssuesInRepository(repository, remainCount)
+		if remainCount <= 0 {
+			break
 		}
 	}
+	return remainCount
+}
 
-	// Concat repositories
-	repositories := append(notInitializedRepositories, initializedRepositories...)
-
+func updateIssuesInRepository(repository *SimpleRepository, remainCount int) int {
 	// Update issues concurrently
 	var wg sync.WaitGroup
 	concurrencyLimitCh := make(chan struct{}, FETCH_ISSUE_CONCURRENCY)
@@ -202,7 +220,7 @@ func updateIssuesMinibach(repositoryCollection *mongo.Collection, updateCount in
 				Issues:           issues,
 			}
 
-			filter := bson.M{"repository_id": repository.RepositoryID}
+			filter := bson.M{"name": repository.Name}
 			update := bson.M{"$set": diff}
 			_, err = repositoryCollection.UpdateOne(context.TODO(), filter, update)
 			if err != nil {
@@ -211,5 +229,4 @@ func updateIssuesMinibach(repositoryCollection *mongo.Collection, updateCount in
 		}(repository)
 	}
 	wg.Wait()
-	return nil
 }
