@@ -78,7 +78,7 @@ func fetchGitHubIssues(repositoryName string) ([]*github.Issue, error) {
 	ctx := context.Background()
 	client := getGitHubClient(ctx)
 	repositoryOwner, repositoryName := strings.Split(repositoryName, "/")[0], strings.Split(repositoryName, "/")[1]
-	listOpts := &github.ListOptions{Page: 1, PerPage: 100}
+	listOpts := &github.ListOptions{Page: 1, PerPage: ISSUES_API_RESULTS_PER_PAGE}
 	opts := &github.IssueListByRepoOptions{State: "open", ListOptions: *listOpts}
 	body, resp, _ := client.Issues.ListByRepo(ctx, repositoryOwner, repositoryName, opts)
 	if resp.StatusCode >= 400 {

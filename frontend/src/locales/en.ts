@@ -8,7 +8,7 @@ const en: Locale = {
     'Flexible and functional filter help you search for good first issues in GitHub. gitnavi support your open-source contribution.',
   TITLE: 'Explore good first issues in GitHub',
   SUB_TITLE_PREFIX: 'gitnavi ',
-  SUB_TITLE: 'support your open-source contribution with functional issue filters',
+  SUB_TITLE: 'support your open-source contribution with functional filters',
   TRANSLATE_ICON_MESSAGE: 'Change language',
   GITHUB_ICON_MESSAGE: 'View on GitHub',
   ALL: 'All',
