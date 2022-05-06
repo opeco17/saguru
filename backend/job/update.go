@@ -31,11 +31,8 @@ func updateRepositories() error {
 	pushedBeforeThreeMonthAgoQuery := "pushed:>" + threeMonthAgo
 	isGoodFirstIssueQuery := "good-first-issues:>0"
 	queries := [][]string{
-		{"stars:30..50", pushedBeforeThreeMonthAgoQuery, isGoodFirstIssueQuery},
-		{"stars:30..50", pushedBeforeThreeMonthAgoQuery, isGoodFirstIssueQuery},
-		{"stars:50..100", pushedBeforeThreeMonthAgoQuery, isGoodFirstIssueQuery},
-		{"stars:100..150", pushedBeforeThreeMonthAgoQuery, isGoodFirstIssueQuery},
-		{"stars:150..200", pushedBeforeThreeMonthAgoQuery, isGoodFirstIssueQuery},
+		{"stars:30..100", pushedBeforeThreeMonthAgoQuery, isGoodFirstIssueQuery},
+		{"stars:100..200", pushedBeforeThreeMonthAgoQuery, isGoodFirstIssueQuery},
 		{"stars:200..300", pushedBeforeThreeMonthAgoQuery, isGoodFirstIssueQuery},
 		{"stars:300..400", pushedBeforeThreeMonthAgoQuery, isGoodFirstIssueQuery},
 		{"stars:400..600", pushedBeforeThreeMonthAgoQuery, isGoodFirstIssueQuery},

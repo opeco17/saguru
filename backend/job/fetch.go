@@ -78,7 +78,8 @@ func fetchGitHubIssues(repositoryName string) ([]*github.Issue, error) {
 	ctx := context.Background()
 	client := getGitHubClient(ctx)
 	repositoryOwner, repositoryName := strings.Split(repositoryName, "/")[0], strings.Split(repositoryName, "/")[1]
-	opts := &github.IssueListByRepoOptions{State: "open"}
+	listOpts := &github.ListOptions{Page: 1, PerPage: 100}
+	opts := &github.IssueListByRepoOptions{State: "open", ListOptions: *listOpts}
 	body, resp, _ := client.Issues.ListByRepo(ctx, repositoryOwner, repositoryName, opts)
 	if resp.StatusCode >= 400 {
 		return nil, fmt.Errorf("bad response status code %d\n%v", resp.StatusCode, body)
