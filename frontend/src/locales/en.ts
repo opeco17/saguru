@@ -22,7 +22,7 @@ const en: Locale = {
   FORK_COUNT_FIELD_LABEL: 'Fork Count',
   LICENSE_FIELD_LABEL: 'License',
   KEYWORD_FIELD_LABEL: 'Keyword',
-  KEYWORD_FIELD_PLACEHOLDER: 'Search for keyword',
+  KEYWORD_FIELD_PLACEHOLDER: 'Filter by keyword',
   STAR_COUNT_DESC: 'Star Count: High to Low',
   STAR_COUNT_ASC: 'Star Count: Low to High',
   FORK_COUNT_DESC: 'Fork Count: High to Low',

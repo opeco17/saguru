@@ -116,6 +116,7 @@ const Index = () => {
         </Box> */}
         <Box sx={{ mt: 4, textAlign: 'center', width: '100%' }} id='back-to-top-anchor'>
           <Title />
+          <br />
           <SubTitle />
         </Box>
         <Box>
