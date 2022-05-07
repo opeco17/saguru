@@ -6,7 +6,7 @@ const en: Locale = {
   HEADER_TITLE: 'Good first issues in GitHub for open-source contribution',
   HEADER_DESCRIPTION:
     'Flexible and functional filter help you search for good first issues in GitHub. gitnavi support your open-source contribution.',
-  TITLE: 'Explore good first issues in GitHub',
+  TITLE: 'Explore Good First Issues in GitHub',
   SUB_TITLE_PREFIX: 'gitnavi ',
   SUB_TITLE: 'support your open-source contribution with functional filters',
   TRANSLATE_ICON_MESSAGE: 'Change language',
