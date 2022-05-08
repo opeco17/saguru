@@ -53,7 +53,9 @@ const RepositoryCard = ({ repository }: RepositoryCardProps) => {
         >
           {repository.description}
         </Typography>
-        <RepositoryCardChip label={`# ${repository.language}`} />
+        <RepositoryCardChip
+          label={`# ${repository.language === '' ? 'N/A' : repository.language}`}
+        />
         <RepositoryCardChip
           label={formatKilo(repository.starCount)}
           icon={<StarBorderIcon sx={{ width: '0.8em' }} />}

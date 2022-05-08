@@ -12,10 +12,8 @@ type IssueCardProps = {
 const IssueCard = ({ issue }: IssueCardProps) => {
   const theme = useTheme();
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', my: 1.5 }}>
-      {/* @ts-ignore to use custom color */}
-      <LabelOutlinedIcon size='small' sx={{ color: 'text.secondary', mr: 1.5 }} />
-      <Typography sx={{ mr: 1.5 }}>
+    <Box sx={{ my: 1.5 }}>
+      <Typography>
         <Box
           component='a'
           href={issue.url}
@@ -26,9 +24,11 @@ const IssueCard = ({ issue }: IssueCardProps) => {
           {issue.title}
         </Box>
       </Typography>
-      {issue.labels.map((label) => {
-        return <IssueChip label={label} key={label} />;
-      })}
+      <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', my: 1, rowGap: 1 }}>
+        {issue.labels.map((label) => {
+          return <IssueChip label={label} key={label} />;
+        })}
+      </Box>
     </Box>
   );
 };
