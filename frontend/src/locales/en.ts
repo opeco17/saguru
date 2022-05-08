@@ -5,10 +5,10 @@ const en: Locale = {
   JAPANESE: 'Japanese',
   HEADER_TITLE: 'Good first issues in GitHub for open-source contribution',
   HEADER_DESCRIPTION:
-    'Flexible and functional filter help you search for good first issues in GitHub. gitnavi support your open-source contributions.',
+    'Flexible and functional filter help you search for good first issues in GitHub. gitnavi helps your open-source contributions.',
   TITLE: 'Explore Good First Issues in GitHub',
   SUB_TITLE_PREFIX: 'gitnavi ',
-  SUB_TITLE: 'support your open-source contributions with functional filters',
+  SUB_TITLE: 'helps your open-source contributions with functional filters',
   TRANSLATE_ICON_MESSAGE: 'Change language',
   GITHUB_ICON_MESSAGE: 'View on GitHub',
   ALL: 'All',
