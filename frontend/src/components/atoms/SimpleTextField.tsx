@@ -5,7 +5,7 @@ type SimpleTextFieldProps = {
   value: string;
   placeholder: string;
   onChange: (event: any) => void;
-}
+};
 
 const SimpleTextField = ({ value, placeholder, onChange }: SimpleTextFieldProps) => {
   const theme = useTheme();
@@ -23,7 +23,7 @@ const SimpleTextField = ({ value, placeholder, onChange }: SimpleTextFieldProps)
         }}
       ></TextField>
     </>
-  )
-}
+  );
+};
 
 export default SimpleTextField;

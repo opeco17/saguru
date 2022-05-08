@@ -1,13 +1,13 @@
 import client from '../lib/api-client';
+import sleep from '../lib/sleep';
 import { Parameters } from '../types/parameters';
 import { RepositoriesParams } from '../types/repositories-params';
 import { RepositoriesResponseBody } from '../types/repositories-response-body';
 import { Repository } from '../types/repository';
 import { useState } from 'react';
-import sleep from '../lib/sleep'
 
 const useFetchRepositories = () => {
-  const wait = 400 // ms
+  const wait = 400; // ms
 
   const [repositories, setRepositories] = useState([] as Repository[]);
   const [page, setPage] = useState(0);
@@ -78,7 +78,7 @@ const useFetchRepositories = () => {
       params.forkCountUpper = forkCountUpper;
     }
     if (keyword !== '') {
-      params.keyword = keyword
+      params.keyword = keyword;
     }
 
     try {
@@ -86,8 +86,8 @@ const useFetchRepositories = () => {
 
       // Sleep for usability
       const end = Date.now();
-      if ((end - start) < wait) {
-        await sleep(wait - (end - start))
+      if (end - start < wait) {
+        await sleep(wait - (end - start));
       }
 
       setHasNext(res.data.hasNext);

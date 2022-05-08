@@ -1,8 +1,8 @@
 import FieldLabel from '../components/atoms/FieldLabel';
+import SimpleTextField from '../components/atoms/SimpleTextField';
 import SubTitle from '../components/atoms/SubTitle';
 import Title from '../components/atoms/Title';
 import AssignStatusField from '../components/molecules/AssignStatusField';
-import SimpleTextField from '../components/atoms/SimpleTextField'
 import ErrorMessages from '../components/molecules/ErrorMessages';
 import LicenseField from '../components/molecules/LicenseField';
 import MinMaxNumberFields from '../components/molecules/MinMaxNumberFields';
@@ -63,10 +63,13 @@ const Index = () => {
   const [parameters, setParameters] = useState(defaultParameters);
   const [establishedParameters, setEstablishedParameters] = useState(defaultParameters);
 
+  const isXSmall = useMediaQuery(theme.breakpoints.only('xs'));
   const isXLarge = useMediaQuery(theme.breakpoints.only('xl'));
+
   const fieldSpacing = 2.5;
   const boxSpacing = isXLarge ? 3 : 2;
   const pageWidth = isXLarge ? 'xl' : 'lg';
+  const progressBarHeight = isXSmall ? 15 : 25;
 
   const detailOpenIcon = isDetailOpen ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />;
 
@@ -120,7 +123,7 @@ const Index = () => {
           <SubTitle />
         </Box>
         <Box>
-          <Box sx={{ height: 25, mt: 1 }}>
+          <Box sx={{ height: progressBarHeight, mt: 1 }}>
             {/* @ts-ignore to use custom color */}
             {isInitSearchLoading || isSearchLoading || isShowMoreLoading ? (
               <LinearProgress color='info' />
@@ -184,7 +187,13 @@ const Index = () => {
                   </Box>
                   <Box sx={{ mb: fieldSpacing }}>
                     <FieldLabel>{t.KEYWORD_FIELD_LABEL}</FieldLabel>
-                    <SimpleTextField value={parameters.keyword} placeholder={t.KEYWORD_FIELD_PLACEHOLDER} onChange={(event) => setParameters({ ...parameters, keyword: event.target.value as string })} />
+                    <SimpleTextField
+                      value={parameters.keyword}
+                      placeholder={t.KEYWORD_FIELD_PLACEHOLDER}
+                      onChange={(event) =>
+                        setParameters({ ...parameters, keyword: event.target.value as string })
+                      }
+                    />
                   </Box>
                   <Box sx={{ mb: fieldSpacing }}>
                     <FieldLabel>{t.ORDER_BY_FIELD_LABEL}</FieldLabel>

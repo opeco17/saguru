@@ -14,7 +14,7 @@ const Title = () => {
       component='h1'
       sx={{
         fontWeight: { xs: 'medium' },
-        lineHeight: '1.5',
+        lineHeight: '1.4',
         textAlign: 'left',
         display: 'inline-block',
       }}
