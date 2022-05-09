@@ -6,6 +6,7 @@ import Icon from '@mdi/react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
+import TagOutlinedIcon from '@mui/icons-material/TagOutlined';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -54,7 +55,8 @@ const RepositoryCard = ({ repository }: RepositoryCardProps) => {
           {repository.description}
         </Typography>
         <RepositoryCardChip
-          label={`# ${repository.language === '' ? 'N/A' : repository.language}`}
+          label={repository.language === '' ? 'N/A' : repository.language}
+          icon={<TagOutlinedIcon sx={{ width: '0.7em' }} />}
         />
         <RepositoryCardChip
           label={formatKilo(repository.starCount)}

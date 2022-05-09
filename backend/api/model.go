@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 )
 
 type (
@@ -20,11 +21,14 @@ type (
 	}
 
 	GetRepositoriesOutputItemIssue struct {
-		ID             int      `json:"id"`
-		Title          string   `json:"title"`
-		URL            string   `json:"url"`
-		AssigneesCount int      `json:"assigneesCount"`
-		Labels         []string `json:"labels"`
+		ID                       int       `json:"id"`
+		Title                    string    `json:"title"`
+		URL                      string    `json:"url"`
+		AssigneesCount           int       `json:"assigneesCount"`
+		CommentCount             int       `json:"commentCount"`
+		GitHubCreatedAt          time.Time `json:"gitHubCreatedAt"`
+		GitHubCreatedAtFormatted string    `json:"gitHubCreatedAtFormatted"`
+		Labels                   []string  `json:"labels"`
 	}
 
 	GetRepositoriesOutputItem struct {

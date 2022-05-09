@@ -2,7 +2,6 @@ import FieldLabel from '../components/atoms/FieldLabel';
 import SimpleTextField from '../components/atoms/SimpleTextField';
 import SubTitle from '../components/atoms/SubTitle';
 import Title from '../components/atoms/Title';
-import SimpleSelectField from '../components/molecules/SimpleSelectField';
 import ErrorMessages from '../components/molecules/ErrorMessages';
 import LicenseField from '../components/molecules/LicenseField';
 import MinMaxNumberFields from '../components/molecules/MinMaxNumberFields';
@@ -10,6 +9,7 @@ import MultipleChipsAutoCompleteField from '../components/molecules/MultipleChip
 import MultipleChipsSelectField from '../components/molecules/MultipleChipsSelectField';
 import OrderByField from '../components/molecules/OrderByField';
 import ScrollTopButton from '../components/molecules/ScrollTopButton';
+import SimpleSelectField from '../components/molecules/SimpleSelectField';
 import NavBar from '../components/organisms/NavBar';
 import RepositoryCard from '../components/organisms/RepositoryCard';
 import { useLocale } from '../hooks/locale';
