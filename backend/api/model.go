@@ -8,8 +8,7 @@ type (
 	GetRepositoriesInput struct {
 		Page           int    `query:"page"`
 		Labels         string `query:"labels"`
-		IsAssigned     *bool  `query:"assigned"`
-		IsPRCreated    *bool  `query:"isPRCreated"`
+		IsAssigned     *bool  `query:"isAssigned"`
 		Languages      string `query:"languages"`
 		StarCountLower *int   `query:"starCountLower"`
 		StarCountUpper *int   `query:"starCountUpper"`

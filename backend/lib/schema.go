@@ -76,7 +76,6 @@ var MongoSchema = bson.M{
 					"issue_id",
 					"title",
 					"url",
-					"pull_request_url",
 					"assignees_count",
 					"comment_count",
 					"github_created_at",
@@ -93,9 +92,6 @@ var MongoSchema = bson.M{
 						"bsonType": "string",
 					},
 					"url": bson.M{
-						"bsonType": "string",
-					},
-					"pull_request_url": bson.M{
 						"bsonType": "string",
 					},
 					"assignees_count": bson.M{
