@@ -37,7 +37,7 @@ const IssueCard = ({ issue }: IssueCardProps) => {
             fontSize: 14,
           }}
         >
-          {`Opend on ${issue.gitHubCreatedAtFormatted} / ${issue.commentCount} comments`}
+          {`Opened on ${issue.gitHubCreatedAtFormatted} / ${issue.commentCount} comments`}
         </Typography>
       </Box>
       <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', mb: 1.5, rowGap: 1 }}>
