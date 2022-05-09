@@ -21,7 +21,6 @@ type (
 		IssueID         int64     `bson:"issue_id"`
 		Title           string    `bson:"title"`
 		URL             string    `bson:"url"`
-		PullRequestURL  string    `bson:"pull_request_url"`
 		AssigneesCount  *int      `bson:"assignees_count"`
 		CommentCount    *int      `bson:"comment_count"`
 		GitHubCreatedAt time.Time `bson:"github_created_at"`

@@ -114,18 +114,12 @@ func convertIssue(gitHubIssue *github.Issue) *lib.Issue {
 		assigneesCount = &assigneesCountValue
 	}
 
-	pullRequestURL := ""
-	if gitHubIssue.PullRequestLinks != nil && gitHubIssue.PullRequestLinks.HTMLURL != nil {
-		pullRequestURL = *gitHubIssue.PullRequestLinks.HTMLURL
-	}
-
 	issue := &lib.Issue{
 		IssueID:         *gitHubIssue.ID,
 		GitHubCreatedAt: *gitHubIssue.CreatedAt,
 		GitHubUpdatedAt: *gitHubIssue.UpdatedAt,
 		Title:           *gitHubIssue.Title,
 		URL:             *gitHubIssue.HTMLURL,
-		PullRequestURL:  pullRequestURL,
 		AssigneesCount:  assigneesCount,
 		CommentCount:    gitHubIssue.Comments,
 		Issuer:          issuer,

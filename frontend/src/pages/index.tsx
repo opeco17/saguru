@@ -2,7 +2,7 @@ import FieldLabel from '../components/atoms/FieldLabel';
 import SimpleTextField from '../components/atoms/SimpleTextField';
 import SubTitle from '../components/atoms/SubTitle';
 import Title from '../components/atoms/Title';
-import AssignStatusField from '../components/molecules/AssignStatusField';
+import SimpleSelectField from '../components/molecules/SimpleSelectField';
 import ErrorMessages from '../components/molecules/ErrorMessages';
 import LicenseField from '../components/molecules/LicenseField';
 import MinMaxNumberFields from '../components/molecules/MinMaxNumberFields';
@@ -247,7 +247,7 @@ const Index = () => {
                     </Box>
                     <Box sx={{ mb: fieldSpacing }}>
                       <FieldLabel>{t.ASSIGN_STATUS_FIELD_LABEL}</FieldLabel>
-                      <AssignStatusField
+                      <SimpleSelectField
                         value={parameters.assignStatus}
                         items={assignStatusChoices}
                         onChange={(event) => {

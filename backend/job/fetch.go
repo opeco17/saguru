@@ -69,6 +69,9 @@ func fetchIssues(RepositoryName string) []*lib.Issue {
 	}
 	issues := make([]*lib.Issue, 0, len(gitHubIssues))
 	for _, gitHubIssue := range gitHubIssues {
+		if gitHubIssue.HTMLURL != nil && strings.Contains(*gitHubIssue.HTMLURL, "pull") {
+			continue
+		}
 		issues = append(issues, convertIssue(gitHubIssue))
 	}
 	return issues
