@@ -14,7 +14,7 @@ const IssueCard = ({ issue }: IssueCardProps) => {
   const theme = useTheme();
   return (
     <Box sx={{ my: 1.5 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', mb: 1.6 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', mb: 1 }}>
         <Typography
           sx={{
             fontSize: 17,
