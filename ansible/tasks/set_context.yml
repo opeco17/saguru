@@ -1,9 +1,0 @@
-- name: set context local
-  command:
-    cmd: "kubectl config use-context {{ context_local }}"
-  when: env == "local"
-
-- name: set context prod
-  command:
-    cmd: "kubectl config use-context {{ context_prod }}"
-  when: env == "prod"

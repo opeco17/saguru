@@ -29,7 +29,11 @@ spec:
       containers:
         - name: mongo-express
           image: mongo-express:0.54.0
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 300m
+              memory: 256Mi
           ports:
             - containerPort: 8081
           envFrom:

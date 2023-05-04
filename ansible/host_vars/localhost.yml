@@ -1,4 +1,0 @@
-cluster_local: docker-desktop
-context_local: docker-desktop
-cluster_prod: gitnavi-cluster
-context_prod: do-sfo3-gitnavi-cluster
