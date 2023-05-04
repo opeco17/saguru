@@ -1,0 +1,50 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: update-all-job
+spec:
+  schedule: "*/30 3 * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: update-all-job
+              image: "opeco17/gitnavi-job:1.9.0"
+              imagePullPolicy: Always
+              envFrom:
+                - secretRef:
+                    name: envs
+              command:
+                - /job
+                - all
+
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: update-issue-job
+spec:
+  schedule: "*/30 0-2,4-23 * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          completions: 1
+          parallelism: 1
+          backoffLimit: 1
+          containers:
+            - name: update-issue-job
+              image: "opeco17/gitnavi-job:{{ image_tag }}"
+              imagePullPolicy: Always
+              envFrom:
+                - secretRef:
+                    name: envs
+              command:
+                - /job
+                - issue

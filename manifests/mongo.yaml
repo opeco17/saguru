@@ -78,8 +78,12 @@ spec:
     spec:
       containers:
         - name: mongo
-          image: mongo:5.0.8
-          imagePullPolicy: IfNotPresent
+          image: mongo:4.4.21
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 500m
+              memory: 512Mi
           ports:
             - containerPort: 27017
               name: mongo
@@ -90,6 +94,8 @@ spec:
             - name: mongo-config
               subPath: mongod.conf
               mountPath: /etc/mongod.conf
+            - name: mongo-data
+              mountPath: /data
       volumes:
         - name: mongo-config
           configMap:
@@ -97,3 +103,7 @@ spec:
             items:
               - key: mongod.conf
                 path: mongod.conf
+        - name: mongo-data
+          hostPath:
+            path: /var/data/mongo
+            type: DirectoryOrCreate

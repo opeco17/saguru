@@ -1,3 +1,0 @@
-namespace: default
-image_prefix: opeco17/gitnavi
-image_tag: "1.9.0"

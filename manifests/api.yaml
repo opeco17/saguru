@@ -2,40 +2,42 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: mongo-express
+  name: api
 spec:
+  type: NodePort
   selector:
-    app: mongo-express
+    app: api
   ports:
-    - port: 8081
-      targetPort: 8081
+    - port: 8000
+      targetPort: 8000
+      nodePort: 30080
 
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mongo-express
+  name: api
 spec:
   strategy:
     type: Recreate
   selector:
     matchLabels:
-      app: mongo-express
+      app: api
   template:
     metadata:
       labels:
-        app: mongo-express
+        app: api
     spec:
       containers:
-        - name: mongo-express
-          image: mongo-express:0.54.0
+        - name: api
+          image: "opeco17/gitnavi-api:1.9.0"
           imagePullPolicy: Always
           resources:
-            requests:
-              cpu: 300m
-              memory: 128Mi
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
           ports:
-            - containerPort: 8081
+            - containerPort: 8000
           envFrom:
             - secretRef:
                 name: envs
