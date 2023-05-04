@@ -1,4 +1,4 @@
-module opeco17/gitnavi/job
+module opeco17/saguru/job
 
 go 1.16
 
@@ -8,7 +8,7 @@ require (
 	go.mongodb.org/mongo-driver v1.9.0
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
 	gorm.io/gorm v1.22.3
-	opeco17/gitnavi/lib v0.0.1
+	opeco17/saguru/lib v0.0.1
 )
 
-replace opeco17/gitnavi/lib v0.0.1 => ../lib
+replace opeco17/saguru/lib v0.0.1 => ../lib

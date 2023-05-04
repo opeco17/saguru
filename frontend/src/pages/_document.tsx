@@ -12,7 +12,7 @@ const Document = () => {
           href='https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500&display=swap'
           rel='stylesheet'
         />
-        <link rel='canonical' href='https://gitnavi.dev'></link>
+        <link rel='canonical' href='https://saguru.dev'></link>
         <link rel='shortcut icon' type='image/x-icon' href='favicon.ico' />
       </Head>
       <body>

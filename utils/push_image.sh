@@ -5,7 +5,7 @@ if [ $# -ne 1 ]; then
   exit 1
 fi
 
-IMAGE_PREFIX=opeco17/gitnavi
+IMAGE_PREFIX=opeco17/saguru
 IMAGE_TAG=${1}
 
 cd backend

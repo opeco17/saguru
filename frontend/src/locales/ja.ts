@@ -5,9 +5,9 @@ const ja: Locale = {
   JAPANESE: '日本語',
   HEADER_TITLE: 'OSS活動のためのGitHub Issue検索サービス',
   HEADER_DESCRIPTION:
-    'gitnaviは豊富なIssueフィルタリング機能で初めてのOSS活動をサポートします。お気に入りのGood first issueやHelp wanted issueを探してOSS開発に参加しましょう。',
+    'saguruは豊富なIssueフィルタリング機能で初めてのOSS活動をサポートします。お気に入りのGood first issueやHelp wanted issueを探してOSS開発に参加しましょう。',
   TITLE: 'お気に入りのIssueをGitHubから見つける',
-  SUB_TITLE_PREFIX: 'gitnavi',
+  SUB_TITLE_PREFIX: 'saguru',
   SUB_TITLE: 'は強力なIssue検索機能であなたのOSS活動をサポートします',
   TRANSLATE_ICON_MESSAGE: '言語を変える',
   GITHUB_ICON_MESSAGE: 'GitHubで見る',

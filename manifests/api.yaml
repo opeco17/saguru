@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
         - name: api
-          image: "opeco17/gitnavi-api:1.9.0"
+          image: "opeco17/saguru-api:1.9.0"
           imagePullPolicy: Always
           resources:
             limits:

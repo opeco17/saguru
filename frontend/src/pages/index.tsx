@@ -102,14 +102,14 @@ const Index = () => {
   return (
     <>
       <Head>
-        <title>{t.HEADER_TITLE} - gitnavi</title>
+        <title>{t.HEADER_TITLE} - saguru</title>
         <meta name='description' content={t.HEADER_DESCRIPTION}></meta>
         <meta property='og:title' content={t.HEADER_TITLE} />
         <meta property='og:description' content={t.HEADER_DESCRIPTION} />
         <meta property='og:type' content='website' />
-        <meta property='og:url' content={`https://gitnavi.dev/${locale}`} />
-        <meta property='og:image' content='https://gitnavi.dev/logo_large.png' />
-        <meta property='og:site_name' content='gitnavi' />
+        <meta property='og:url' content={`https://saguru.dev/${locale}`} />
+        <meta property='og:image' content='https://saguru.dev/logo_large.png' />
+        <meta property='og:site_name' content='saguru' />
       </Head>
       <NavBar />
       <Container sx={{ mb: 4 }} maxWidth={pageWidth}>

@@ -13,7 +13,7 @@ spec:
           restartPolicy: OnFailure
           containers:
             - name: update-all-job
-              image: "opeco17/gitnavi-job:1.9.0"
+              image: "opeco17/saguru-job:1.9.0"
               imagePullPolicy: Always
               envFrom:
                 - secretRef:
@@ -40,7 +40,7 @@ spec:
           backoffLimit: 1
           containers:
             - name: update-issue-job
-              image: "opeco17/gitnavi-job:{{ image_tag }}"
+              image: "opeco17/saguru-job:{{ image_tag }}"
               imagePullPolicy: Always
               envFrom:
                 - secretRef:
