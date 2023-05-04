@@ -107,8 +107,8 @@ const Index = () => {
         <meta property='og:title' content={t.HEADER_TITLE} />
         <meta property='og:description' content={t.HEADER_DESCRIPTION} />
         <meta property='og:type' content='website' />
-        <meta property='og:url' content={`https://saguru.dev/${locale}`} />
-        <meta property='og:image' content='https://saguru.dev/logo_large.png' />
+        <meta property='og:url' content={`https://saguru.opeco17.com/${locale}`} />
+        <meta property='og:image' content='https://saguru.opeco17.com/logo_large.png' />
         <meta property='og:site_name' content='saguru' />
       </Head>
       <NavBar />

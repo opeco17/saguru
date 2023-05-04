@@ -1,6 +1,6 @@
-<p align="center"><a href="https://saguru.dev" target="_blank" rel="noopener noreferrer"><img width="270" src="https://user-images.githubusercontent.com/46510874/144610986-29261b45-9b4a-4957-9973-54be60dc6c45.png" alt="saguru logo"></a></p>
+<p align="center"><a href="https://saguru.opeco17.com" target="_blank" rel="noopener noreferrer"><img width="270" src="https://user-images.githubusercontent.com/46510874/236253510-3d0b10ff-daea-4d71-9427-6207bb546046.png" alt="saguru logo"></a></p>
 
-## [saguru](https://saguru.dev)
+## [saguru](https://saguru.opeco17.com)
 saguru is Web application to help you search for GitHub issues and repositories with functional filters and beautiful UI.
 
 saguru support your open-source contribution.
