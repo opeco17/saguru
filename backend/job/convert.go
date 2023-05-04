@@ -1,7 +1,7 @@
 package main
 
 import (
-	"opeco17/gitnavi/lib"
+	"opeco17/saguru/lib"
 
 	"github.com/google/go-github/v41/github"
 )

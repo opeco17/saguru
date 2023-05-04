@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"opeco17/gitnavi/lib"
+	"opeco17/saguru/lib"
 	"time"
 
 	"github.com/sirupsen/logrus"

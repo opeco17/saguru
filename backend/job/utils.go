@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"opeco17/gitnavi/lib"
+	"opeco17/saguru/lib"
 	"os"
 
 	"github.com/google/go-github/v41/github"

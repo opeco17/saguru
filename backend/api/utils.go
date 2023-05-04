@@ -1,7 +1,7 @@
 package main
 
 import (
-	"opeco17/gitnavi/lib"
+	"opeco17/saguru/lib"
 	"os"
 
 	"github.com/sirupsen/logrus"
