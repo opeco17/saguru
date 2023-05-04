@@ -66,7 +66,7 @@ const NavBar = () => {
           <LanguageMenuItem onClick={() => handleCangeLocale('ja')} text='Japanese' />
         </Menu>
         <Tooltip title={t.GITHUB_ICON_MESSAGE}>
-          <a href='https://github.com/opeco17/gitnavi' target='_blank' rel='noreferrer'>
+          <a href='https://github.com/opeco17/saguru' target='_blank' rel='noreferrer'>
             <IconButton>
               <GitHubIcon sx={{ fontSize: { xs: '34px', sm: '37px' } }} />
             </IconButton>

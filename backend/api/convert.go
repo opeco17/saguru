@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"opeco17/gitnavi/lib"
+	"opeco17/saguru/lib"
 	"time"
 )
 
