@@ -54,6 +54,8 @@ You can check frontend page from http://localhost:3000.
 
 ### Create .prodenv
 
+Following commands create `secret` resource on Kubernetes cluster.
+
 ```sh
 cat <<EOF > .prodenv
 GITHUB_API_USER=YOUR_GITHUB_USERNAME
@@ -66,12 +68,20 @@ ME_CONFIG_MONGODB_ADMINPASSWORD=password
 EOF
 ```
 
-```
+```sh
 kubectl create secret generic envs --from-env-file=.prodenv
 ```
 
 ### Apply manifests
 
-```
+Following command run API server and DB server on Kubernetes cluster.
+
+```sh
 kubectl apply -f manifests
+```
+
+You can manually trigger the job to update DB.
+
+```sh
+kubectl create job --from=cronjob/update-all-job update-all-job-tmp
 ```
