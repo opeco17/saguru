@@ -4,11 +4,13 @@ kind: Service
 metadata:
   name: mongo-express
 spec:
+  type: NodePort
   selector:
     app: mongo-express
   ports:
     - port: 8081
       targetPort: 8081
+      nodePort: 30081
 
 ---
 apiVersion: apps/v1

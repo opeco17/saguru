@@ -18,8 +18,9 @@ kind: Deployment
 metadata:
   name: api
 spec:
+  replicas: 2
   strategy:
-    type: Recreate
+    type: RollingUpdate
   selector:
     matchLabels:
       app: api
@@ -35,7 +36,7 @@ spec:
           resources:
             limits:
               cpu: "500m"
-              memory: "256Mi"
+              memory: "512Mi"
           ports:
             - containerPort: 8000
           envFrom:
