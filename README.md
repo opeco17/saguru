@@ -5,7 +5,7 @@ saguru is Web application to help you search for GitHub issues and repositories 
 
 saguru support your open-source contribution.
 
-## How to spin-up
+## How to deploy application into local
 
 ### Create .env
 First, it's necessary to create `.env` in the root directory of this project.
@@ -49,3 +49,29 @@ npm run dev
 ```
 
 You can check frontend page from http://localhost:3000.
+
+## how to deploy application into prod
+
+### Create .prodenv
+
+```sh
+cat <<EOF > .prodenv
+GITHUB_API_USER=YOUR_GITHUB_USERNAME
+GITHUB_API_TOKEN=YOUR_GITHUB_API_TOKEN
+MONGODB_HOST=mongo
+MONGO_INITDB_ROOT_USERNAME=root
+MONGO_INITDB_ROOT_PASSWORD=password
+ME_CONFIG_MONGODB_ADMINUSERNAME=root
+ME_CONFIG_MONGODB_ADMINPASSWORD=password
+EOF
+```
+
+```
+kubectl create secret generic envs --from-env-file=.prodenv
+```
+
+### Apply manifests
+
+```
+kubectl apply -f manifests
+```

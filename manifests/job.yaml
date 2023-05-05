@@ -35,9 +35,6 @@ spec:
       template:
         spec:
           restartPolicy: OnFailure
-          completions: 1
-          parallelism: 1
-          backoffLimit: 1
           containers:
             - name: update-issue-job
               image: "opeco17/saguru-job:1.0.0"
