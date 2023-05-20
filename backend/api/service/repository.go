@@ -1,9 +1,11 @@
-package main
+package service
 
 import (
 	"context"
 	"fmt"
-	"opeco17/saguru/lib"
+	"opeco17/saguru/api/constant"
+	"opeco17/saguru/api/model"
+	libModel "opeco17/saguru/lib/model"
 	"strings"
 
 	"github.com/sirupsen/logrus"
@@ -12,7 +14,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func getRepositoriesFromDB(client *mongo.Client, input *GetRepositoriesInput) ([]lib.Repository, error) {
+func GetRepositoriesFromDB(client *mongo.Client, input *model.GetRepositoriesInput) ([]libModel.Repository, error) {
 	repositoryCollection := client.Database("main").Collection("repositories")
 	filter := bson.M{}
 
@@ -81,14 +83,14 @@ func getRepositoriesFromDB(client *mongo.Client, input *GetRepositoriesInput) ([
 	} else if strings.Contains(orderBy, "ASC") {
 		direction = 1
 	}
-	opts := options.Find().SetLimit(int64(RESULTS_PER_PAGE + 1)).SetSkip(int64(RESULTS_PER_PAGE * input.Page)).SetSort(bson.M{metric: direction})
+	opts := options.Find().SetLimit(int64(constant.RESULTS_PER_PAGE + 1)).SetSkip(int64(constant.RESULTS_PER_PAGE * input.Page)).SetSort(bson.M{metric: direction})
 
 	cursor, err := repositoryCollection.Find(context.TODO(), filter, opts)
 	if err != nil {
 		logrus.Error(err)
 		return nil, err
 	}
-	var repositories []lib.Repository
+	var repositories []libModel.Repository
 	if err = cursor.All(context.TODO(), &repositories); err != nil {
 		logrus.Error(err)
 		return nil, err
@@ -96,10 +98,10 @@ func getRepositoriesFromDB(client *mongo.Client, input *GetRepositoriesInput) ([
 	return repositories, nil
 }
 
-func filterIssuesInRepositories(repositories []lib.Repository, input *GetRepositoriesInput) []lib.Repository {
-	filteredRepositories := make([]lib.Repository, 0, len(repositories))
+func FilterIssuesInRepositories(repositories []libModel.Repository, input *model.GetRepositoriesInput) []libModel.Repository {
+	filteredRepositories := make([]libModel.Repository, 0, len(repositories))
 	assigneeFilter := func(assigneesCount int) bool { return true }
-	labelFilter := func(labels []*lib.Label) bool { return true }
+	labelFilter := func(labels []*libModel.Label) bool { return true }
 
 	// Set filter
 	if input.IsAssigned != nil && *input.IsAssigned {
@@ -109,7 +111,7 @@ func filterIssuesInRepositories(repositories []lib.Repository, input *GetReposit
 	}
 
 	if input.Labels != "" {
-		labelFilter = func(labels []*lib.Label) bool {
+		labelFilter = func(labels []*libModel.Label) bool {
 			inputLabelNames := strings.Split(input.Labels, ",")
 			for _, label := range labels {
 				for _, inputLabelName := range inputLabelNames {
@@ -124,7 +126,7 @@ func filterIssuesInRepositories(repositories []lib.Repository, input *GetReposit
 
 	// Filter issues
 	for _, repository := range repositories {
-		filteredIssues := make([]*lib.Issue, 0, len(repository.Issues))
+		filteredIssues := make([]*libModel.Issue, 0, len(repository.Issues))
 		for _, issue := range repository.Issues {
 			if assigneeFilter(*issue.AssigneesCount) && labelFilter(issue.Labels) {
 				filteredIssues = append(filteredIssues, issue)
@@ -134,52 +136,4 @@ func filterIssuesInRepositories(repositories []lib.Repository, input *GetReposit
 		filteredRepositories = append(filteredRepositories, repository)
 	}
 	return filteredRepositories
-}
-
-func getCachedLanguagesFromDB(client *mongo.Client) ([]lib.CachedItem, error) {
-	cacheCollection := client.Database("main").Collection("cached_languages")
-	filter := bson.M{"count": bson.M{"$gte": MINIMUM_COUNT_IN_CACHED_LANGUAGES}}
-	cursor, err := cacheCollection.Find(context.TODO(), filter)
-	if err != nil {
-		logrus.Error(err)
-		return nil, err
-	}
-	var cachedLanguages []lib.CachedItem
-	if err = cursor.All(context.TODO(), &cachedLanguages); err != nil {
-		logrus.Error(err)
-		return nil, err
-	}
-	return cachedLanguages, nil
-}
-
-func getCachedLicenses(client *mongo.Client) ([]lib.CachedItem, error) {
-	cacheCollection := client.Database("main").Collection("cached_licenses")
-	filter := bson.M{"count": bson.M{"$gte": MINIMUM_COUNT_IN_CACHED_LICENSES}}
-	cursor, err := cacheCollection.Find(context.TODO(), filter)
-	if err != nil {
-		logrus.Error(err)
-		return nil, err
-	}
-	var cachedLicenses []lib.CachedItem
-	if err = cursor.All(context.TODO(), &cachedLicenses); err != nil {
-		logrus.Error(err)
-		return nil, err
-	}
-	return cachedLicenses, nil
-}
-
-func getCachedLabels(client *mongo.Client) ([]lib.CachedItem, error) {
-	cacheCollection := client.Database("main").Collection("cached_labels")
-	filter := bson.M{"count": bson.M{"$gte": MINIMUM_COUNT_IN_CACHED_LABELS}}
-	cursor, err := cacheCollection.Find(context.TODO(), filter)
-	if err != nil {
-		logrus.Error(err)
-		return nil, err
-	}
-	var cachedLabels []lib.CachedItem
-	if err = cursor.All(context.TODO(), &cachedLabels); err != nil {
-		logrus.Error(err)
-		return nil, err
-	}
-	return cachedLabels, nil
 }

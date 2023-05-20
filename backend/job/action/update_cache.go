@@ -1,9 +1,10 @@
-package main
+package action
 
 import (
 	"context"
 	"fmt"
-	"opeco17/saguru/lib"
+	"opeco17/saguru/job/util"
+	"opeco17/saguru/lib/model"
 
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
@@ -15,7 +16,7 @@ type AggregationResult struct {
 	Count int    `bson:"count,omitempty"`
 }
 
-func updateCache() error {
+func UpdateCache() error {
 	if err := updateCachedLanguages(); err != nil {
 		logrus.Error("Failed to update cached languages.")
 		return err
@@ -35,7 +36,7 @@ func updateCachedLanguages() error {
 	logrus.Info("Start updating cached languages.")
 
 	// Connect DB
-	client, err := getMongoDBClient()
+	client, err := util.GetMongoDBClient()
 	if err != nil {
 		message := "Failed to connect to MongoDB"
 		logrus.Error(message)
@@ -70,7 +71,7 @@ func updateCachedLicenses() error {
 	logrus.Info("Start updating cached licenses.")
 
 	// Connect DB
-	client, err := getMongoDBClient()
+	client, err := util.GetMongoDBClient()
 	if err != nil {
 		message := "Failed to connect to MongoDB"
 		logrus.Error(message)
@@ -105,7 +106,7 @@ func updateCachedLabels() error {
 	logrus.Info("Start updating cached labels.")
 
 	// Connect DB
-	client, err := getMongoDBClient()
+	client, err := util.GetMongoDBClient()
 	if err != nil {
 		message := "Failed to connect to MongoDB"
 		logrus.Error(message)
@@ -140,13 +141,13 @@ func updateCachedLabels() error {
 
 func updateCachedItems(collection *mongo.Collection, cursor *mongo.Cursor) error {
 	// Get items
-	var cachedItems = make([]lib.CachedItem, 0)
+	var cachedItems = make([]model.CachedItem, 0)
 	for cursor.Next(context.TODO()) {
 		var result AggregationResult
 		if err := cursor.Decode(&result); err != nil {
 			logrus.Warn(err)
 		}
-		item := lib.CachedItem{Name: result.ID, Count: result.Count}
+		item := model.CachedItem{Name: result.ID, Count: result.Count}
 		if item.Name == "" {
 			continue
 		}
@@ -170,7 +171,7 @@ func updateCachedItems(collection *mongo.Collection, cursor *mongo.Cursor) error
 	return nil
 }
 
-func containsCachedItem(items []lib.CachedItem, target lib.CachedItem) bool {
+func containsCachedItem(items []model.CachedItem, target model.CachedItem) bool {
 	for _, item := range items {
 		if target.Name == item.Name {
 			return true

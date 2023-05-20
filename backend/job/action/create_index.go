@@ -1,8 +1,8 @@
-package main
+package action
 
 import (
 	"context"
-	"opeco17/saguru/lib"
+	"opeco17/saguru/job/util"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -11,34 +11,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func initDB() error {
-	logrus.Info("Start initializing DB.")
-
-	client, err := getMongoDBClient()
-	if err != nil {
-		return err
-	}
-	defer client.Disconnect(context.TODO())
-
-	client.Database("main").CreateCollection(context.TODO(), "repositories")
-
-	var validator = bson.M{
-		"$jsonSchema": lib.MongoSchema,
-	}
-	command := bson.D{{Key: "collMod", Value: "repositories"}, {Key: "validator", Value: validator}}
-	err = client.Database("main").RunCommand(context.TODO(), command).Err()
-	if err != nil {
-		logrus.Error(err)
-	}
-
-	logrus.Info("Finished to initialize DB.")
-	return nil
-}
-
-func createIndex() error {
+func CreateIndex() error {
 	logrus.Info("Start creating index.")
 
-	client, err := getMongoDBClient()
+	client, err := util.GetMongoDBClient()
 	if err != nil {
 		return err
 	}

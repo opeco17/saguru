@@ -1,4 +1,4 @@
-package main
+package model
 
 import (
 	"fmt"
@@ -49,25 +49,9 @@ type (
 		Items   []GetRepositoriesOutputItem `json:"items"`
 		HasNext bool                        `json:"hasNext"`
 	}
-
-	GetLanguagesOutput struct {
-		Items []string `json:"items"`
-	}
-
-	GetLicensesOutput struct {
-		Items []string `json:"items"`
-	}
-
-	GetLabelsOutput struct {
-		Items []string `json:"items"`
-	}
-
-	GetOrderMetricsOutput struct {
-		Items []string `json:"items"`
-	}
 )
 
-func (input *GetRepositoriesInput) validator() error {
+func (input *GetRepositoriesInput) Validate() error {
 	if input.StarCountLower != nil && input.StarCountUpper != nil && *input.StarCountLower > *input.StarCountUpper {
 		return fmt.Errorf("star_count_lower should be less than star_count_upper")
 	}

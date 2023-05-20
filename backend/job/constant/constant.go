@@ -1,4 +1,4 @@
-package main
+package constant
 
 const (
 	REPOSITORIES_API_URL              string = "https://api.github.com/search/repositories"
