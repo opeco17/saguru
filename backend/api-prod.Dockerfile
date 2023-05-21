@@ -1,4 +1,4 @@
-FROM golang:1.16.5 AS api-build
+FROM golang:1.18 AS api-build
 
 WORKDIR /usr/src/app/lib/
 COPY lib/go.mod lib/go.sum ./
