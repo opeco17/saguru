@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"opeco17/saguru/api/metrics"
 	"opeco17/saguru/api/model"
 	"opeco17/saguru/api/service"
 	"opeco17/saguru/api/util"
@@ -16,6 +17,9 @@ import (
 
 func GetLicenses(c echo.Context) error {
 	logrus.Info("Get licenses")
+
+	since := time.Now()
+	defer metrics.M.ObservefunctionCallDuration(since)
 
 	// Connect DB
 	client, err := util.GetMongoDBClient()
@@ -37,6 +41,9 @@ func GetLicenses(c echo.Context) error {
 }
 
 func convertGetLicensesOutput(cachedLicenses []libModel.CachedItem) model.GetLicensesOutput {
+	since := time.Now()
+	defer metrics.M.ObservefunctionCallDuration(since)
+
 	outputItems := make([]string, 0, len(cachedLicenses))
 	for _, cachedLicense := range cachedLicenses {
 		outputItems = append(outputItems, cachedLicense.Name)

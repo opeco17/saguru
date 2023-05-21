@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"opeco17/saguru/api/metrics"
 	"opeco17/saguru/api/model"
 	"opeco17/saguru/api/service"
 	"opeco17/saguru/api/util"
@@ -16,6 +17,9 @@ import (
 
 func GetLabels(c echo.Context) error {
 	logrus.Info("Get labels")
+
+	since := time.Now()
+	defer metrics.M.ObservefunctionCallDuration(since)
 
 	// Connect DB
 	client, err := util.GetMongoDBClient()
@@ -37,6 +41,9 @@ func GetLabels(c echo.Context) error {
 }
 
 func convertGetLabelsOutput(cachedLabels []libModel.CachedItem) model.GetLabelsOutput {
+	since := time.Now()
+	defer metrics.M.ObservefunctionCallDuration(since)
+
 	outputItems := make([]string, 0, len(cachedLabels))
 	for _, cachedLabel := range cachedLabels {
 		outputItems = append(outputItems, cachedLabel.Name)

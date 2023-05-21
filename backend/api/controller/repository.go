@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"opeco17/saguru/api/constant"
+	"opeco17/saguru/api/metrics"
 	"opeco17/saguru/api/model"
 	"opeco17/saguru/api/service"
 	"opeco17/saguru/api/util"
@@ -17,6 +18,9 @@ import (
 
 func GetRepositories(c echo.Context) error {
 	logrus.Info("Get repositories")
+
+	since := time.Now()
+	defer metrics.M.ObservefunctionCallDuration(since)
 
 	// Validation
 	input := new(model.GetRepositoriesInput)
@@ -50,6 +54,9 @@ func GetRepositories(c echo.Context) error {
 }
 
 func convertGetRepositoriesOutput(repositories []libModel.Repository) model.GetRepositoriesOutput {
+	since := time.Now()
+	defer metrics.M.ObservefunctionCallDuration(since)
+
 	hasNext := len(repositories) > int(constant.RESULTS_PER_PAGE)
 	var last int
 	if hasNext {
@@ -70,6 +77,9 @@ func convertGetRepositoriesOutput(repositories []libModel.Repository) model.GetR
 }
 
 func convertGetRepositoriesOutputItem(repository libModel.Repository) model.GetRepositoriesOutputItem {
+	since := time.Now()
+	defer metrics.M.ObservefunctionCallDuration(since)
+
 	getRepositoryIssues := make([]model.GetRepositoriesOutputItemIssue, 0, len(repository.Issues)-1)
 	for _, issue := range repository.Issues {
 		getRepositoryIssues = append(getRepositoryIssues, convertGetRepositoriesOutputItemIssue(*issue))
@@ -91,6 +101,9 @@ func convertGetRepositoriesOutputItem(repository libModel.Repository) model.GetR
 }
 
 func convertGetRepositoriesOutputItemIssue(issue libModel.Issue) model.GetRepositoriesOutputItemIssue {
+	since := time.Now()
+	defer metrics.M.ObservefunctionCallDuration(since)
+
 	getRepositoryIssueLabels := make([]string, 0, len(issue.Labels))
 	for _, label := range issue.Labels {
 		getRepositoryIssueLabels = append(getRepositoryIssueLabels, label.Name)
@@ -109,6 +122,9 @@ func convertGetRepositoriesOutputItemIssue(issue libModel.Issue) model.GetReposi
 }
 
 func formatGitHubCreatedAt(createdAt time.Time) string {
+	since := time.Now()
+	defer metrics.M.ObservefunctionCallDuration(since)
+
 	now := time.Now()
 	if createdAt.After(now.AddDate(0, 0, -1)) {
 		diffHours := int(now.Sub(createdAt).Hours())

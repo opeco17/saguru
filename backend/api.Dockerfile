@@ -1,6 +1,6 @@
-FROM golang:1.16.5
+FROM golang:1.18
 
-RUN go get github.com/cosmtrek/air
+RUN go install github.com/cosmtrek/air@latest
 
 WORKDIR /usr/src/app/lib/
 COPY lib/go.mod lib/go.sum ./

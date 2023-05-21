@@ -4,9 +4,11 @@ import (
 	"context"
 	"fmt"
 	"opeco17/saguru/api/constant"
+	"opeco17/saguru/api/metrics"
 	"opeco17/saguru/api/model"
 	libModel "opeco17/saguru/lib/model"
 	"strings"
+	"time"
 
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
@@ -15,6 +17,9 @@ import (
 )
 
 func GetRepositoriesFromDB(client *mongo.Client, input *model.GetRepositoriesInput) ([]libModel.Repository, error) {
+	since := time.Now()
+	defer metrics.M.ObservefunctionCallDuration(since)
+
 	repositoryCollection := client.Database("main").Collection("repositories")
 	filter := bson.M{}
 
@@ -99,6 +104,9 @@ func GetRepositoriesFromDB(client *mongo.Client, input *model.GetRepositoriesInp
 }
 
 func FilterIssuesInRepositories(repositories []libModel.Repository, input *model.GetRepositoriesInput) []libModel.Repository {
+	since := time.Now()
+	defer metrics.M.ObservefunctionCallDuration(since)
+
 	filteredRepositories := make([]libModel.Repository, 0, len(repositories))
 	assigneeFilter := func(assigneesCount int) bool { return true }
 	labelFilter := func(labels []*libModel.Label) bool { return true }

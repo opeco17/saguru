@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"opeco17/saguru/api/metrics"
 	"time"
 )
 
@@ -52,6 +53,9 @@ type (
 )
 
 func (input *GetRepositoriesInput) Validate() error {
+	since := time.Now()
+	defer metrics.M.ObservefunctionCallDuration(since)
+
 	if input.StarCountLower != nil && input.StarCountUpper != nil && *input.StarCountLower > *input.StarCountUpper {
 		return fmt.Errorf("star_count_lower should be less than star_count_upper")
 	}
