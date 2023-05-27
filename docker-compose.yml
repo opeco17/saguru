@@ -12,7 +12,7 @@ services:
     env_file:
       - .env
     depends_on:
-      - mongo
+      - mongodb
 
   job:
     build:
@@ -23,10 +23,10 @@ services:
     env_file:
       - .env
     depends_on:
-      - mongo
+      - mongodb
     tty: true
 
-  mongo:
+  mongodb:
     image: mongo:4.4.21
     ports:
       - 27017:27017
