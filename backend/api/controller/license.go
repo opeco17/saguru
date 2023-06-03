@@ -1,14 +1,14 @@
 package controller
 
 import (
-	"context"
-	"fmt"
 	"net/http"
+	"opeco17/saguru/api/constant"
 	"opeco17/saguru/api/metrics"
 	"opeco17/saguru/api/model"
 	"opeco17/saguru/api/service"
 	"opeco17/saguru/api/util"
-	libModel "opeco17/saguru/lib/model"
+	"opeco17/saguru/lib/memcached"
+	"sort"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -21,32 +21,63 @@ func GetLicenses(c echo.Context) error {
 	since := time.Now()
 	defer metrics.M.ObservefunctionCallDuration(since)
 
-	// Connect DB
-	client, err := util.GetMongoDBClient()
+	connectedToMemcached := true
+	memcachedClient, err := util.GetMemcachedClient()
 	if err != nil {
-		return c.String(http.StatusServiceUnavailable, "Failed to connect database.")
+		logrus.Warn("Failed to connect to Memcached.")
+		connectedToMemcached = false
 	}
-	defer client.Disconnect(context.TODO())
 
-	// Get data
-	now := time.Now()
-	cachedLicenses, err := service.GetCachedLicenses(client)
-	if err != nil {
-		return c.String(http.StatusServiceUnavailable, "Failed to get licenses from database.")
+	hitCache := true
+	licenses := new(memcached.Licenses)
+	if connectedToMemcached {
+		licenses, err = service.GetLicensesFromMemcached(memcachedClient)
+		if err != nil {
+			hitCache = false
+		}
+		metrics.M.CountCacheAccess(memcached.LICENSES_CACHE_KEY, hitCache)
 	}
-	output := convertGetLicensesOutput(cachedLicenses)
-	logrus.Info(fmt.Sprintf("Total time to get cached licenses: %vms\n", time.Since(now).Milliseconds()))
 
+	if !(connectedToMemcached && hitCache) {
+		mongoDBClient, err := util.GetMongoDBClient()
+		if err != nil {
+			logrus.Error("Failed to connect to MongoDB.")
+			return c.String(http.StatusServiceUnavailable, "Failed to get licenses")
+		}
+
+		licenses, err = service.GetLicensesFromMongoDB(mongoDBClient)
+		if err != nil {
+			logrus.Error("Failed to get licenses from MongoDB.")
+			return c.String(http.StatusServiceUnavailable, "Failed to get licenses")
+		}
+	}
+
+	if connectedToMemcached && !hitCache {
+		licenses.Save(memcachedClient)
+	}
+
+	output := convertGetLicensesOutput(licenses)
 	return c.JSON(http.StatusOK, output)
 }
 
-func convertGetLicensesOutput(cachedLicenses []libModel.CachedItem) model.GetLicensesOutput {
+func convertGetLicensesOutput(licenses *memcached.Licenses) model.GetLicensesOutput {
 	since := time.Now()
 	defer metrics.M.ObservefunctionCallDuration(since)
 
-	outputItems := make([]string, 0, len(cachedLicenses))
-	for _, cachedLicense := range cachedLicenses {
-		outputItems = append(outputItems, cachedLicense.Name)
+	items := licenses.Items
+	sort.Slice(items, func(i, j int) bool {
+		return items[i].Count > items[j].Count
+	})
+
+	outputItems := make([]string, 0, len(licenses.Items))
+	for _, license := range items {
+		if license.Name == "" {
+			continue
+		}
+		if license.Count <= constant.MINIMUM_COUNT_IN_CACHED_LICENSES {
+			continue
+		}
+		outputItems = append(outputItems, license.Name)
 	}
 	return model.GetLicensesOutput{Items: outputItems}
 }

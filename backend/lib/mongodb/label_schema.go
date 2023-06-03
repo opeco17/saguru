@@ -1,27 +1,19 @@
-package schema
+package mongodb
 
 import "go.mongodb.org/mongo-driver/bson"
 
-var issuerSchema = bson.M{
+var labelSchema = bson.M{
 	"bsonType": "object",
 	"required": bson.A{
-		"user_id",
+		"label_id",
 		"name",
-		"url",
-		"avatar_url",
 	},
 	"additionalProperties": true,
 	"properties": bson.M{
-		"user_id": bson.M{
+		"label_id": bson.M{
 			"bsonType": bson.A{"int", "long"},
 		},
 		"name": bson.M{
-			"bsonType": "string",
-		},
-		"url": bson.M{
-			"bsonType": "string",
-		},
-		"avatar_url": bson.M{
 			"bsonType": "string",
 		},
 	},

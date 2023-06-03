@@ -1,14 +1,14 @@
 package controller
 
 import (
-	"context"
-	"fmt"
 	"net/http"
+	"opeco17/saguru/api/constant"
 	"opeco17/saguru/api/metrics"
 	"opeco17/saguru/api/model"
 	"opeco17/saguru/api/service"
 	"opeco17/saguru/api/util"
-	libModel "opeco17/saguru/lib/model"
+	"opeco17/saguru/lib/memcached"
+	"sort"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -21,32 +21,63 @@ func GetLanguages(c echo.Context) error {
 	since := time.Now()
 	defer metrics.M.ObservefunctionCallDuration(since)
 
-	// Connect DB
-	client, err := util.GetMongoDBClient()
+	connectedToMemcached := true
+	memcachedClient, err := util.GetMemcachedClient()
 	if err != nil {
-		return c.String(http.StatusServiceUnavailable, "Failed to connect database.")
+		logrus.Warn("Failed to connect to Memcached.")
+		connectedToMemcached = false
 	}
-	defer client.Disconnect(context.TODO())
 
-	// Get data
-	now := time.Now()
-	cachedLanguages, err := service.GetCachedLanguagesFromDB(client)
-	if err != nil {
-		return c.String(http.StatusServiceUnavailable, "Failed to get languages from database.")
+	hitCache := true
+	languages := new(memcached.Languages)
+	if connectedToMemcached {
+		languages, err = service.GetLanguagesFromMemcached(memcachedClient)
+		if err != nil {
+			hitCache = false
+		}
+		metrics.M.CountCacheAccess(memcached.LANGUAGES_CACHE_KEY, hitCache)
 	}
-	output := convertGetLanguagesOutput(cachedLanguages)
-	logrus.Info(fmt.Sprintf("Total time to get cached languages: %vms\n", time.Since(now).Milliseconds()))
 
+	if !(connectedToMemcached && hitCache) {
+		mongoDBClient, err := util.GetMongoDBClient()
+		if err != nil {
+			logrus.Error("Failed to connect to MongoDB.")
+			return c.String(http.StatusServiceUnavailable, "Failed to get languages")
+		}
+
+		languages, err = service.GetLanguagesFromMongoDB(mongoDBClient)
+		if err != nil {
+			logrus.Error("Failed to get languages from MongoDB.")
+			return c.String(http.StatusServiceUnavailable, "Failed to get languages")
+		}
+	}
+
+	if connectedToMemcached && !hitCache {
+		languages.Save(memcachedClient)
+	}
+
+	output := convertGetLanguagesOutput(languages)
 	return c.JSON(http.StatusOK, output)
 }
 
-func convertGetLanguagesOutput(cachedLanguages []libModel.CachedItem) model.GetLanguagesOutput {
+func convertGetLanguagesOutput(languages *memcached.Languages) model.GetLanguagesOutput {
 	since := time.Now()
 	defer metrics.M.ObservefunctionCallDuration(since)
 
-	outputItems := make([]string, 0, len(cachedLanguages))
-	for _, cachedLanguage := range cachedLanguages {
-		outputItems = append(outputItems, cachedLanguage.Name)
+	items := languages.Items
+	sort.Slice(items, func(i, j int) bool {
+		return items[i].Count > items[j].Count
+	})
+
+	outputItems := make([]string, 0, len(languages.Items))
+	for _, language := range items {
+		if language.Name == "" {
+			continue
+		}
+		if language.Count <= constant.MINIMUM_COUNT_IN_CACHED_LANGUAGES {
+			continue
+		}
+		outputItems = append(outputItems, language.Name)
 	}
 	return model.GetLanguagesOutput{Items: outputItems}
 }

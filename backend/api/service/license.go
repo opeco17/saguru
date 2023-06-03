@@ -1,32 +1,33 @@
 package service
 
 import (
-	"context"
-	"opeco17/saguru/api/constant"
 	"opeco17/saguru/api/metrics"
-	libModel "opeco17/saguru/lib/model"
+	"opeco17/saguru/lib/memcached"
+	"opeco17/saguru/lib/mongodb"
 	"time"
 
-	"github.com/sirupsen/logrus"
-	"go.mongodb.org/mongo-driver/bson"
+	"github.com/bradfitz/gomemcache/memcache"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func GetCachedLicenses(client *mongo.Client) ([]libModel.CachedItem, error) {
+func GetLicensesFromMemcached(client *memcache.Client) (*memcached.Licenses, error) {
 	since := time.Now()
 	defer metrics.M.ObservefunctionCallDuration(since)
 
-	cacheCollection := client.Database("main").Collection("cached_licenses")
-	filter := bson.M{"count": bson.M{"$gte": constant.MINIMUM_COUNT_IN_CACHED_LICENSES}}
-	cursor, err := cacheCollection.Find(context.TODO(), filter)
+	licenses, err := memcached.GetLicenses(client)
 	if err != nil {
-		logrus.Error(err)
 		return nil, err
 	}
-	var cachedLicenses []libModel.CachedItem
-	if err = cursor.All(context.TODO(), &cachedLicenses); err != nil {
-		logrus.Error(err)
+	return licenses, nil
+}
+
+func GetLicensesFromMongoDB(client *mongo.Client) (*memcached.Licenses, error) {
+	since := time.Now()
+	defer metrics.M.ObservefunctionCallDuration(since)
+
+	licenses, err := mongodb.AggregateLicenses(client)
+	if err != nil {
 		return nil, err
 	}
-	return cachedLicenses, nil
+	return licenses.ConvertToMemcachedLicenses(), nil
 }

@@ -6,7 +6,7 @@ import (
 	"opeco17/saguru/api/constant"
 	"opeco17/saguru/api/metrics"
 	"opeco17/saguru/api/model"
-	libModel "opeco17/saguru/lib/model"
+	"opeco17/saguru/lib/mongodb"
 	"strings"
 	"time"
 
@@ -16,7 +16,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func GetRepositoriesFromDB(client *mongo.Client, input *model.GetRepositoriesInput) ([]libModel.Repository, error) {
+func GetRepositoriesFromMongoDB(client *mongo.Client, input *model.GetRepositoriesInput) ([]mongodb.Repository, error) {
 	since := time.Now()
 	defer metrics.M.ObservefunctionCallDuration(since)
 
@@ -95,7 +95,7 @@ func GetRepositoriesFromDB(client *mongo.Client, input *model.GetRepositoriesInp
 		logrus.Error(err)
 		return nil, err
 	}
-	var repositories []libModel.Repository
+	var repositories []mongodb.Repository
 	if err = cursor.All(context.TODO(), &repositories); err != nil {
 		logrus.Error(err)
 		return nil, err
@@ -103,13 +103,13 @@ func GetRepositoriesFromDB(client *mongo.Client, input *model.GetRepositoriesInp
 	return repositories, nil
 }
 
-func FilterIssuesInRepositories(repositories []libModel.Repository, input *model.GetRepositoriesInput) []libModel.Repository {
+func FilterIssuesInRepositories(repositories []mongodb.Repository, input *model.GetRepositoriesInput) []mongodb.Repository {
 	since := time.Now()
 	defer metrics.M.ObservefunctionCallDuration(since)
 
-	filteredRepositories := make([]libModel.Repository, 0, len(repositories))
+	filteredRepositories := make([]mongodb.Repository, 0, len(repositories))
 	assigneeFilter := func(assigneesCount int) bool { return true }
-	labelFilter := func(labels []*libModel.Label) bool { return true }
+	labelFilter := func(labels []*mongodb.Label) bool { return true }
 
 	// Set filter
 	if input.IsAssigned != nil && *input.IsAssigned {
@@ -119,7 +119,7 @@ func FilterIssuesInRepositories(repositories []libModel.Repository, input *model
 	}
 
 	if input.Labels != "" {
-		labelFilter = func(labels []*libModel.Label) bool {
+		labelFilter = func(labels []*mongodb.Label) bool {
 			inputLabelNames := strings.Split(input.Labels, ",")
 			for _, label := range labels {
 				for _, inputLabelName := range inputLabelNames {
@@ -134,7 +134,7 @@ func FilterIssuesInRepositories(repositories []libModel.Repository, input *model
 
 	// Filter issues
 	for _, repository := range repositories {
-		filteredIssues := make([]*libModel.Issue, 0, len(repository.Issues))
+		filteredIssues := make([]*mongodb.Issue, 0, len(repository.Issues))
 		for _, issue := range repository.Issues {
 			if assigneeFilter(*issue.AssigneesCount) && labelFilter(issue.Labels) {
 				filteredIssues = append(filteredIssues, issue)

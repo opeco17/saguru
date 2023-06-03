@@ -9,7 +9,7 @@ import (
 	"opeco17/saguru/api/model"
 	"opeco17/saguru/api/service"
 	"opeco17/saguru/api/util"
-	libModel "opeco17/saguru/lib/model"
+	"opeco17/saguru/lib/mongodb"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -32,28 +32,27 @@ func GetRepositories(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	// Connect DB
+	// Connect to MongoDB
 	client, err := util.GetMongoDBClient()
 	if err != nil {
-		return c.String(http.StatusServiceUnavailable, "Failed to connect database.")
+		logrus.Error("Failed to connect to MongoDB.")
+		return c.String(http.StatusServiceUnavailable, "Failed to get repositories")
 	}
 	defer client.Disconnect(context.TODO())
 
 	// Get data
-	now := time.Now()
-	repositories, err := service.GetRepositoriesFromDB(client, input)
+	repositories, err := service.GetRepositoriesFromMongoDB(client, input)
 	if err != nil {
-		return c.String(http.StatusServiceUnavailable, "Failed to get repositories from database.")
+		logrus.Error("Failed to get repositories from MongoDB")
+		return c.String(http.StatusServiceUnavailable, "Failed to get repositories.")
 	}
 	repositories = service.FilterIssuesInRepositories(repositories, input)
 	output := convertGetRepositoriesOutput(repositories)
 
-	logrus.Info(fmt.Sprintf("Total time to fetch repositories: %vms\n", time.Since(now).Milliseconds()))
-
 	return c.JSON(http.StatusOK, output)
 }
 
-func convertGetRepositoriesOutput(repositories []libModel.Repository) model.GetRepositoriesOutput {
+func convertGetRepositoriesOutput(repositories []mongodb.Repository) model.GetRepositoriesOutput {
 	since := time.Now()
 	defer metrics.M.ObservefunctionCallDuration(since)
 
@@ -76,7 +75,7 @@ func convertGetRepositoriesOutput(repositories []libModel.Repository) model.GetR
 	return GetRepositoriesOutput
 }
 
-func convertGetRepositoriesOutputItem(repository libModel.Repository) model.GetRepositoriesOutputItem {
+func convertGetRepositoriesOutputItem(repository mongodb.Repository) model.GetRepositoriesOutputItem {
 	since := time.Now()
 	defer metrics.M.ObservefunctionCallDuration(since)
 
@@ -100,7 +99,7 @@ func convertGetRepositoriesOutputItem(repository libModel.Repository) model.GetR
 	return getRepositoriesOutputItem
 }
 
-func convertGetRepositoriesOutputItemIssue(issue libModel.Issue) model.GetRepositoriesOutputItemIssue {
+func convertGetRepositoriesOutputItemIssue(issue mongodb.Issue) model.GetRepositoriesOutputItemIssue {
 	since := time.Now()
 	defer metrics.M.ObservefunctionCallDuration(since)
 
