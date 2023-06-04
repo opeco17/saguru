@@ -1,32 +1,33 @@
 package service
 
 import (
-	"context"
-	"opeco17/saguru/api/constant"
 	"opeco17/saguru/api/metrics"
-	libModel "opeco17/saguru/lib/model"
+	"opeco17/saguru/lib/memcached"
+	"opeco17/saguru/lib/mongodb"
 	"time"
 
-	"github.com/sirupsen/logrus"
-	"go.mongodb.org/mongo-driver/bson"
+	"github.com/bradfitz/gomemcache/memcache"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func GetCachedLanguagesFromDB(client *mongo.Client) ([]libModel.CachedItem, error) {
+func GetLanguagesFromMemcached(client *memcache.Client) (*memcached.Languages, error) {
 	since := time.Now()
 	defer metrics.M.ObservefunctionCallDuration(since)
 
-	cacheCollection := client.Database("main").Collection("cached_languages")
-	filter := bson.M{"count": bson.M{"$gte": constant.MINIMUM_COUNT_IN_CACHED_LANGUAGES}}
-	cursor, err := cacheCollection.Find(context.TODO(), filter)
+	languages, err := memcached.GetLanguages(client)
 	if err != nil {
-		logrus.Error(err)
 		return nil, err
 	}
-	var cachedLanguages []libModel.CachedItem
-	if err = cursor.All(context.TODO(), &cachedLanguages); err != nil {
-		logrus.Error(err)
+	return languages, nil
+}
+
+func GetLanguagesFromMongoDB(client *mongo.Client) (*memcached.Languages, error) {
+	since := time.Now()
+	defer metrics.M.ObservefunctionCallDuration(since)
+
+	languages, err := mongodb.AggregateLanguages(client)
+	if err != nil {
 		return nil, err
 	}
-	return cachedLanguages, nil
+	return languages.ConvertToMemcachedLanguages(), nil
 }

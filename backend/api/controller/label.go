@@ -1,14 +1,14 @@
 package controller
 
 import (
-	"context"
-	"fmt"
 	"net/http"
+	"opeco17/saguru/api/constant"
 	"opeco17/saguru/api/metrics"
 	"opeco17/saguru/api/model"
 	"opeco17/saguru/api/service"
 	"opeco17/saguru/api/util"
-	libModel "opeco17/saguru/lib/model"
+	"opeco17/saguru/lib/memcached"
+	"sort"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -21,32 +21,63 @@ func GetLabels(c echo.Context) error {
 	since := time.Now()
 	defer metrics.M.ObservefunctionCallDuration(since)
 
-	// Connect DB
-	client, err := util.GetMongoDBClient()
+	connectedToMemcached := true
+	memcachedClient, err := util.GetMemcachedClient()
 	if err != nil {
-		return c.String(http.StatusServiceUnavailable, "Failed to connect database.")
+		logrus.Warn("Failed to connect to Memcached.")
+		connectedToMemcached = false
 	}
-	defer client.Disconnect(context.TODO())
 
-	// Get data
-	now := time.Now()
-	cachedLabels, err := service.GetCachedLabels(client)
-	if err != nil {
-		return c.String(http.StatusServiceUnavailable, "Failed to get licenses from database.")
+	hitCache := true
+	labels := new(memcached.Labels)
+	if connectedToMemcached {
+		labels, err = service.GetLabelsFromMemcached(memcachedClient)
+		if err != nil {
+			hitCache = false
+		}
+		metrics.M.CountCacheAccess(memcached.LABELS_CACHE_KEY, hitCache)
 	}
-	getLabelsOutput := convertGetLabelsOutput(cachedLabels)
-	logrus.Info(fmt.Sprintf("Total time to fetch front labels: %vms\n", time.Since(now).Milliseconds()))
 
-	return c.JSON(http.StatusOK, getLabelsOutput)
+	if !(connectedToMemcached && hitCache) {
+		mongoDBClient, err := util.GetMongoDBClient()
+		if err != nil {
+			logrus.Error("Failed to connect to MongoDB.")
+			return c.String(http.StatusServiceUnavailable, "Failed to get labels")
+		}
+
+		labels, err = service.GetLabelsFromMongoDB(mongoDBClient)
+		if err != nil {
+			logrus.Error("Failed to get labels from MongoDB.")
+			return c.String(http.StatusServiceUnavailable, "Failed to get labels")
+		}
+	}
+
+	if connectedToMemcached && !hitCache {
+		labels.Save(memcachedClient)
+	}
+
+	output := convertGetLabelsOutput(labels)
+	return c.JSON(http.StatusOK, output)
 }
 
-func convertGetLabelsOutput(cachedLabels []libModel.CachedItem) model.GetLabelsOutput {
+func convertGetLabelsOutput(labels *memcached.Labels) model.GetLabelsOutput {
 	since := time.Now()
 	defer metrics.M.ObservefunctionCallDuration(since)
 
-	outputItems := make([]string, 0, len(cachedLabels))
-	for _, cachedLabel := range cachedLabels {
-		outputItems = append(outputItems, cachedLabel.Name)
+	items := labels.Items
+	sort.Slice(items, func(i, j int) bool {
+		return items[i].Count > items[j].Count
+	})
+
+	outputItems := make([]string, 0, len(labels.Items))
+	for _, label := range items {
+		if label.Name == "" {
+			continue
+		}
+		if label.Count <= constant.MINIMUM_COUNT_IN_CACHED_LABELS {
+			continue
+		}
+		outputItems = append(outputItems, label.Name)
 	}
 	return model.GetLabelsOutput{Items: outputItems}
 }

@@ -13,6 +13,7 @@ services:
       - .env
     depends_on:
       - mongodb
+      - memcached
 
   job:
     build:
@@ -24,12 +25,11 @@ services:
       - .env
     depends_on:
       - mongodb
+      - memcached
     tty: true
 
   mongodb:
     image: mongo:4.4.21
-    ports:
-      - 27017:27017
     volumes:
       - ./database/mongod.conf:/etc/mongod.conf
       - ./database/data:/data/db
@@ -44,12 +44,14 @@ services:
     env_file:
       - .env
 
+  memcached:
+    image: memcached:1.6.20
+
   nginx:
     image: nginx:1.20
     ports:
       - 80:80
     volumes:
       - ./nginx/conf/default.conf:/etc/nginx/conf.d/default.conf
-    restart: always
     depends_on:
       - api

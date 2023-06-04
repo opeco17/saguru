@@ -1,4 +1,4 @@
-package model
+package mongodb
 
 type (
 	Label struct {

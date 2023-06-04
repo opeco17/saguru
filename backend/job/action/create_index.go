@@ -3,6 +3,7 @@ package action
 import (
 	"context"
 	"opeco17/saguru/job/util"
+	"opeco17/saguru/lib/mongodb"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -20,7 +21,7 @@ func CreateIndex() error {
 	}
 	defer client.Disconnect(context.TODO())
 
-	collection := client.Database("main").Collection("repositories")
+	collection := client.Database(mongodb.DATABASE_NAME).Collection(mongodb.REPOSITORY_COLLECTION_NAME)
 	indexes := []mongo.IndexModel{
 		{
 			Keys: bson.M{"language": 1},

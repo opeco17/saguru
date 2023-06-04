@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"opeco17/saguru/job/constant"
 	"opeco17/saguru/job/util"
-	"opeco17/saguru/lib/model"
+	"opeco17/saguru/lib/mongodb"
 	"strings"
 	"time"
 
@@ -18,7 +18,7 @@ import (
 func UpdateRepositories() error {
 	logrus.Info("Start updating repositories.")
 
-	// Connect DB
+	// Connect MongoDB
 	client, err := util.GetMongoDBClient()
 	if err != nil {
 		message := "Failed to connect to MongoDB"
@@ -26,7 +26,7 @@ func UpdateRepositories() error {
 		return fmt.Errorf(message)
 	}
 	defer client.Disconnect(context.TODO())
-	repositoryCollection := client.Database("main").Collection("repositories")
+	repositoryCollection := client.Database(mongodb.DATABASE_NAME).Collection(mongodb.REPOSITORY_COLLECTION_NAME)
 
 	// Fetch and save repositories
 	threeMonthAgo := time.Now().AddDate(0, -3, 0).Format("2006-01-02T15:04:05+09:00")
@@ -63,7 +63,7 @@ func UpdateRepositories() error {
 			repository.UpdatedAt = time.Now()
 
 			// Set existing issues
-			var oldRepository model.Repository
+			var oldRepository mongodb.Repository
 			findFilter := bson.M{"repository_id": repository.RepositoryID}
 			repositoryCollection.FindOne(context.TODO(), findFilter).Decode(&oldRepository)
 			if oldRepository.RepositoryID != 0 {
@@ -96,8 +96,8 @@ func UpdateRepositories() error {
 		}
 		defer cursor.Close(context.TODO())
 
+		var result mongodb.Repository
 		for cursor.Next(context.TODO()) {
-			var result model.Repository
 			if err := cursor.Decode(&result); err != nil {
 				logrus.Error(err)
 				return err
@@ -110,9 +110,9 @@ func UpdateRepositories() error {
 	return nil
 }
 
-func fetchRepositories(queries ...string) []*model.Repository {
+func fetchRepositories(queries ...string) []*mongodb.Repository {
 	gitHubRepositories := fetchGitHubRepositories(queries...)
-	repositories := make([]*model.Repository, 0, len(gitHubRepositories))
+	repositories := make([]*mongodb.Repository, 0, len(gitHubRepositories))
 	for _, gitHubRepository := range gitHubRepositories {
 		repositories = append(repositories, convertRepository(gitHubRepository))
 	}
@@ -160,7 +160,7 @@ func fetchGitHubRepositoriesSubset(page int, queries ...string) (*github.Reposit
 	return body, strings.Join(queries, " "), nil
 }
 
-func convertRepository(gitHubRepository *github.Repository) *model.Repository {
+func convertRepository(gitHubRepository *github.Repository) *mongodb.Repository {
 	name := ""
 	if gitHubRepository.FullName != nil {
 		name = *gitHubRepository.FullName
@@ -191,7 +191,7 @@ func convertRepository(gitHubRepository *github.Repository) *model.Repository {
 		topics = gitHubRepository.Topics
 	}
 
-	repository := &model.Repository{
+	repository := &mongodb.Repository{
 		RepositoryID:     *gitHubRepository.ID,
 		GitHubCreatedAt:  gitHubRepository.CreatedAt.Time,
 		GitHubUpdatedAt:  gitHubRepository.UpdatedAt.Time,
@@ -205,12 +205,12 @@ func convertRepository(gitHubRepository *github.Repository) *model.Repository {
 		Language:         language,
 		IssueInitialized: false,
 		Topics:           topics,
-		Issues:           []*model.Issue{},
+		Issues:           []*mongodb.Issue{},
 	}
 	return repository
 }
 
-func convertUser(gitHubUser *github.User) *model.User {
+func convertUser(gitHubUser *github.User) *mongodb.User {
 	name := ""
 	if gitHubUser.Name != nil {
 		name = *gitHubUser.Name
@@ -226,7 +226,7 @@ func convertUser(gitHubUser *github.User) *model.User {
 		avatarURL = *gitHubUser.AvatarURL
 	}
 
-	user := &model.User{
+	user := &mongodb.User{
 		UserID:    *gitHubUser.ID,
 		Name:      name,
 		URL:       url,
@@ -235,14 +235,14 @@ func convertUser(gitHubUser *github.User) *model.User {
 	return user
 }
 
-func convertLabels(gitHubLabels []*github.Label) []*model.Label {
-	labels := make([]*model.Label, 0, len(gitHubLabels))
+func convertLabels(gitHubLabels []*github.Label) []*mongodb.Label {
+	labels := make([]*mongodb.Label, 0, len(gitHubLabels))
 	for _, gitHubLabel := range gitHubLabels {
 		name := ""
 		if gitHubLabel.Name != nil {
 			name = *gitHubLabel.Name
 		}
-		label := &model.Label{
+		label := &mongodb.Label{
 			LabelID: *gitHubLabel.ID,
 			Name:    name,
 		}

@@ -11,24 +11,26 @@ import (
 func main() {
 	flag.Parse()
 	if flag.Arg(0) == "issue" {
-		initDB()
+		initMongoDB()
 		updateIssues()
 		updateCache()
 		createIndex()
 	} else if flag.Arg(0) == "all" {
-		initDB()
+		initMongoDB()
 		updateRepositories()
 		updateIssues()
 		updateCache()
 		createIndex()
+	} else if flag.Arg(0) == "cache" {
+		updateCache()
 	} else {
 		logrus.Error("MustcreateIndex specify all or isssue to a sub command.")
 		os.Exit(1)
 	}
 }
 
-func initDB() {
-	if err := action.InitDB(); err != nil {
+func initMongoDB() {
+	if err := action.InitMongoDB(); err != nil {
 		logrus.Error("Failed to initialize DB.")
 		os.Exit(1)
 	}
