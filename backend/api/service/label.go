@@ -1,32 +1,33 @@
 package service
 
 import (
-	"context"
-	"opeco17/saguru/api/constant"
 	"opeco17/saguru/api/metrics"
-	libModel "opeco17/saguru/lib/model"
+	"opeco17/saguru/lib/memcached"
+	"opeco17/saguru/lib/mongodb"
 	"time"
 
-	"github.com/sirupsen/logrus"
-	"go.mongodb.org/mongo-driver/bson"
+	"github.com/bradfitz/gomemcache/memcache"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func GetCachedLabels(client *mongo.Client) ([]libModel.CachedItem, error) {
+func GetLabelsFromMemcached(client *memcache.Client) (*memcached.Labels, error) {
 	since := time.Now()
 	defer metrics.M.ObservefunctionCallDuration(since)
 
-	cacheCollection := client.Database("main").Collection("cached_labels")
-	filter := bson.M{"count": bson.M{"$gte": constant.MINIMUM_COUNT_IN_CACHED_LABELS}}
-	cursor, err := cacheCollection.Find(context.TODO(), filter)
+	labels, err := memcached.GetLabels(client)
 	if err != nil {
-		logrus.Error(err)
 		return nil, err
 	}
-	var cachedLabels []libModel.CachedItem
-	if err = cursor.All(context.TODO(), &cachedLabels); err != nil {
-		logrus.Error(err)
+	return labels, nil
+}
+
+func GetLabelsFromMongoDB(client *mongo.Client) (*memcached.Labels, error) {
+	since := time.Now()
+	defer metrics.M.ObservefunctionCallDuration(since)
+
+	labels, err := mongodb.AggregateLabels(client)
+	if err != nil {
 		return nil, err
 	}
-	return cachedLabels, nil
+	return labels.ConvertToMemcachedLabels(), nil
 }

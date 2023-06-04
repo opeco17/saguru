@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"opeco17/saguru/job/constant"
 	"opeco17/saguru/job/util"
-	"opeco17/saguru/lib/model"
+	"opeco17/saguru/lib/mongodb"
 	"strings"
 	"sync"
 	"time"
@@ -20,7 +20,7 @@ import (
 func UpdateIssues() error {
 	logrus.Info("Start updating issues.")
 
-	// Connect DB
+	// Connect MongoDB
 	client, err := util.GetMongoDBClient()
 	if err != nil {
 		message := "Failed to connect to MongoDB"
@@ -28,7 +28,7 @@ func UpdateIssues() error {
 		return fmt.Errorf(message)
 	}
 	defer client.Disconnect(context.TODO())
-	repositoryCollection := client.Database("main").Collection("repositories")
+	repositoryCollection := client.Database(mongodb.DATABASE_NAME).Collection(mongodb.REPOSITORY_COLLECTION_NAME)
 
 	// Update issues
 	for i := 0; i < constant.UPDATE_ISSUE_BATCH_SIZE/constant.UPDATE_ISSUE_MINIBATCH_SIZE; i++ {
@@ -50,9 +50,9 @@ func updateIssuesMinibach(repositoryCollection *mongo.Collection, updateCount in
 		Name         string `bson:"name,omitempty"`
 	}
 	type RepositoryDiff struct {
-		UpdatedAt        time.Time      `bson:"updated_at"`
-		IssueInitialized bool           `bson:"issue_initialized"`
-		Issues           []*model.Issue `bson:"issues"`
+		UpdatedAt        time.Time        `bson:"updated_at"`
+		IssueInitialized bool             `bson:"issue_initialized"`
+		Issues           []*mongodb.Issue `bson:"issues"`
 	}
 	simpleRepoFields := bson.M{"repository_id": 1, "name": 1}
 
@@ -120,13 +120,13 @@ func updateIssuesMinibach(repositoryCollection *mongo.Collection, updateCount in
 	return nil
 }
 
-func fetchIssues(RepositoryName string) []*model.Issue {
+func fetchIssues(RepositoryName string) []*mongodb.Issue {
 	gitHubIssues, err := fetchGitHubIssues(RepositoryName)
 	if err != nil {
 		logrus.Error(err)
-		return []*model.Issue{}
+		return []*mongodb.Issue{}
 	}
-	issues := make([]*model.Issue, 0, len(gitHubIssues))
+	issues := make([]*mongodb.Issue, 0, len(gitHubIssues))
 	for _, gitHubIssue := range gitHubIssues {
 		if gitHubIssue.HTMLURL != nil && strings.Contains(*gitHubIssue.HTMLURL, "pull") {
 			continue
@@ -149,13 +149,13 @@ func fetchGitHubIssues(repositoryName string) ([]*github.Issue, error) {
 	return body, nil
 }
 
-func convertIssue(gitHubIssue *github.Issue) *model.Issue {
-	issuer := new(model.User)
+func convertIssue(gitHubIssue *github.Issue) *mongodb.Issue {
+	issuer := new(mongodb.User)
 	if gitHubIssue.User != nil {
 		issuer = convertUser(gitHubIssue.User)
 	}
 
-	labels := make([]*model.Label, 0)
+	labels := make([]*mongodb.Label, 0)
 	if gitHubIssue.Labels != nil {
 		labels = convertLabels(gitHubIssue.Labels)
 	}
@@ -166,7 +166,7 @@ func convertIssue(gitHubIssue *github.Issue) *model.Issue {
 		assigneesCount = &assigneesCountValue
 	}
 
-	issue := &model.Issue{
+	issue := &mongodb.Issue{
 		IssueID:         *gitHubIssue.ID,
 		GitHubCreatedAt: *gitHubIssue.CreatedAt,
 		GitHubUpdatedAt: *gitHubIssue.UpdatedAt,

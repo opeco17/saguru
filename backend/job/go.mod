@@ -3,6 +3,7 @@ module opeco17/saguru/job
 go 1.18
 
 require (
+	github.com/bradfitz/gomemcache v0.0.0-20230124162541-5f7a7d875746
 	github.com/google/go-github/v41 v41.0.0
 	github.com/sirupsen/logrus v1.8.1
 	go.mongodb.org/mongo-driver v1.9.0
