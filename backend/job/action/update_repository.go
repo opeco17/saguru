@@ -34,24 +34,24 @@ func UpdateRepositories() error {
 	isGoodFirstIssueQuery := "good-first-issues:>0"
 	queries := [][]string{
 		{"stars:30..100", pushedBeforeThreeMonthAgoQuery, isGoodFirstIssueQuery},
-		{"stars:100..200", pushedBeforeThreeMonthAgoQuery, isGoodFirstIssueQuery},
-		{"stars:200..300", pushedBeforeThreeMonthAgoQuery, isGoodFirstIssueQuery},
-		{"stars:300..400", pushedBeforeThreeMonthAgoQuery, isGoodFirstIssueQuery},
-		{"stars:400..600", pushedBeforeThreeMonthAgoQuery, isGoodFirstIssueQuery},
-		{"stars:600..1000", pushedBeforeThreeMonthAgoQuery, isGoodFirstIssueQuery},
-		{"stars:1000..1300", pushedBeforeThreeMonthAgoQuery, isGoodFirstIssueQuery},
-		{"stars:1300..1500", pushedBeforeThreeMonthAgoQuery, isGoodFirstIssueQuery},
-		{"stars:1500..1700", pushedBeforeThreeMonthAgoQuery},
-		{"stars:1700..2000", pushedBeforeThreeMonthAgoQuery},
-		{"stars:2000..2500", pushedBeforeThreeMonthAgoQuery},
-		{"stars:2500..3000", pushedBeforeThreeMonthAgoQuery},
-		{"stars:3500..4000", pushedBeforeThreeMonthAgoQuery},
-		{"stars:4000..5000", pushedBeforeThreeMonthAgoQuery},
-		{"stars:5000..6000", pushedBeforeThreeMonthAgoQuery},
-		{"stars:6000..7000", pushedBeforeThreeMonthAgoQuery},
-		{"stars:7000..10000", pushedBeforeThreeMonthAgoQuery},
-		{"stars:10000..15000", pushedBeforeThreeMonthAgoQuery},
-		{"stars:15000..20000", pushedBeforeThreeMonthAgoQuery},
+		// {"stars:100..200", pushedBeforeThreeMonthAgoQuery, isGoodFirstIssueQuery},
+		// {"stars:200..300", pushedBeforeThreeMonthAgoQuery, isGoodFirstIssueQuery},
+		// {"stars:300..400", pushedBeforeThreeMonthAgoQuery, isGoodFirstIssueQuery},
+		// {"stars:400..600", pushedBeforeThreeMonthAgoQuery, isGoodFirstIssueQuery},
+		// {"stars:600..1000", pushedBeforeThreeMonthAgoQuery, isGoodFirstIssueQuery},
+		// {"stars:1000..1300", pushedBeforeThreeMonthAgoQuery, isGoodFirstIssueQuery},
+		// {"stars:1300..1500", pushedBeforeThreeMonthAgoQuery, isGoodFirstIssueQuery},
+		// {"stars:1500..1700", pushedBeforeThreeMonthAgoQuery},
+		// {"stars:1700..2000", pushedBeforeThreeMonthAgoQuery},
+		// {"stars:2000..2500", pushedBeforeThreeMonthAgoQuery},
+		// {"stars:2500..3000", pushedBeforeThreeMonthAgoQuery},
+		// {"stars:3500..4000", pushedBeforeThreeMonthAgoQuery},
+		// {"stars:4000..5000", pushedBeforeThreeMonthAgoQuery},
+		// {"stars:5000..6000", pushedBeforeThreeMonthAgoQuery},
+		// {"stars:6000..7000", pushedBeforeThreeMonthAgoQuery},
+		// {"stars:7000..10000", pushedBeforeThreeMonthAgoQuery},
+		// {"stars:10000..15000", pushedBeforeThreeMonthAgoQuery},
+		// {"stars:15000..20000", pushedBeforeThreeMonthAgoQuery},
 		{"stars:>20000", pushedBeforeThreeMonthAgoQuery},
 	}
 	for _, eachQuery := range queries {
@@ -112,6 +112,7 @@ func UpdateRepositories() error {
 
 func fetchRepositories(queries ...string) []*mongodb.Repository {
 	gitHubRepositories := fetchGitHubRepositories(queries...)
+	fmt.Println(len(gitHubRepositories))
 	repositories := make([]*mongodb.Repository, 0, len(gitHubRepositories))
 	for _, gitHubRepository := range gitHubRepositories {
 		repositories = append(repositories, convertRepository(gitHubRepository))
