@@ -93,9 +93,9 @@ func UpdateRepositories(client *mongo.Client) error {
 				continue
 			}
 		}
-		if restTimeSecond := constant.REPOSITORIES_API_INTERVAL_SECOND - int(time.Since(now).Seconds()); restTimeSecond > 0 {
-			logrus.Info(fmt.Sprintf("Wait for %v by next fetch", time.Second*time.Duration(restTimeSecond)))
-			time.Sleep(time.Second * time.Duration(restTimeSecond))
+		if waitingTime := constant.REPOSITORIES_API_INTERVAL - time.Since(now); waitingTime > 0 {
+			logrus.Info(fmt.Sprintf("Wait for %v by next fetch", waitingTime))
+			time.Sleep(waitingTime)
 		}
 	}
 
@@ -142,7 +142,7 @@ func fetchGitHubRepositories(queryOpt queryOption) []gitHubRepository {
 	var once sync.Once
 	fetchRepoWg.Add(totalPages)
 
-	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(time.Minute*3))
+	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(constant.REPOSITORIES_API_TIME_OUT))
 
 	go func() {
 		var gitHubRepo gitHubRepository
@@ -156,6 +156,7 @@ func fetchGitHubRepositories(queryOpt queryOption) []gitHubRepository {
 		}
 	}()
 
+	// Fetch requests are called in parallel
 	for page := 0; page < totalPages; page++ {
 		go func(page int) {
 			defer fetchRepoWg.Done()
