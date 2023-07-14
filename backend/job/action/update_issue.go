@@ -31,11 +31,11 @@ func UpdateIssues() error {
 	repositoryCollection := client.Database(mongodb.DATABASE_NAME).Collection(mongodb.REPOSITORY_COLLECTION_NAME)
 
 	// Update issues
-	for i := 0; i < constant.UPDATE_ISSUE_BATCH_SIZE/constant.UPDATE_ISSUE_MINIBATCH_SIZE; i++ {
+	for i := 0; i < constant.UPDATE_ISSUE_SIZE/constant.UPDATE_ISSUE_SUBSET_SIZE; i++ {
 		if i%10 == 0 {
-			logrus.Info(fmt.Sprintf("Updating issues: %d/%d", i*constant.UPDATE_ISSUE_MINIBATCH_SIZE, constant.UPDATE_ISSUE_BATCH_SIZE))
+			logrus.Info(fmt.Sprintf("Updating issues: %d/%d", i*constant.UPDATE_ISSUE_SUBSET_SIZE, constant.UPDATE_ISSUE_SIZE))
 		}
-		if err := updateIssuesMinibach(repositoryCollection, constant.UPDATE_ISSUE_MINIBATCH_SIZE); err != nil {
+		if err := updateIssuesMinibach(repositoryCollection, constant.UPDATE_ISSUE_SUBSET_SIZE); err != nil {
 			return err
 		}
 	}

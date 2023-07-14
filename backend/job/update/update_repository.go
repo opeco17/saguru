@@ -82,7 +82,7 @@ func UpdateRepositories(client *mongo.Client) error {
 
 	for _, queryOpt := range getQueryOptions() {
 		now := time.Now()
-		for _, gitHubRepo := range fetchGitHubRepositories(queryOpt) {
+		for _, gitHubRepo := range fetchGitHubRepositoriesFromGitHub(queryOpt) {
 			repo := gitHubRepo.toMongoDBRepository()
 			if err := setExistingIssuesToMongoDBRepository(repo, client); err != nil {
 				logrus.Warn(fmt.Sprintf("Failed to set existing issues to *mongodb.repository: %s", err.Error()))
@@ -131,7 +131,7 @@ func getQueryOptions() []queryOption {
 	}
 }
 
-func fetchGitHubRepositories(queryOpt queryOption) []gitHubRepository {
+func fetchGitHubRepositoriesFromGitHub(queryOpt queryOption) []gitHubRepository {
 	logrus.Info(fmt.Sprintf("Start fetching repositories with query: %s", queryOpt.render()))
 
 	totalPages := constant.REPOSITORIES_API_MAX_RESULTS / constant.REPOSITORIES_API_RESULTS_PER_PAGE
@@ -199,11 +199,11 @@ func fetchGitHubRepositories(queryOpt queryOption) []gitHubRepository {
 }
 
 func setExistingIssuesToMongoDBRepository(repo *mongodb.Repository, client *mongo.Client) error {
-	repositoryCollection := client.Database(mongodb.DATABASE_NAME).Collection(mongodb.REPOSITORY_COLLECTION_NAME)
+	repoCollection := client.Database(mongodb.DATABASE_NAME).Collection(mongodb.REPOSITORY_COLLECTION_NAME)
 
 	existingRepo := &mongodb.Repository{}
 	filter := bson.M{"repository_id": repo.RepositoryID}
-	if err := repositoryCollection.FindOne(context.Background(), filter).Decode(existingRepo); err != nil {
+	if err := repoCollection.FindOne(context.Background(), filter).Decode(existingRepo); err != nil {
 		if err == bson.ErrNilRegistry || err == mongo.ErrNoDocuments {
 			return nil
 		}
@@ -216,11 +216,11 @@ func setExistingIssuesToMongoDBRepository(repo *mongodb.Repository, client *mong
 }
 
 func updateMongoDBRepository(repo *mongodb.Repository, client *mongo.Client) error {
-	repositoryCollection := client.Database(mongodb.DATABASE_NAME).Collection(mongodb.REPOSITORY_COLLECTION_NAME)
+	repoCollection := client.Database(mongodb.DATABASE_NAME).Collection(mongodb.REPOSITORY_COLLECTION_NAME)
 
 	filter := bson.M{"repository_id": repo.RepositoryID}
 	update := bson.M{"$set": repo}
-	if _, err := repositoryCollection.UpdateOne(context.Background(), filter, update, options.Update().SetUpsert(true)); err != nil {
+	if _, err := repoCollection.UpdateOne(context.Background(), filter, update, options.Update().SetUpsert(true)); err != nil {
 		return err
 	}
 	return nil

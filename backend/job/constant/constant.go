@@ -11,7 +11,6 @@ const (
 	REPOSITORIES_API_TIME_OUT         time.Duration = 180 * time.Second
 	ISSUES_API_URL                    string        = "https://api.github.com/repos/%s/issues"
 	ISSUES_API_RESULTS_PER_PAGE       int           = 100
-	UPDATE_ISSUE_BATCH_SIZE           int           = 5000 // FIXED by GitHub issues API (core)
-	UPDATE_ISSUE_MINIBATCH_SIZE       int           = 50
-	FETCH_ISSUE_CONCURRENCY           int           = 5
+	UPDATE_ISSUE_SIZE                 int           = 5000 // FIXED by GitHub issues API (core)
+	UPDATE_ISSUE_SUBSET_SIZE          int           = 5
 )
