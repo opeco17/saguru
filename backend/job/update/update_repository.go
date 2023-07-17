@@ -23,72 +23,18 @@ func (queryOpt queryOption) render() string {
 	return strings.Join(queryOpt, " ")
 }
 
-type gitHubRepository struct {
-	github.Repository
-}
-
-func (gitHubRepository *gitHubRepository) toMongoDBRepository() *mongodb.Repository {
-	name := ""
-	if gitHubRepository.FullName != nil {
-		name = *gitHubRepository.FullName
-	}
-
-	url := ""
-	if gitHubRepository.HTMLURL != nil {
-		url = *gitHubRepository.HTMLURL
-	}
-
-	description := ""
-	if gitHubRepository.Description != nil {
-		description = *gitHubRepository.Description
-	}
-
-	license := ""
-	if gitHubRepository.License != nil && gitHubRepository.License.Name != nil {
-		license = *gitHubRepository.License.Name
-	}
-
-	language := ""
-	if gitHubRepository.Language != nil {
-		language = *gitHubRepository.Language
-	}
-
-	topics := make([]string, 0)
-	if gitHubRepository.Topics != nil {
-		topics = gitHubRepository.Topics
-	}
-
-	repository := &mongodb.Repository{
-		RepositoryID:     *gitHubRepository.ID,
-		GitHubCreatedAt:  gitHubRepository.CreatedAt.Time,
-		GitHubUpdatedAt:  gitHubRepository.UpdatedAt.Time,
-		Name:             name,
-		URL:              url,
-		Description:      description,
-		StarCount:        gitHubRepository.StargazersCount,
-		ForkCount:        gitHubRepository.ForksCount,
-		OpenIssueCount:   gitHubRepository.OpenIssuesCount,
-		License:          license,
-		Language:         language,
-		IssueInitialized: false,
-		Topics:           topics,
-		Issues:           []*mongodb.Issue{},
-	}
-	return repository
-}
-
 func UpdateRepositories(client *mongo.Client) error {
 	logrus.Info("Start updating repositories")
 
 	for _, queryOpt := range getQueryOptions() {
 		now := time.Now()
-		for _, gitHubRepo := range fetchGitHubRepositoriesFromGitHub(queryOpt) {
-			repo := gitHubRepo.toMongoDBRepository()
-			if err := setExistingIssuesToMongoDBRepository(repo, client); err != nil {
+		for _, repo := range fetchGitHubRepositoriesFromGitHubInParallel(queryOpt) {
+			mongoDBRepo := gitHubRepositoryToMongoDBRepository(repo)
+			if err := setExistingIssuesToMongoDBRepository(mongoDBRepo, client); err != nil {
 				logrus.Warn(fmt.Sprintf("Failed to set existing issues to *mongodb.repository: %s", err.Error()))
 				continue
 			}
-			if err := updateMongoDBRepository(repo, client); err != nil {
+			if err := updateMongoDBRepository(mongoDBRepo, client); err != nil {
 				logrus.Warn(fmt.Sprintf("Failed to upert repository in MongoDB: %s", err.Error()))
 				continue
 			}
@@ -131,27 +77,28 @@ func getQueryOptions() []queryOption {
 	}
 }
 
-func fetchGitHubRepositoriesFromGitHub(queryOpt queryOption) []gitHubRepository {
+func fetchGitHubRepositoriesFromGitHubInParallel(queryOpt queryOption) []*github.Repository {
 	logrus.Info(fmt.Sprintf("Start fetching repositories with query: %s", queryOpt.render()))
 
 	totalPages := constant.REPOSITORIES_API_MAX_RESULTS / constant.REPOSITORIES_API_RESULTS_PER_PAGE
-	gitHubRepos := make([]gitHubRepository, 0, constant.REPOSITORIES_API_MAX_RESULTS)
-	gitHubReposCh := make(chan gitHubRepository, constant.REPOSITORIES_API_MAX_RESULTS)
+	repos := make([]*github.Repository, 0, constant.REPOSITORIES_API_MAX_RESULTS)
+	reposCh := make(chan *github.Repository, constant.REPOSITORIES_API_MAX_RESULTS)
 
 	var fetchRepoWg sync.WaitGroup
 	var once sync.Once
 	fetchRepoWg.Add(totalPages)
 
-	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(constant.REPOSITORIES_API_TIME_OUT))
+	ctx, cancel := context.WithTimeout(context.Background(), constant.REPOSITORIES_API_TIME_OUT)
+	defer cancel()
 
 	go func() {
-		var gitHubRepo gitHubRepository
+		var repo *github.Repository
 		for {
 			select {
 			case <-ctx.Done():
 				return
-			case gitHubRepo = <-gitHubReposCh:
-				gitHubRepos = append(gitHubRepos, gitHubRepo)
+			case repo = <-reposCh:
+				repos = append(repos, repo)
 			}
 		}
 	}()
@@ -184,18 +131,17 @@ func fetchGitHubRepositoriesFromGitHub(queryOpt queryOption) []gitHubRepository 
 				}
 				logrus.Info(fmt.Sprintf("%d/%d will be fetched", targetRepoCount, *searchResult.Total))
 			})
-			for _, gitHubRepo := range searchResult.Repositories {
-				gitHubReposCh <- gitHubRepository{*gitHubRepo}
+			for _, repo := range searchResult.Repositories {
+				reposCh <- repo
 			}
 		}(page)
 	}
 
 	fetchRepoWg.Wait()
-	cancel()
 
 	logrus.Info("Finished to fetch repositories")
 
-	return gitHubRepos
+	return repos
 }
 
 func setExistingIssuesToMongoDBRepository(repo *mongodb.Repository, client *mongo.Client) error {
@@ -224,4 +170,54 @@ func updateMongoDBRepository(repo *mongodb.Repository, client *mongo.Client) err
 		return err
 	}
 	return nil
+}
+
+func gitHubRepositoryToMongoDBRepository(repo *github.Repository) *mongodb.Repository {
+	name := ""
+	if repo.FullName != nil {
+		name = *repo.FullName
+	}
+
+	url := ""
+	if repo.HTMLURL != nil {
+		url = *repo.HTMLURL
+	}
+
+	description := ""
+	if repo.Description != nil {
+		description = *repo.Description
+	}
+
+	license := ""
+	if repo.License != nil && repo.License.Name != nil {
+		license = *repo.License.Name
+	}
+
+	language := ""
+	if repo.Language != nil {
+		language = *repo.Language
+	}
+
+	topics := make([]string, 0)
+	if repo.Topics != nil {
+		topics = repo.Topics
+	}
+
+	converted := &mongodb.Repository{
+		RepositoryID:     *repo.ID,
+		GitHubCreatedAt:  repo.CreatedAt.Time,
+		GitHubUpdatedAt:  repo.UpdatedAt.Time,
+		Name:             name,
+		URL:              url,
+		Description:      description,
+		StarCount:        repo.StargazersCount,
+		ForkCount:        repo.ForksCount,
+		OpenIssueCount:   repo.OpenIssuesCount,
+		License:          license,
+		Language:         language,
+		IssueInitialized: false,
+		Topics:           topics,
+		Issues:           []*mongodb.Issue{},
+	}
+	return converted
 }
