@@ -35,8 +35,6 @@ var updateCmd = &cobra.Command{
 			os.Exit(1)
 		}
 		defer mongoDBClient.Disconnect(context.Background())
-		mongodb.InitMongoDB(mongoDBClient)
-		logrus.Info("Finished to initialize database")
 
 		memcachedClient, err := util.GetMemcachedClient()
 		if err != nil {
@@ -44,6 +42,9 @@ var updateCmd = &cobra.Command{
 			os.Exit(1)
 		}
 		defer memcachedClient.Close()
+
+		mongodb.InitMongoDB(mongoDBClient)
+		logrus.Info("Finished to initialize database")
 
 		if options.Repository {
 			if err := update.UpdateRepositories(mongoDBClient); err != nil {
@@ -76,8 +77,8 @@ var updateCmd = &cobra.Command{
 func init() {
 	updateCmd.Flags().BoolP("issue", "", false, "Issues are updated when specified")
 	updateCmd.Flags().BoolP("repository", "", false, "Repositories are updated when specified")
-	updateCmd.Flags().BoolP("cache", "", false, "caches are updated when specified")
-	updateCmd.Flags().BoolP("index", "", false, "indices are updated when specified")
+	updateCmd.Flags().BoolP("cache", "", false, "Caches are updated when specified")
+	updateCmd.Flags().BoolP("index", "", false, "Indices are updated when specified")
 	rootCmd.AddCommand(updateCmd)
 }
 
