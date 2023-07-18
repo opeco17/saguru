@@ -35,6 +35,8 @@ func UpdateIssues(client *mongo.Client) error {
 
 	var wg sync.WaitGroup
 	slots := make(chan interface{}, constant.UPDATE_ISSUE_SUBSET_SIZE)
+	github_api_40x_errors := make(chan interface{})
+	_ = github_api_40x_errors
 	completed := make(chan interface{}, len(repos))
 
 	wg.Add(len(repos))
