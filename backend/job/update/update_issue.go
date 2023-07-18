@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"opeco17/saguru/job/constant"
 	"opeco17/saguru/job/util"
+	"opeco17/saguru/lib/custom_errors"
 	"opeco17/saguru/lib/mongodb"
 	"strings"
 	"sync"
@@ -27,7 +28,8 @@ func UpdateIssues(client *mongo.Client) error {
 
 	repos, err := getRepositoriesFromMongoDB(client)
 	if err != nil {
-		logrus.Error("Failed to get repositories from MongoDB: %s", err.Error())
+		logrus.Error("Failed to get repositories from MongoDB")
+		logrus.Errorf("%#v", err)
 		return err
 	}
 
@@ -46,11 +48,12 @@ func UpdateIssues(client *mongo.Client) error {
 
 			issues, err := fetchIssuesFromGitHub(repo.Name)
 			if err != nil {
-				logrus.Warn(fmt.Sprintf("Failed to fetch issues from GitHub: %s", err.Error()))
+				logrus.Warnf("Failed to fetch issues from GitHub: %s", err.Error())
 				return
 			}
 			if err := updateMongoDBIssues(issues, repo.RepositoryID, client); err != nil {
-				logrus.Warn(fmt.Sprintf("Failed to update issues in MongoDB: %s", err.Error()))
+				logrus.Warn("Failed to update issues in MongoDB")
+				logrus.Warnf("%#v", err)
 				return
 			}
 		}(repo)
@@ -78,8 +81,7 @@ func getRepositoriesFromMongoDB(client *mongo.Client) ([]*repoNameAndID, error) 
 	getSize := constant.UPDATE_ISSUE_SIZE
 	notInitializedRepos, err := getRepositoriesSubsetFromMongoDB(client, getSize, false)
 	if err != nil {
-		logrus.Warn("Failed to get not initialized repositories: %s", err.Error())
-		return nil, err
+		return nil, custom_errors.Wrap(err, "Failed to get not initialized repositories")
 	}
 	getSize = getSize - len(notInitializedRepos)
 
@@ -87,8 +89,7 @@ func getRepositoriesFromMongoDB(client *mongo.Client) ([]*repoNameAndID, error) 
 	if getSize > 0 {
 		initializedRepos, err = getRepositoriesSubsetFromMongoDB(client, getSize, true)
 		if err != nil {
-			logrus.Warn("Failed to get initialized repositories: %s", err.Error())
-			return nil, err
+			return nil, custom_errors.Wrap(err, "Failed to get initialized repositories")
 		}
 	}
 
@@ -105,10 +106,10 @@ func getRepositoriesSubsetFromMongoDB(client *mongo.Client, maxGetSize int, isIn
 	filter := bson.M{"issue_initialized": isInitialized}
 	initializedIssueCursor, err := repoCollection.Find(context.Background(), filter, opts)
 	if err != nil {
-		return []*repoNameAndID{}, err
+		return []*repoNameAndID{}, custom_errors.Wrap(err, err.Error())
 	}
 	if err = initializedIssueCursor.All(context.Background(), &repos); err != nil {
-		return []*repoNameAndID{}, err
+		return []*repoNameAndID{}, custom_errors.Wrap(err, err.Error())
 	}
 
 	filteredRepos := make([]*repoNameAndID, 0, len(repos))
@@ -132,7 +133,17 @@ func fetchIssuesFromGitHub(repoName string) ([]*mongodb.Issue, error) {
 
 	issues, resp, _ := client.Issues.ListByRepo(ctx, repositoryOwner, repositoryName, opts)
 	if resp.StatusCode >= 400 {
-		return nil, fmt.Errorf("bad response status code %d: %v", resp.StatusCode, resp)
+		message := fmt.Sprintf("Bad response status code %d: %v", resp.StatusCode, resp)
+		code := custom_errors.DEFAULT_ERROR_CODE
+		if resp.StatusCode < 500 {
+			code = custom_errors.GITHUB_API_40X_ERROR_CODE
+		} else if resp.StatusCode < 600 {
+			code = custom_errors.GITHUB_API_50X_ERROR_CODE
+		}
+		return nil, custom_errors.CustomError{
+			Message: message,
+			Code:    code,
+		}
 	}
 
 	mongoDBIssues := make([]*mongodb.Issue, 0, len(issues))
@@ -158,8 +169,8 @@ func updateMongoDBIssues(issues []*mongodb.Issue, repoID int, client *mongo.Clie
 
 	filter := bson.M{"repository_id": repoID}
 	update := bson.M{"$set": diff}
-	if _, err := repoCollection.UpdateOne(context.TODO(), filter, update); err != nil {
-		return err
+	if _, err := repoCollection.UpdateOne(context.Background(), filter, update); err != nil {
+		return custom_errors.Wrap(err, err.Error())
 	}
 	return nil
 }

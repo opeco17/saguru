@@ -6,6 +6,8 @@ require (
 	github.com/bradfitz/gomemcache v0.0.0-20230124162541-5f7a7d875746
 	github.com/google/go-github/v41 v41.0.0
 	github.com/sirupsen/logrus v1.8.1
+	github.com/spf13/cobra v1.7.0
+	github.com/spf13/pflag v1.0.5
 	go.mongodb.org/mongo-driver v1.9.0
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
 	opeco17/saguru/lib v0.0.1
@@ -19,8 +21,6 @@ require (
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/spf13/cobra v1.7.0 // indirect
-	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.0.2 // indirect
 	github.com/xdg-go/stringprep v1.0.2 // indirect
