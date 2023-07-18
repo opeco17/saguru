@@ -6,6 +6,7 @@ type Options struct {
 	Repository bool
 	Issue      bool
 	Cache      bool
+	Index      bool
 }
 
 func GetOptions(flagSet *pflag.FlagSet) (*Options, error) {
@@ -21,5 +22,9 @@ func GetOptions(flagSet *pflag.FlagSet) (*Options, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Options{Repository: repository, Issue: issue, Cache: cache}, nil
+	index, err := flagSet.GetBool("index")
+	if err != nil {
+		return nil, err
+	}
+	return &Options{Repository: repository, Issue: issue, Cache: cache, Index: index}, nil
 }

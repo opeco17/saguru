@@ -45,6 +45,8 @@ func UpdateRepositories(client *mongo.Client) error {
 		}
 	}
 
+	logrus.Info("Finished updating repositories")
+
 	return nil
 }
 

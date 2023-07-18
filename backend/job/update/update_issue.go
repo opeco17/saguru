@@ -67,6 +67,9 @@ func UpdateIssues(client *mongo.Client) error {
 	}()
 
 	wg.Wait()
+	close(completed)
+
+	logrus.Info("Finished updating issues")
 
 	return nil
 }
@@ -90,6 +93,7 @@ func getRepositoriesFromMongoDB(client *mongo.Client) ([]*repoNameAndID, error) 
 	}
 
 	repos := append(notInitializedRepos, initializedRepos...)
+
 	return repos, nil
 }
 
@@ -107,7 +111,13 @@ func getRepositoriesSubsetFromMongoDB(client *mongo.Client, maxGetSize int, isIn
 		return []*repoNameAndID{}, err
 	}
 
-	return repos, nil
+	filteredRepos := make([]*repoNameAndID, 0, len(repos))
+	for _, repo := range repos {
+		if repo != nil {
+			filteredRepos = append(filteredRepos, repo)
+		}
+	}
+	return filteredRepos, nil
 }
 
 func fetchIssuesFromGitHub(repoName string) ([]*mongodb.Issue, error) {
