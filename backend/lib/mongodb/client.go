@@ -5,42 +5,35 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/sirupsen/logrus"
+	errorsutil "opeco17/saguru/lib/errors"
+
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func GetMongoDBClient(user string, password string, host string, port int) (*mongo.Client, error) {
 	if host == "" {
-		err_message := "You must set 'host' to connect to MongoDB"
-		logrus.Error(err_message)
-		return nil, fmt.Errorf(err_message)
+		return nil, errorsutil.CustomError{Message: "You must set 'host' to connect to MongoDB"}
 	}
 	if port < 0 {
-		err_message := "Port number is invalid"
-		logrus.Error(err_message)
-		return nil, fmt.Errorf(err_message)
+		return nil, errorsutil.CustomError{Message: "Port number is invalid"}
 	}
 	if user == "" {
-		err_message := "You must set 'user' to connect to MongoDB"
-		logrus.Error(err_message)
-		return nil, fmt.Errorf(err_message)
+		return nil, errorsutil.CustomError{Message: "You must set 'user' to connect to MongoDB"}
 	}
 	if password == "" {
-		err_message := "You must set 'password' to connect to MongoDB"
-		logrus.Error(err_message)
-		return nil, fmt.Errorf(err_message)
+		return nil, errorsutil.CustomError{Message: "You must set 'password' to connect to MongoDB"}
 	}
 
 	credential := options.Credential{
 		Username: user,
 		Password: password,
 	}
-	clientOpts := options.Client().ApplyURI("mongodb://" + host + ":" + strconv.Itoa(port)).SetAuth(credential)
-	client, err := mongo.Connect(context.TODO(), clientOpts)
+	clientOpts := options.Client().ApplyURI(
+		fmt.Sprintf("mongodb://%s:%s", host, strconv.Itoa(port))).SetAuth(credential)
+	client, err := mongo.Connect(context.Background(), clientOpts)
 	if err != nil {
-		logrus.Error(err)
-		return nil, err
+		return nil, errorsutil.Wrap(err, err.Error())
 	}
 	return client, nil
 }

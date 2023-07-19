@@ -5,6 +5,8 @@ import (
 	"opeco17/saguru/lib/mongodb"
 	"time"
 
+	errorsutil "opeco17/saguru/lib/errors"
+
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -28,7 +30,7 @@ func UpdateIndices(client *mongo.Client) error {
 	}
 	opts := options.CreateIndexes().SetMaxTime(100 * time.Second)
 	if _, err := collection.Indexes().CreateMany(context.Background(), indexes, opts); err != nil {
-		return err
+		return errorsutil.Wrap(err, err.Error())
 	}
 
 	logrus.Info("Finished updating indices.")

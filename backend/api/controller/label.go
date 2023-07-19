@@ -11,6 +11,8 @@ import (
 	"sort"
 	"time"
 
+	errorsutil "opeco17/saguru/lib/errors"
+
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 )
@@ -24,7 +26,7 @@ func GetLabels(c echo.Context) error {
 	connectedToMemcached := true
 	memcachedClient, err := util.GetMemcachedClient()
 	if err != nil {
-		logrus.Warn("Failed to connect to Memcached.")
+		logrus.Warnf("Failed to connect to Memcached: %s", err.Error())
 		connectedToMemcached = false
 	}
 
@@ -41,13 +43,15 @@ func GetLabels(c echo.Context) error {
 	if !(connectedToMemcached && hitCache) {
 		mongoDBClient, err := util.GetMongoDBClient()
 		if err != nil {
-			logrus.Error("Failed to connect to MongoDB.")
+			logrus.Error("Failed to connect to MongoDB")
+			logrus.Errorf("%#v", errorsutil.CustomError{Message: err.Error()})
 			return c.String(http.StatusServiceUnavailable, "Failed to get labels")
 		}
 
 		labels, err = service.GetLabelsFromMongoDB(mongoDBClient)
 		if err != nil {
-			logrus.Error("Failed to get labels from MongoDB.")
+			logrus.Error("Failed to get labels from MongoDB")
+			logrus.Errorf("%#v", errorsutil.CustomError{Message: err.Error()})
 			return c.String(http.StatusServiceUnavailable, "Failed to get labels")
 		}
 	}
@@ -57,7 +61,11 @@ func GetLabels(c echo.Context) error {
 	}
 
 	output := convertGetLabelsOutput(labels)
-	return c.JSON(http.StatusOK, output)
+	if err := c.JSON(http.StatusOK, output); err != nil {
+		logrus.Errorf("%#v", errorsutil.Wrap(err, err.Error()))
+		return c.String(http.StatusServiceUnavailable, "Something wrong happend")
+	}
+	return nil
 }
 
 func convertGetLabelsOutput(labels *memcached.Labels) model.GetLabelsOutput {

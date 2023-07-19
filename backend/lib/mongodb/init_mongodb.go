@@ -3,7 +3,8 @@ package mongodb
 import (
 	"context"
 
-	"github.com/sirupsen/logrus"
+	errorsutil "opeco17/saguru/lib/errors"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -15,9 +16,9 @@ func InitMongoDB(client *mongo.Client) error {
 		"$jsonSchema": RepositorySchema,
 	}
 	command := bson.D{{Key: "collMod", Value: REPOSITORY_COLLECTION_NAME}, {Key: "validator", Value: validator}}
-	err := client.Database("main").RunCommand(context.TODO(), command).Err()
+	err := client.Database("main").RunCommand(context.Background(), command).Err()
 	if err != nil {
-		logrus.Error(err)
+		return errorsutil.Wrap(err, err.Error())
 	}
 	return nil
 }

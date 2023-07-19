@@ -2,7 +2,7 @@ package memcached
 
 import (
 	"encoding/json"
-	"fmt"
+	errorsutil "opeco17/saguru/lib/errors"
 
 	"github.com/bradfitz/gomemcache/memcache"
 )
@@ -19,11 +19,11 @@ type Licenses struct {
 func (licenses *Licenses) Save(client *memcache.Client) error {
 	data, err := json.Marshal(licenses)
 	if err != nil {
-		return fmt.Errorf("Failed to serialize licenses.")
+		return errorsutil.Wrap(err, err.Error())
 	}
 
 	if err := client.Set(&memcache.Item{Key: LICENSES_CACHE_KEY, Value: data, Expiration: LICENSES_CACHE_RETENTION_SECONDS}); err != nil {
-		return fmt.Errorf("Failed to cache licenses.")
+		return errorsutil.Wrap(err, err.Error())
 	}
 	return nil
 }
@@ -31,12 +31,12 @@ func (licenses *Licenses) Save(client *memcache.Client) error {
 func GetLicenses(client *memcache.Client) (*Licenses, error) {
 	item, err := client.Get(LICENSES_CACHE_KEY)
 	if err != nil {
-		return nil, err
+		return nil, errorsutil.Wrap(err, err.Error())
 	}
 
 	licenses := new(Licenses)
 	if err := json.Unmarshal(item.Value, &licenses); err != nil {
-		return nil, err
+		return nil, errorsutil.Wrap(err, err.Error())
 	}
 
 	return licenses, nil

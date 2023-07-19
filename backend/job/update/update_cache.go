@@ -1,8 +1,10 @@
 package update
 
 import (
-	"fmt"
 	"opeco17/saguru/lib/mongodb"
+	"sync"
+
+	errorsutil "opeco17/saguru/lib/errors"
 
 	"github.com/bradfitz/gomemcache/memcache"
 	"github.com/sirupsen/logrus"
@@ -17,18 +19,35 @@ type AggregationResult struct {
 func UpdateCaches(mongoDBClient *mongo.Client, memcachedClient *memcache.Client) error {
 	logrus.Info("Start updating caches")
 
-	if err := cacheLanguages(mongoDBClient, memcachedClient); err != nil {
-		logrus.Error("Failed to cache languages")
-		return err
-	}
-	if err := cacheLicenses(mongoDBClient, memcachedClient); err != nil {
-		logrus.Error("Failed to cache licenses")
-		return err
-	}
-	if err := cacheLabels(mongoDBClient, memcachedClient); err != nil {
-		logrus.Error("Failed to cache labels")
-		return err
-	}
+	var wg sync.WaitGroup
+
+	wg.Add(3)
+
+	go func() {
+		defer wg.Done()
+		if err := cacheLanguages(mongoDBClient, memcachedClient); err != nil {
+			logrus.Error("Failed to cache languages")
+			logrus.Errorf("%#v", err)
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+		if err := cacheLicenses(mongoDBClient, memcachedClient); err != nil {
+			logrus.Error("Failed to cache licenses")
+			logrus.Errorf("%#v", err)
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+		if err := cacheLabels(mongoDBClient, memcachedClient); err != nil {
+			logrus.Error("Failed to cache labels")
+			logrus.Errorf("%#v", err)
+		}
+	}()
+
+	wg.Wait()
 
 	logrus.Info("Finished updating caches")
 
@@ -41,16 +60,13 @@ func cacheLanguages(mongoDBClient *mongo.Client, memcachedClient *memcache.Clien
 	// Get languages
 	languages, err := mongodb.AggregateLanguages(mongoDBClient)
 	if err != nil {
-		message := "Failed to aggregate languages"
-		logrus.Error(message)
-		return fmt.Errorf(message)
+		return errorsutil.Wrap(err, "Failed to get languages from MongoDB")
 	}
 
 	// Cache languages
 	memcachedLanguages := languages.ConvertToMemcachedLanguages()
 	if err := memcachedLanguages.Save(memcachedClient); err != nil {
-		logrus.Error(err)
-		return err
+		return errorsutil.Wrap(err, "Failed to cache languages to Memcached")
 	}
 
 	logrus.Info("Successfully finished to cache languages.")
@@ -63,16 +79,13 @@ func cacheLicenses(mongoDBClient *mongo.Client, memcachedClient *memcache.Client
 	// Get licenses
 	licenses, err := mongodb.AggregateLicenses(mongoDBClient)
 	if err != nil {
-		message := "Failed to aggregate licenses"
-		logrus.Error(message)
-		return fmt.Errorf(message)
+		return errorsutil.Wrap(err, "Failed to get licenses from MongoDB")
 	}
 
 	// Cache licenses
 	memcachedLicenses := licenses.ConvertToMemcachedLicenses()
 	if err := memcachedLicenses.Save(memcachedClient); err != nil {
-		logrus.Error(err)
-		return err
+		return errorsutil.Wrap(err, "Failed to cache licenses to Memcached")
 	}
 
 	logrus.Info("Successfully finished to cache licenses.")
@@ -85,16 +98,13 @@ func cacheLabels(mongoDBClient *mongo.Client, memcachedClient *memcache.Client) 
 	// Get labels
 	labels, err := mongodb.AggregateLabels(mongoDBClient)
 	if err != nil {
-		message := "Failed to aggregate labels"
-		logrus.Error(message)
-		return fmt.Errorf(message)
+		return errorsutil.Wrap(err, "Failed to get labels from MongoDB")
 	}
 
 	// Cache labels
 	memcachedLabels := labels.ConvertToMemcachedLabels()
 	if err := memcachedLabels.Save(memcachedClient); err != nil {
-		logrus.Error(err)
-		return err
+		return errorsutil.Wrap(err, "Failed to cache labels to Memcached")
 	}
 
 	logrus.Info("Successfully finished to cache labels")

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"opeco17/saguru/job/constant"
 	"opeco17/saguru/job/util"
+	errorsutil "opeco17/saguru/lib/errors"
 	"opeco17/saguru/lib/mongodb"
 	"strings"
 	"sync"
@@ -31,16 +32,18 @@ func UpdateRepositories(client *mongo.Client) error {
 		for _, repo := range fetchGitHubRepositoriesFromGitHubInParallel(queryOpt) {
 			mongoDBRepo := gitHubRepositoryToMongoDBRepository(repo)
 			if err := setExistingIssuesToMongoDBRepository(mongoDBRepo, client); err != nil {
-				logrus.Warn(fmt.Sprintf("Failed to set existing issues to *mongodb.repository: %s", err.Error()))
+				logrus.Warnf("Failed to set existing issues to *mongodb.repository: %s", err.Error())
+				logrus.Warnf("%#v", err)
 				continue
 			}
 			if err := updateMongoDBRepository(mongoDBRepo, client); err != nil {
-				logrus.Warn(fmt.Sprintf("Failed to upert repository in MongoDB: %s", err.Error()))
+				logrus.Warnf("Failed to upert repository in MongoDB: %s", err.Error())
+				logrus.Warnf("%#v", err)
 				continue
 			}
 		}
 		if waitingTime := constant.REPOSITORIES_API_INTERVAL - time.Since(now); waitingTime > 0 {
-			logrus.Info(fmt.Sprintf("Wait for %v by next fetch", waitingTime))
+			logrus.Infof("Wait for %v by next fetch", waitingTime)
 			time.Sleep(waitingTime)
 		}
 	}
@@ -118,12 +121,9 @@ func fetchGitHubRepositoriesFromGitHubInParallel(queryOpt queryOption) []*github
 				},
 			}
 			searchResult, resp, err := client.Search.Repositories(ctx, queryOpt.render(), searchOpt)
-			if err != nil {
-				logrus.Error(err)
-				return
-			}
-			if resp.StatusCode >= 400 {
-				logrus.Error(fmt.Sprintf("Bad response status code %d\n%v", resp.StatusCode, searchResult))
+			if err != nil || resp.StatusCode >= 400 {
+				logrus.Warn("Failed to get repositories from GitHub")
+				logrus.Warnf("%#v", err)
 				return
 			}
 			once.Do(func() {
@@ -131,7 +131,7 @@ func fetchGitHubRepositoriesFromGitHubInParallel(queryOpt queryOption) []*github
 				if *searchResult.Total < constant.REPOSITORIES_API_MAX_RESULTS {
 					targetRepoCount = *searchResult.Total
 				}
-				logrus.Info(fmt.Sprintf("%d/%d will be fetched", targetRepoCount, *searchResult.Total))
+				logrus.Infof("%d/%d will be fetched", targetRepoCount, *searchResult.Total)
 			})
 			for _, repo := range searchResult.Repositories {
 				reposCh <- repo
@@ -155,7 +155,7 @@ func setExistingIssuesToMongoDBRepository(repo *mongodb.Repository, client *mong
 		if err == bson.ErrNilRegistry || err == mongo.ErrNoDocuments {
 			return nil
 		}
-		return err
+		return errorsutil.Wrap(err, err.Error())
 	}
 	if existingRepo.RepositoryID != 0 {
 		repo.Issues = existingRepo.Issues
@@ -169,7 +169,7 @@ func updateMongoDBRepository(repo *mongodb.Repository, client *mongo.Client) err
 	filter := bson.M{"repository_id": repo.RepositoryID}
 	update := bson.M{"$set": repo}
 	if _, err := repoCollection.UpdateOne(context.Background(), filter, update, options.Update().SetUpsert(true)); err != nil {
-		return err
+		return errorsutil.Wrap(err, err.Error())
 	}
 	return nil
 }
