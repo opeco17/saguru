@@ -47,6 +47,7 @@ var updateCmd = &cobra.Command{
 		}
 		defer memcachedClient.Close()
 
+		logrus.Info("Start initializing database")
 		mongodb.InitMongoDB(mongoDBClient)
 		logrus.Info("Finished to initialize database")
 
