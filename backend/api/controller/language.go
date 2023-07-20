@@ -7,6 +7,7 @@ import (
 	"opeco17/saguru/api/model"
 	"opeco17/saguru/api/service"
 	"opeco17/saguru/api/util"
+	errorsutil "opeco17/saguru/lib/errors"
 	"opeco17/saguru/lib/memcached"
 	"sort"
 	"time"
@@ -24,7 +25,8 @@ func GetLanguages(c echo.Context) error {
 	connectedToMemcached := true
 	memcachedClient, err := util.GetMemcachedClient()
 	if err != nil {
-		logrus.Warn("Failed to connect to Memcached.")
+		logrus.Warn("Failed to connect to Memcached")
+		logrus.Warnf("%#v", err)
 		connectedToMemcached = false
 	}
 
@@ -41,13 +43,15 @@ func GetLanguages(c echo.Context) error {
 	if !(connectedToMemcached && hitCache) {
 		mongoDBClient, err := util.GetMongoDBClient()
 		if err != nil {
-			logrus.Error("Failed to connect to MongoDB.")
+			logrus.Error("Failed to connect to MongoDB")
+			logrus.Errorf("%#v", err)
 			return c.String(http.StatusServiceUnavailable, "Failed to get languages")
 		}
 
 		languages, err = service.GetLanguagesFromMongoDB(mongoDBClient)
 		if err != nil {
-			logrus.Error("Failed to get languages from MongoDB.")
+			logrus.Error("Failed to get labels from MongoDB")
+			logrus.Errorf("%#v", err)
 			return c.String(http.StatusServiceUnavailable, "Failed to get languages")
 		}
 	}
@@ -57,7 +61,11 @@ func GetLanguages(c echo.Context) error {
 	}
 
 	output := convertGetLanguagesOutput(languages)
-	return c.JSON(http.StatusOK, output)
+	if err := c.JSON(http.StatusOK, output); err != nil {
+		logrus.Errorf("%#v", errorsutil.Wrap(err, err.Error()))
+		return c.String(http.StatusServiceUnavailable, "Something wrong happend")
+	}
+	return nil
 }
 
 func convertGetLanguagesOutput(languages *memcached.Languages) model.GetLanguagesOutput {

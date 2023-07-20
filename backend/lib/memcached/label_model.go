@@ -2,7 +2,8 @@ package memcached
 
 import (
 	"encoding/json"
-	"fmt"
+
+	errorsutil "opeco17/saguru/lib/errors"
 
 	"github.com/bradfitz/gomemcache/memcache"
 )
@@ -19,11 +20,11 @@ type Labels struct {
 func (labels *Labels) Save(client *memcache.Client) error {
 	data, err := json.Marshal(labels)
 	if err != nil {
-		return fmt.Errorf("Failed to serialize labels.")
+		return errorsutil.Wrap(err, err.Error())
 	}
 
 	if err := client.Set(&memcache.Item{Key: LABELS_CACHE_KEY, Value: data, Expiration: LABELS_CACHE_RETENTION_SECONDS}); err != nil {
-		return fmt.Errorf("Failed to cache labels.")
+		return errorsutil.Wrap(err, err.Error())
 	}
 	return nil
 }
@@ -31,12 +32,12 @@ func (labels *Labels) Save(client *memcache.Client) error {
 func GetLabels(client *memcache.Client) (*Labels, error) {
 	item, err := client.Get(LABELS_CACHE_KEY)
 	if err != nil {
-		return nil, err
+		return nil, errorsutil.Wrap(err, err.Error())
 	}
 
 	labels := new(Labels)
 	if err := json.Unmarshal(item.Value, &labels); err != nil {
-		return nil, err
+		return nil, errorsutil.Wrap(err, err.Error())
 	}
 
 	return labels, nil

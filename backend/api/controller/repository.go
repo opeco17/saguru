@@ -9,6 +9,7 @@ import (
 	"opeco17/saguru/api/model"
 	"opeco17/saguru/api/service"
 	"opeco17/saguru/api/util"
+	errorsutil "opeco17/saguru/lib/errors"
 	"opeco17/saguru/lib/mongodb"
 	"time"
 
@@ -26,16 +27,21 @@ func GetRepositories(c echo.Context) error {
 	input := new(model.GetRepositoriesInput)
 	logrus.Info(fmt.Sprintf("Input %+v", input))
 	if err := c.Bind(input); err != nil {
+		logrus.Error("Invalid request is received")
+		logrus.Errorf("%#v", errorsutil.Wrap(err, err.Error()))
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	if err := input.Validate(); err != nil {
+		logrus.Error("Invalid request is received")
+		logrus.Errorf("%#v", errorsutil.Wrap(err, err.Error()))
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	// Connect to MongoDB
 	client, err := util.GetMongoDBClient()
 	if err != nil {
-		logrus.Error("Failed to connect to MongoDB.")
+		logrus.Error("Failed to connect to MongoDB")
+		logrus.Errorf("%#v", errorsutil.Wrap(err, err.Error()))
 		return c.String(http.StatusServiceUnavailable, "Failed to get repositories")
 	}
 	defer client.Disconnect(context.TODO())
@@ -44,6 +50,7 @@ func GetRepositories(c echo.Context) error {
 	repositories, err := service.GetRepositoriesFromMongoDB(client, input)
 	if err != nil {
 		logrus.Error("Failed to get repositories from MongoDB")
+		logrus.Errorf("%#v", errorsutil.Wrap(err, err.Error()))
 		return c.String(http.StatusServiceUnavailable, "Failed to get repositories.")
 	}
 	repositories = service.FilterIssuesInRepositories(repositories, input)

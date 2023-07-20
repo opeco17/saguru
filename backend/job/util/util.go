@@ -2,16 +2,15 @@ package util
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"strconv"
 
+	errorsutil "opeco17/saguru/lib/errors"
 	"opeco17/saguru/lib/memcached"
 	"opeco17/saguru/lib/mongodb"
 
 	"github.com/bradfitz/gomemcache/memcache"
 	"github.com/google/go-github/v41/github"
-	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/oauth2"
 )
@@ -22,15 +21,12 @@ func GetMongoDBClient() (*mongo.Client, error) {
 	host := os.Getenv("MONGODB_HOST")
 	port, err := strconv.Atoi(os.Getenv("MONGODB_PORT"))
 	if err != nil {
-		logrus.Error("MONGODB_PORT should be integer")
-		return nil, err
+		return nil, errorsutil.Wrap(err, err.Error())
 	}
 
 	client, err := mongodb.GetMongoDBClient(user, password, host, port)
 	if err != nil {
-		message := "Failed to connect to MongoDB"
-		logrus.Error(message)
-		return nil, fmt.Errorf(message)
+		return nil, errorsutil.Wrap(err, "Failed to connect to MongoDB")
 	}
 	return client, nil
 }
@@ -39,14 +35,12 @@ func GetMemcachedClient() (*memcache.Client, error) {
 	host := os.Getenv("MEMCACHED_HOST")
 	port, err := strconv.Atoi(os.Getenv("MEMCACHED_PORT"))
 	if err != nil {
-		logrus.Error("MEMCACHED_PORT should be integer")
-		return nil, err
+		return nil, errorsutil.Wrap(err, err.Error())
 	}
 
 	client, err := memcached.GetMemcachedClient(host, port)
 	if err != nil {
-		logrus.Error(err)
-		return nil, err
+		return nil, errorsutil.Wrap(err, "Failed to connect to Memcached")
 	}
 	return client, nil
 }
