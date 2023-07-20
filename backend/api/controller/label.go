@@ -26,7 +26,8 @@ func GetLabels(c echo.Context) error {
 	connectedToMemcached := true
 	memcachedClient, err := util.GetMemcachedClient()
 	if err != nil {
-		logrus.Warnf("Failed to connect to Memcached: %s", err.Error())
+		logrus.Warn("Failed to connect to Memcached")
+		logrus.Warnf("%#v", err)
 		connectedToMemcached = false
 	}
 
@@ -44,14 +45,14 @@ func GetLabels(c echo.Context) error {
 		mongoDBClient, err := util.GetMongoDBClient()
 		if err != nil {
 			logrus.Error("Failed to connect to MongoDB")
-			logrus.Errorf("%#v", errorsutil.CustomError{Message: err.Error()})
+			logrus.Errorf("%#v", err)
 			return c.String(http.StatusServiceUnavailable, "Failed to get labels")
 		}
 
 		labels, err = service.GetLabelsFromMongoDB(mongoDBClient)
 		if err != nil {
 			logrus.Error("Failed to get labels from MongoDB")
-			logrus.Errorf("%#v", errorsutil.CustomError{Message: err.Error()})
+			logrus.Errorf("%#v", err)
 			return c.String(http.StatusServiceUnavailable, "Failed to get labels")
 		}
 	}

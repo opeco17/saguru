@@ -6,6 +6,8 @@ import (
 	"opeco17/saguru/lib/mongodb"
 	"time"
 
+	errorsutil "opeco17/saguru/lib/errors"
+
 	"github.com/bradfitz/gomemcache/memcache"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -16,7 +18,7 @@ func GetLabelsFromMemcached(client *memcache.Client) (*memcached.Labels, error) 
 
 	labels, err := memcached.GetLabels(client)
 	if err != nil {
-		return nil, err
+		return nil, errorsutil.Wrap(err, "Failed to get labels from Memcached")
 	}
 	return labels, nil
 }
@@ -27,7 +29,7 @@ func GetLabelsFromMongoDB(client *mongo.Client) (*memcached.Labels, error) {
 
 	labels, err := mongodb.AggregateLabels(client)
 	if err != nil {
-		return nil, err
+		return nil, errorsutil.Wrap(err, "Failed to get labels from MongoDB")
 	}
 	return labels.ConvertToMemcachedLabels(), nil
 }

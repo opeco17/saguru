@@ -22,5 +22,8 @@ func GetOrderMetrics(c echo.Context) error {
 		metrics = append(metrics, metric+"_DESC", metric+"_ASC")
 	}
 	getOrderMetricsOutput := model.GetOrderMetricsOutput{Items: metrics}
-	return c.JSON(http.StatusOK, getOrderMetricsOutput)
+	if err := c.JSON(http.StatusOK, getOrderMetricsOutput); err != nil {
+		return c.String(http.StatusServiceUnavailable, "Something wrong happend")
+	}
+	return nil
 }

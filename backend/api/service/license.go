@@ -2,6 +2,7 @@ package service
 
 import (
 	"opeco17/saguru/api/metrics"
+	errorsutil "opeco17/saguru/lib/errors"
 	"opeco17/saguru/lib/memcached"
 	"opeco17/saguru/lib/mongodb"
 	"time"
@@ -16,7 +17,7 @@ func GetLicensesFromMemcached(client *memcache.Client) (*memcached.Licenses, err
 
 	licenses, err := memcached.GetLicenses(client)
 	if err != nil {
-		return nil, err
+		return nil, errorsutil.Wrap(err, "Failed to get licenses from Memcached")
 	}
 	return licenses, nil
 }
@@ -27,7 +28,7 @@ func GetLicensesFromMongoDB(client *mongo.Client) (*memcached.Licenses, error) {
 
 	licenses, err := mongodb.AggregateLicenses(client)
 	if err != nil {
-		return nil, err
+		return nil, errorsutil.Wrap(err, "Failed to get licenses from MongoDB")
 	}
 	return licenses.ConvertToMemcachedLicenses(), nil
 }
