@@ -4,7 +4,8 @@ import (
 	"context"
 	"opeco17/saguru/lib/memcached"
 
-	"github.com/sirupsen/logrus"
+	errorsutil "opeco17/saguru/lib/errors"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -72,17 +73,15 @@ func AggregateLanguages(client *mongo.Client) (*AggregatedLanguages, error) {
 	sortStage := bson.D{{Key: "$sort", Value: bson.M{"count": -1}}}
 	cursor, err := repositoryCollection.Aggregate(context.TODO(), mongo.Pipeline{groupStage, sortStage})
 	if err != nil {
-		logrus.Error(err)
-		return nil, err
+		return nil, errorsutil.Wrap(err, err.Error())
 	}
-	defer cursor.Close(context.TODO())
+	defer cursor.Close(context.Background())
 
 	languages := new(AggregatedLanguages)
 	var result aggregationResult
-	for cursor.Next(context.TODO()) {
+	for cursor.Next(context.Background()) {
 		if err := cursor.Decode(&result); err != nil {
-			logrus.Error(err)
-			return nil, err
+			return nil, errorsutil.Wrap(err, err.Error())
 		}
 		languages.Items = append(languages.Items, AggregatedLanguage{Name: result.ID, Count: result.Count})
 	}
@@ -96,17 +95,15 @@ func AggregateLicenses(client *mongo.Client) (*AggregatedLicenses, error) {
 	sortStage := bson.D{{Key: "$sort", Value: bson.M{"count": -1}}}
 	cursor, err := repositoryCollection.Aggregate(context.TODO(), mongo.Pipeline{groupStage, sortStage})
 	if err != nil {
-		logrus.Error(err)
-		return nil, err
+		return nil, errorsutil.Wrap(err, err.Error())
 	}
-	defer cursor.Close(context.TODO())
+	defer cursor.Close(context.Background())
 
 	licenses := new(AggregatedLicenses)
 	var result aggregationResult
-	for cursor.Next(context.TODO()) {
+	for cursor.Next(context.Background()) {
 		if err := cursor.Decode(&result); err != nil {
-			logrus.Error(err)
-			return nil, err
+			return nil, errorsutil.Wrap(err, err.Error())
 		}
 		licenses.Items = append(licenses.Items, AggregatedLicense{Name: result.ID, Count: result.Count})
 	}
@@ -120,19 +117,17 @@ func AggregateLabels(client *mongo.Client) (*AggregatedLabels, error) {
 	unwindStage2 := bson.D{{Key: "$unwind", Value: "$issues.labels"}}
 	groupStage := bson.D{{Key: "$group", Value: bson.M{"_id": "$issues.labels.name", "count": bson.M{"$sum": 1}}}}
 	sortStage := bson.D{{Key: "$sort", Value: bson.M{"count": -1}}}
-	cursor, err := repositoryCollection.Aggregate(context.TODO(), mongo.Pipeline{unwindStage1, unwindStage2, groupStage, sortStage})
+	cursor, err := repositoryCollection.Aggregate(context.Background(), mongo.Pipeline{unwindStage1, unwindStage2, groupStage, sortStage})
 	if err != nil {
-		logrus.Error(err)
-		return nil, err
+		return nil, errorsutil.Wrap(err, err.Error())
 	}
-	defer cursor.Close(context.TODO())
+	defer cursor.Close(context.Background())
 
 	labels := new(AggregatedLabels)
 	var result aggregationResult
-	for cursor.Next(context.TODO()) {
+	for cursor.Next(context.Background()) {
 		if err := cursor.Decode(&result); err != nil {
-			logrus.Error(err)
-			return nil, err
+			return nil, errorsutil.Wrap(err, err.Error())
 		}
 		labels.Items = append(labels.Items, AggregatedLabel{Name: result.ID, Count: result.Count})
 	}

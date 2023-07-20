@@ -2,6 +2,7 @@ package service
 
 import (
 	"opeco17/saguru/api/metrics"
+	errorsutil "opeco17/saguru/lib/errors"
 	"opeco17/saguru/lib/memcached"
 	"opeco17/saguru/lib/mongodb"
 	"time"
@@ -16,7 +17,7 @@ func GetLanguagesFromMemcached(client *memcache.Client) (*memcached.Languages, e
 
 	languages, err := memcached.GetLanguages(client)
 	if err != nil {
-		return nil, err
+		return nil, errorsutil.Wrap(err, "Failed to get languages from Memcached")
 	}
 	return languages, nil
 }
@@ -27,7 +28,7 @@ func GetLanguagesFromMongoDB(client *mongo.Client) (*memcached.Languages, error)
 
 	languages, err := mongodb.AggregateLanguages(client)
 	if err != nil {
-		return nil, err
+		return nil, errorsutil.Wrap(err, "Failed to get languages from MongoDB")
 	}
 	return languages.ConvertToMemcachedLanguages(), nil
 }

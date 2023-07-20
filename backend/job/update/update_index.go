@@ -1,10 +1,11 @@
-package action
+package update
 
 import (
 	"context"
-	"opeco17/saguru/job/util"
 	"opeco17/saguru/lib/mongodb"
 	"time"
+
+	errorsutil "opeco17/saguru/lib/errors"
 
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
@@ -12,14 +13,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func CreateIndex() error {
-	logrus.Info("Start creating index.")
-
-	client, err := util.GetMongoDBClient()
-	if err != nil {
-		return err
-	}
-	defer client.Disconnect(context.TODO())
+func UpdateIndices(client *mongo.Client) error {
+	logrus.Info("Start updating indices")
 
 	collection := client.Database(mongodb.DATABASE_NAME).Collection(mongodb.REPOSITORY_COLLECTION_NAME)
 	indexes := []mongo.IndexModel{
@@ -34,12 +29,10 @@ func CreateIndex() error {
 		},
 	}
 	opts := options.CreateIndexes().SetMaxTime(100 * time.Second)
-	_, err = collection.Indexes().CreateMany(context.TODO(), indexes, opts)
-	if err != nil {
-		logrus.Error(err)
-		return err
+	if _, err := collection.Indexes().CreateMany(context.Background(), indexes, opts); err != nil {
+		return errorsutil.Wrap(err, err.Error())
 	}
 
-	logrus.Info("Finished to create DB.")
+	logrus.Info("Finished updating indices.")
 	return nil
 }

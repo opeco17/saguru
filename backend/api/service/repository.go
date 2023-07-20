@@ -6,6 +6,7 @@ import (
 	"opeco17/saguru/api/constant"
 	"opeco17/saguru/api/metrics"
 	"opeco17/saguru/api/model"
+	errorsutil "opeco17/saguru/lib/errors"
 	"opeco17/saguru/lib/mongodb"
 	"strings"
 	"time"
@@ -90,15 +91,13 @@ func GetRepositoriesFromMongoDB(client *mongo.Client, input *model.GetRepositori
 	}
 	opts := options.Find().SetLimit(int64(constant.RESULTS_PER_PAGE + 1)).SetSkip(int64(constant.RESULTS_PER_PAGE * input.Page)).SetSort(bson.M{metric: direction})
 
-	cursor, err := repositoryCollection.Find(context.TODO(), filter, opts)
+	cursor, err := repositoryCollection.Find(context.Background(), filter, opts)
 	if err != nil {
-		logrus.Error(err)
-		return nil, err
+		return nil, errorsutil.Wrap(err, "Failed to get repositories from MongoDB")
 	}
 	var repositories []mongodb.Repository
-	if err = cursor.All(context.TODO(), &repositories); err != nil {
-		logrus.Error(err)
-		return nil, err
+	if err = cursor.All(context.Background(), &repositories); err != nil {
+		return nil, errorsutil.Wrap(err, "Failed to get repositories from MongoDB")
 	}
 	return repositories, nil
 }

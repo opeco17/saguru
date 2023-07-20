@@ -24,7 +24,8 @@ func GetLicenses(c echo.Context) error {
 	connectedToMemcached := true
 	memcachedClient, err := util.GetMemcachedClient()
 	if err != nil {
-		logrus.Warn("Failed to connect to Memcached.")
+		logrus.Warn("Failed to connect to Memcached")
+		logrus.Warnf("%#v", err)
 		connectedToMemcached = false
 	}
 
@@ -41,13 +42,15 @@ func GetLicenses(c echo.Context) error {
 	if !(connectedToMemcached && hitCache) {
 		mongoDBClient, err := util.GetMongoDBClient()
 		if err != nil {
-			logrus.Error("Failed to connect to MongoDB.")
+			logrus.Error("Failed to connect to MongoDB")
+			logrus.Errorf("%#v", err)
 			return c.String(http.StatusServiceUnavailable, "Failed to get licenses")
 		}
 
 		licenses, err = service.GetLicensesFromMongoDB(mongoDBClient)
 		if err != nil {
-			logrus.Error("Failed to get licenses from MongoDB.")
+			logrus.Error("Failed to get labels from MongoDB")
+			logrus.Errorf("%#v", err)
 			return c.String(http.StatusServiceUnavailable, "Failed to get licenses")
 		}
 	}
@@ -57,7 +60,10 @@ func GetLicenses(c echo.Context) error {
 	}
 
 	output := convertGetLicensesOutput(licenses)
-	return c.JSON(http.StatusOK, output)
+	if err := c.JSON(http.StatusOK, output); err != nil {
+		return c.String(http.StatusServiceUnavailable, "Something wrong happend")
+	}
+	return nil
 }
 
 func convertGetLicensesOutput(licenses *memcached.Licenses) model.GetLicensesOutput {
