@@ -57,7 +57,10 @@ func GetLanguages(c echo.Context) error {
 	}
 
 	if connectedToMemcached && !hitCache {
-		languages.Save(memcachedClient)
+		if err := languages.Save(memcachedClient); err != nil {
+			logrus.Warn("Failed to save languages into Memcached")
+			logrus.Warnf("%#v", err)
+		}
 	}
 
 	output := convertGetLanguagesOutput(languages)

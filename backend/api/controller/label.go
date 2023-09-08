@@ -58,7 +58,10 @@ func GetLabels(c echo.Context) error {
 	}
 
 	if connectedToMemcached && !hitCache {
-		labels.Save(memcachedClient)
+		if err := labels.Save(memcachedClient); err != nil {
+			logrus.Warn("Failed to save labels into Memcached")
+			logrus.Warnf("%#v", err)
+		}
 	}
 
 	output := convertGetLabelsOutput(labels)

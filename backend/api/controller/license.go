@@ -56,7 +56,10 @@ func GetLicenses(c echo.Context) error {
 	}
 
 	if connectedToMemcached && !hitCache {
-		licenses.Save(memcachedClient)
+		if err := licenses.Save(memcachedClient); err != nil {
+			logrus.Warn("Failed to save licenses into Memcached")
+			logrus.Warnf("%#v", err)
+		}
 	}
 
 	output := convertGetLicensesOutput(licenses)

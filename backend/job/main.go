@@ -58,7 +58,7 @@ var updateCmd = &cobra.Command{
 		}
 		if options.Issue {
 			if err := update.UpdateIssues(mongoDBClient); err != nil {
-				logrus.Warn("Failed to update issues: %s", err.Error())
+				logrus.Warnf("Failed to update issues: %s", err.Error())
 			}
 		}
 		if options.Cache {
